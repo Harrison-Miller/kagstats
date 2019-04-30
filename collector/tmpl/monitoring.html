@@ -1,0 +1,93 @@
+<html>
+<head>
+<title>Kag Stats Collector Monitoring</title>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+<style>
+	.top-buffer {
+		margin-top: 32px;
+	}
+</style>
+</head>
+<body onload="setTimeout('location.reload(true);', 5000)">
+<nav class="navbar navbar-dark bg-primary">
+	<p class="navbar-brand" href="#">{{ .Config.Name }}</a>
+</nav>
+<div class="container">
+<div class="row top-buffer">
+	<div class="col-lg">
+		<div class="card text-left">
+			<div class="card-header">
+				Servers ({{ .Config.Servers | len }})
+			</div>
+			<div class="card-body">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>Tags</th>
+							<th>Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{ range .Config.Servers }}
+						<tr>
+							<td> {{ .Name }} </td>
+							<td> {{ range .Tags }} {{.}}, {{ end }} </td>
+							<td> {{ if .Connected }} <span class="badge badge-success">Connected</span> {{ else }} <span class="badge badge-danger">Disconnected</span> {{ end }}</td>
+						</tr>
+						{{ end}}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row top-buffer">
+	<div class="col-md">
+		<div class="card text-center">
+			<div class="card-header">
+				General
+			</div>
+			<div class="card-body">
+				Uptime: {{ .Uptime }}
+			</div>
+		</div>
+	</div>
+	<div class="col-md">
+		<div class="card text-center">
+			<div class="card-header">
+				Configuration
+			</div>
+			<div class="card-body">
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th>Variable</th>
+							<th>Value</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Server Timeout</td>
+							<td>{{ .Config.Timeout }}</td>
+						</tr>
+						<tr>
+							<td>Server Max Reconnect Attempts</td>
+							<td>{{ .Config.MaxAttempts }}</td>
+						</tr>
+						<tr>
+							<td>Bulk Load Limit</td>
+							<td>{{ .Config.BulkLoadMax }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+</body>
+</html>
