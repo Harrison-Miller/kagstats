@@ -5,13 +5,18 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.0.min.js"></script>
 <style>
 	.top-buffer {
 		margin-top: 32px;
 	}
+	.bottom-buffer {
+		margin-bottom: 32px;
+	}
 </style>
 </head>
-<body onload="setTimeout('location.reload(true);', 5000)">
+<body>
+<body>
 <nav class="navbar navbar-dark bg-primary">
 	<p class="navbar-brand" href="#">{{ .Config.Name }}</a>
 </nav>
@@ -29,14 +34,19 @@
 							<th>Name</th>
 							<th>Tags</th>
 							<th>Status</th>
+							<th>API Status</th>
 						</tr>
 					</thead>
 					<tbody>
 						{{ range .Config.Servers }}
 						<tr>
 							<td> {{ .Name }} </td>
-							<td> {{ range .Tags }} {{.}}, {{ end }} </td>
+							<td> {{ range .Tags }} <span class="badge badge-pill badge-secondary">{{.}}</span> {{ end }} </td>
 							<td> {{ if .Connected }} <span class="badge badge-success">Connected</span> {{ else }} <span class="badge badge-danger">Disconnected</span> {{ end }}</td>
+							<td>
+								<ul class="list-group" id="{{.GetID}}">
+								</ul>
+							</td>
 						</tr>
 						{{ end}}
 					</tbody>
@@ -88,6 +98,36 @@
 		</div>
 	</div>
 </div>
+<div class="row top-buffer bottom-buffer">
+	<div class="col-lg">
+		<div class="card text-center">
+			<div class="card-header">
+				Logs
+			</div>
+			<div class="card-body">
+				<textarea style="resize: none; width: 100%;  height: 100%; font-size: medium;" rows="10" class="form-contol form-control-lg bg-light font-weight-normal text-muted" readonly>{{.RecentLog}}</textarea>
+			</div>
+		</div>
+	</div>
+</div>
 </div>
 </body>
+<script type="text/javascript">
+window.onload = function() {
+	{{ range .Config.Servers }}
+	getStatus("#{{.GetID}}", "{{.Address}}", "{{.Port}}");
+	{{ end }}
+
+	setTimeout(function(){ window.location.reload(1);}, {{ .Config.RefreshRate }});
+}
+
+function getStatus(element, address, port) {
+	base_url = "https://api.kag2d.com/server/ip/" + address + "/port/" + port;
+	$.getJSON(base_url + "/status", function(data){
+		$(element).append('<li class="list-group-item">Last Update: ' + data.serverStatus.lastUpdate + '</li>');
+		$(element).append('<li class="list-group-item">Players: ' + data.serverStatus.currentPlayers + '/' + data.serverStatus.maxPlayers + '</li>');
+		$(element).append('<li class="list-group-item"><img src="' + base_url + '/minimap"></img></li>');
+	});
+}
+</script>
 </html>

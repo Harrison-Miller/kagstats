@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
+	"os"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -34,20 +36,33 @@ type ServerConfig struct {
 	Name          string   `json:"name"`
 	Tags          []string `json:"tags"`
 	Address       string   `json:"address"`
+	Port          int      `json:"port"`
 	Password      string   `json:"password"`
 	Connected     bool
 	ConnectedTime time.Time
 }
 
+func (sc *ServerConfig) GetID() string {
+	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
+	if err != nil {
+		log.Println(err)
+		return sc.Name
+	}
+	id := reg.ReplaceAllString(sc.Name, "")
+	return id
+}
+
 type Config struct {
-	Name         string         `json:"name"`
-	Timeout      string         `json:"timeout"`
-	MaxAttempts  int            `json:"maxAttempts"`
-	BulkLoadMax  int            `json:"bulkLoadMax"`
-	BulkLoadWait string         `json:"bulkLoadWait"`
-	Database     DatabaseConfig `json:"database"`
-	Servers      []ServerConfig `json:"servers"`
-	Monitoring   bool           `json:monitoring`
+	Name           string         `json:"name"`
+	Timeout        string         `json:"timeout"`
+	MaxAttempts    int            `json:"maxAttempts"`
+	BulkLoadMax    int            `json:"bulkLoadMax"`
+	BulkLoadWait   string         `json:"bulkLoadWait"`
+	Database       DatabaseConfig `json:"database"`
+	Servers        []ServerConfig `json:"servers"`
+	Monitoring     bool           `json:"monitoring"`
+	RefreshRate    int            `json:"refreshRate"`
+	MonitoringPort int            `json:"monitoringPort"`
 }
 
 type KillMessage struct {
@@ -61,6 +76,15 @@ type KillMessage struct {
 	KillerCharacterName string
 	KillerClantag       string
 	KillerClass         string
+}
+
+func CreateDirIfNotExist(dir string) {
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		err = os.MkdirAll(dir, 0755)
+		if err != nil {
+			panic(err)
+		}
+	}
 }
 
 func process(pdb *PlayerDatabase, message string) (KillEntry, error) {
@@ -146,16 +170,18 @@ func Collect(pdb *PlayerDatabase, config *Config, index int, entires chan KillEn
 	sconfig := &config.Servers[index]
 	info, err := pdb.GetOrUpdateServer(sconfig.Name, sconfig.Tags)
 	if err != nil {
-		log.Printf("[%d] %v", err)
+		logOut(sconfig.Name, fmt.Sprintf("%v", err))
 	}
 
-	fmt.Printf("[%d] Connecting to %s...\n", index, sconfig.Address)
-	conn, err := RCONLogin(sconfig.Address, sconfig.Password, timeout, config.MaxAttempts)
+	address := fmt.Sprintf("%s:%d", sconfig.Address, sconfig.Port)
+
+	logOut(sconfig.Name, fmt.Sprintf("Connecting to %s...", address))
+	conn, err := RCONLogin(address, sconfig.Password, timeout, config.MaxAttempts)
 	if err != nil {
-		log.Printf("[%d] %v", index, err)
+		logOut(sconfig.Name, fmt.Sprintf("%v", err))
 		return
 	}
-	fmt.Printf("[%d] Authenticated with %s!\n", index, sconfig.Address)
+	logOut(sconfig.Name, fmt.Sprintf("Authenticated with %s!", address))
 	sconfig.Connected = true
 	sconfig.ConnectedTime = time.Now()
 
@@ -164,14 +190,14 @@ func Collect(pdb *PlayerDatabase, config *Config, index int, entires chan KillEn
 		if err != nil {
 			sconfig.Connected = false
 			sconfig.ConnectedTime = time.Now()
-			fmt.Printf("[%d] Disconnected from %s...\n", index, sconfig.Address)
+			logOut(sconfig.Name, fmt.Sprintf("Disconnected from %s...", address))
 			conn, err = RCONLogin(address, rconPassword, 15*time.Second, 20)
 			if err != nil {
-				fmt.Printf("[%d] Failed to reconnect to %s...\n", index, sconfig.Address)
+				logOut(sconfig.Name, fmt.Sprintf("Failed to reconnect to %s...", address))
 				log.Println(err)
 				return
 			}
-			fmt.Printf("[%d] Reconnected to %s!\n", index, sconfig.Address)
+			logOut(sconfig.Name, fmt.Sprintf("Reconnected to %s!\n", address))
 			sconfig.Connected = true
 		} else if strings.Contains(message, "*STATS") {
 			kill, err := process(pdb, message)
@@ -184,6 +210,16 @@ func Collect(pdb *PlayerDatabase, config *Config, index int, entires chan KillEn
 		}
 	}
 
+}
+
+var logFilePath string
+var logFile *os.File
+
+func logOut(context string, text string) {
+	logMsg := fmt.Sprintf("[%s] [%s] %s\n", time.Now().Format("15:04:05-01-02-2006"), context, text)
+	fmt.Print(logMsg)
+	logFile.WriteString(logMsg)
+	logFile.Sync()
 }
 
 func main() {
@@ -204,16 +240,25 @@ func main() {
 		timeout = defaultTimeout
 	}
 
-	fmt.Printf("Connecting to the database at %s...\n", config.Database.Address)
+	CreateDirIfNotExist("logs")
+	logFilePath = fmt.Sprintf("logs/collector-%s.log", time.Now().Format("15-04-05-01-02-2006"))
+	fmt.Println(logFilePath)
+	logFile, _ = os.Create(logFilePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	logOut("main", fmt.Sprintf("Connecting to the database at %s...", config.Database.Address))
 	pdb, err := CreatePlayerDatabase(config.Database.ConnectionString())
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Connected to the database!")
+	logOut("main", "Connected to the database!")
 	pdb.Init()
 
 	startTime := time.Now()
 	if config.Monitoring {
+		logOut("main", "Starting monitoring webserver...")
 		go startMonitoringServer(&config, &pdb, startTime)
 	}
 
