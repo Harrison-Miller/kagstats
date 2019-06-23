@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Kag Stats Collector Monitoring</title>
+<title>Kag Stats Collector</title>
 
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
@@ -13,12 +13,18 @@
 	.bottom-buffer {
 		margin-bottom: 32px;
 	}
+	.navbar-brand small {
+		display: block;
+		font-size: 10px;
+		white-space: normal;
+		position: absolute;
+	}
 </style>
 </head>
 <body>
 <body>
 <nav class="navbar navbar-dark bg-primary">
-	<p class="navbar-brand" href="#">{{ .Config.Name }}</a>
+	<p class="navbar-brand" href="#">KAG Stats Collector<small>{{.Config.Name}}</a>
 </nav>
 <div class="container">
 <div class="row top-buffer">
@@ -32,7 +38,7 @@
 					<thead>
 						<tr>
 							<th>Name</th>
-							<th>Tags</th>
+							<th>Info</th>
 							<th>Status</th>
 							<th>API Status</th>
 						</tr>
@@ -41,7 +47,12 @@
 						{{ range .Config.Servers }}
 						<tr>
 							<td> {{ .Name }} </td>
-							<td> {{ range .Tags }} <span class="badge badge-pill badge-secondary">{{.}}</span> {{ end }} </td>
+							<td>
+								<ul class="list-group">
+									<li class="list-group-item">Tags:{{ range .Tags }} <span class="badge badge-pill badge-secondary">{{.}}</span> {{ end }}</li>
+									<li class="list-group-item">Address: {{.Address}}:{{.Port}}</li>
+								</ul>
+							</td>
 							<td> {{ if .Connected }} <span class="badge badge-success">Connected</span> {{ else }} <span class="badge badge-danger">Disconnected</span> {{ end }}</td>
 							<td>
 								<ul class="list-group" id="{{.GetID}}">
@@ -62,7 +73,10 @@
 				General
 			</div>
 			<div class="card-body">
-				Uptime: {{ .Uptime }}
+				<ul class="list-group">
+					<li class="list-group-item">Uptime: {{.Uptime}}</li>
+					<li class="list-group-item">Entries Commited: {{ .PDB.Total }}</li>
+				</ul>
 			</div>
 		</div>
 	</div>
@@ -105,7 +119,7 @@
 				Logs
 			</div>
 			<div class="card-body">
-				<textarea style="resize: none; width: 100%;  height: 100%; font-size: medium;" rows="10" class="form-contol form-control-lg bg-light font-weight-normal text-muted" readonly>{{.RecentLog}}</textarea>
+				<textarea id="logs" style="resize: none; width: 100%;  height: 100%; font-size: medium;" rows="10" class="form-contol form-control-lg bg-light font-weight-normal text-muted" readonly>{{.RecentLog}}</textarea>
 			</div>
 		</div>
 	</div>
@@ -113,16 +127,68 @@
 </div>
 </body>
 <script type="text/javascript">
+bottomScroll = 0;
 window.onload = function() {
 	{{ range .Config.Servers }}
 	getStatus("#{{.GetID}}", "{{.Address}}", "{{.Port}}");
 	{{ end }}
 
-	setTimeout(function(){ window.location.reload(1);}, {{ .Config.RefreshRate }});
+	logs = $("#logs");
+	logs.scrollTop(logs[0].scrollHeight);
+	bottomScroll = logs.scrollTop();
+
+
+	setTimeout(function(){
+		if(localStorage) {
+			var scroll = localStorage["scroll"]
+			if(scroll) {
+				document.body.scrollTop = scroll;
+			}
+
+			var logsScroll = localStorage["logsScroll"]
+			if(logsScroll) {
+				logs.scrollTop(logsScroll);
+			}
+		}
+	}, 500);
+
+	setTimeout(reload, {{.Config.RefreshRate}});
+}
+
+function reload() {
+	if(localStorage) {
+		localStorage["scroll"] = getScrollY();
+		logsScroll = getLogsScrollY();
+		if(logsScroll == bottomScroll) {
+			localStorage.removeItem("logsScroll");
+		} else {
+			localStorage["logsScroll"] = logsScroll;
+		}
+	}
+	document.location.reload(true);
+}
+
+function getScrollY() {
+  var scrOfY = 0;
+  if( typeof( window.pageYOffset ) == 'number' ) {
+    //Netscape compliant
+    scrOfY = window.pageYOffset;
+  } else if( document.body && ( document.body.scrollLeft || document.body.scrollTop ) ) {
+    //DOM compliant
+    scrOfY = document.body.scrollTop;
+  } else if( document.documentElement && ( document.documentElement.scrollLeft || document.documentElement.scrollTop ) ) {
+    //IE6 standards compliant mode
+    scrOfY = document.documentElement.scrollTop;
+  }
+  return scrOfY;
+}
+
+function getLogsScrollY() {
+	return $("#logs").scrollTop();
 }
 
 function getStatus(element, address, port) {
-	base_url = "https://api.kag2d.com/server/ip/" + address + "/port/" + port;
+	var base_url = "https://api.kag2d.com/server/ip/" + address + "/port/" + port;
 	$.getJSON(base_url + "/status", function(data){
 		$(element).append('<li class="list-group-item">Last Update: ' + data.serverStatus.lastUpdate + '</li>');
 		$(element).append('<li class="list-group-item">Players: ' + data.serverStatus.currentPlayers + '/' + data.serverStatus.maxPlayers + '</li>');

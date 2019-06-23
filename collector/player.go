@@ -27,6 +27,7 @@ type KillEntry struct {
 	hitter       int64
 	time         int64
 	serverID     int64
+	teamKill     bool
 }
 
 type PlayerInfo struct {
@@ -57,7 +58,7 @@ func CreatePlayerDatabase(connection string) (PlayerDatabase, error) {
 }
 
 func (pdb *PlayerDatabase) Init() {
-	_, err := pdb.db.Exec("CREATE DATABASE IF NOT EXISTS kagstats")
+	_, err := pdb.db.Exec("CREATE DATABASE IF NOT EXISTS kagstats CHARACTER SET UTF8mb4 COLLATE utf8mb4_bin")
 	if err != nil {
 		panic(err)
 	}
@@ -96,6 +97,7 @@ func (pdb *PlayerDatabase) Init() {
 			hitter INT DEFAULT 0,
 			epoch INT NOT NULL,
 			serverID INT NOT NULL,
+			teamKill BOOLEAN DEFAULT false,
 			FOREIGN KEY(killerID) REFERENCES players(ID),
 			FOREIGN KEY(victimID) REFERENCES players(ID),
 			FOREIGN KEY(assistID) REFERENCES players(ID),
@@ -216,10 +218,10 @@ func (pdb *PlayerDatabase) Commit() error {
 
 	//https://stackoverflow.com/questions/21108084/how-to-insert-multiple-data-at-once
 	values := []interface{}{}
-	sqlStr := "INSERT INTO kagstats.kills (killerID, victimID, assistID, killerClass, victimClass, hitter, epoch, serverID) VALUES "
+	sqlStr := "INSERT INTO kagstats.kills (killerID, victimID, assistID, killerClass, victimClass, hitter, epoch, serverID, teamKill) VALUES "
 	for _, v := range pdb.uncommited {
-		sqlStr += "(?,?,?,?,?,?,?,?),"
-		values = append(values, v.killerID, v.victimID, v.assistID, v.killerClasss, v.victimClass, v.hitter, v.time, v.serverID)
+		sqlStr += "(?,?,?,?,?,?,?,?,?),"
+		values = append(values, v.killerID, v.victimID, v.assistID, v.killerClasss, v.victimClass, v.hitter, v.time, v.serverID, v.teamKill)
 	}
 	sqlStr = strings.TrimSuffix(sqlStr, ",")
 

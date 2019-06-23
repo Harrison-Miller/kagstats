@@ -15,7 +15,7 @@ create a file: settings.json
 	"database": {
 		"user": "root",
 		"password": "password",
-		"address": "localhost:3306"
+		"address": "127.0.0.1:3306"
 	},
 	"servers": [
 		{

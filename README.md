@@ -21,10 +21,10 @@ The collector provides the option to launch a monitoring web server.
 That shows basic information about the Collector and all the status of connections
 to game servers.
 
-## Ingestion
+## Indexer
 
 Because we're collecting so much data, fetching stats directly from the database such as k/d per class
-can be costly and slow. As such instead an ingestion service will take the raw data and incrementally
+can be costly and slow. As such instead an indexer service will take the raw data and incrementally
 write out stats such as k/d, nemesis, most played server, etc.
 
 ## Webserver

@@ -36,7 +36,7 @@ func startMonitoringServer(config *Config, pdb *PlayerDatabase, startTime time.T
 		t.Execute(w, data)
 	})
 
-	address := fmt.Sprintf(":%d", config.MonitoringPort)
+	address := fmt.Sprintf("0.0.0.0:%d", config.MonitoringPort)
 	err := http.ListenAndServe(address, nil)
 	if err != nil {
 		log.Println(err)

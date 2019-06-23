@@ -2,7 +2,9 @@ package main
 
 import (
 	"bufio"
+	"crypto/rand"
 	"database/sql"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -13,10 +15,6 @@ import (
 	"strings"
 	"time"
 )
-
-var address = "localhost:50301"
-var rconPassword = "admin1234!"
-var maxUncommited = 3
 
 const defaultTimeout = 15 * time.Second
 
@@ -76,6 +74,7 @@ type KillMessage struct {
 	KillerCharacterName string
 	KillerClantag       string
 	KillerClass         string
+	TeamKill            bool
 }
 
 func CreateDirIfNotExist(dir string) {
@@ -135,27 +134,40 @@ func process(pdb *PlayerDatabase, message string) (KillEntry, error) {
 		msg.Hitter,
 		time.Now().Unix(),
 		0,
+		msg.TeamKill,
 	}
 
 	return kill, nil
 
 }
 
-func RCONLogin(address string, password string, timeout time.Duration, maxAttempts int) (net.Conn, error) {
+func RCONLogin(address string, password string, timeout time.Duration, maxAttempts int, context string) (net.Conn, error) {
 	var conn net.Conn
 	var attempts int
+	var shortCircuit = 1
 
 	for ok := true; ok; {
+		logOut(context, fmt.Sprintf("Attempt %d/%d...", attempts+1, maxAttempts))
 		c, err := net.DialTimeout("tcp", address, timeout)
 		if err != nil {
 			attempts++
 			if attempts >= maxAttempts {
 				return conn, err
 			}
+
+			logOut(context, fmt.Sprintf("%v", err))
+
+			logOut(context, fmt.Sprintf("Waiting %d seconds before next attempt", shortCircuit))
+			time.Sleep(time.Duration(shortCircuit) * time.Second)
+			if shortCircuit < 30 {
+				shortCircuit = shortCircuit * 2
+			}
 		} else {
 			fmt.Fprintf(c, "%s\n", password)
 			_, err = bufio.NewReader(c).ReadString('\n')
 			if err != nil {
+				c.Close()
+				logOut(context, fmt.Sprintf("%v", err))
 				return nil, fmt.Errorf("Wrong password")
 			}
 			conn = c
@@ -176,7 +188,7 @@ func Collect(pdb *PlayerDatabase, config *Config, index int, entires chan KillEn
 	address := fmt.Sprintf("%s:%d", sconfig.Address, sconfig.Port)
 
 	logOut(sconfig.Name, fmt.Sprintf("Connecting to %s...", address))
-	conn, err := RCONLogin(address, sconfig.Password, timeout, config.MaxAttempts)
+	conn, err := RCONLogin(address, sconfig.Password, timeout, config.MaxAttempts, sconfig.Name)
 	if err != nil {
 		logOut(sconfig.Name, fmt.Sprintf("%v", err))
 		return
@@ -185,24 +197,27 @@ func Collect(pdb *PlayerDatabase, config *Config, index int, entires chan KillEn
 	sconfig.Connected = true
 	sconfig.ConnectedTime = time.Now()
 
+	fmt.Fprintf(conn, "CRules@ r = getRules();string myId = '%s';if(!r.exists('stats_lock')) {r.set_s32('stats_lock', getGameTime() + getTicksASecond() * 10);r.set_string('stats_lock_holder', myId);} else {s32 timeleft = r.get_s32('stats_lock') - getGameTime();if(timeleft <= 0) {r.set_s32('stats_lock', getGameTime() + getTicksASecond() * 10);r.set_string('stats_lock_holder', myId);}}\n", collectorID)
+
 	for {
 		message, err := bufio.NewReader(conn).ReadString('\n')
 		if err != nil {
 			sconfig.Connected = false
 			sconfig.ConnectedTime = time.Now()
 			logOut(sconfig.Name, fmt.Sprintf("Disconnected from %s...", address))
-			conn, err = RCONLogin(address, rconPassword, 15*time.Second, 20)
+			conn, err = RCONLogin(address, sconfig.Password, timeout, config.MaxAttempts, sconfig.Name)
 			if err != nil {
 				logOut(sconfig.Name, fmt.Sprintf("Failed to reconnect to %s...", address))
-				log.Println(err)
+				logOut(sconfig.Name, fmt.Sprintf("%v", err))
 				return
 			}
 			logOut(sconfig.Name, fmt.Sprintf("Reconnected to %s!\n", address))
 			sconfig.Connected = true
 		} else if strings.Contains(message, "*STATS") {
 			kill, err := process(pdb, message)
+			logOut(sconfig.Name, message)
 			if err != nil {
-				log.Printf("[%d] %v", index, err)
+				logOut(sconfig.Name, fmt.Sprintf("%v", err))
 			} else {
 				kill.serverID = info.ID
 				entires <- kill
@@ -214,6 +229,7 @@ func Collect(pdb *PlayerDatabase, config *Config, index int, entires chan KillEn
 
 var logFilePath string
 var logFile *os.File
+var collectorID string
 
 func logOut(context string, text string) {
 	logMsg := fmt.Sprintf("[%s] [%s] %s\n", time.Now().Format("15:04:05-01-02-2006"), context, text)
@@ -222,9 +238,22 @@ func logOut(context string, text string) {
 	logFile.Sync()
 }
 
+func randomHex(n int) (string, error) {
+	bytes := make([]byte, n)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(bytes), nil
+}
+
 func main() {
 	// Read in the configuration file
-	file, err := ioutil.ReadFile("settings.json")
+	configPath := "settings.json"
+	if value, ok := os.LookupEnv("KAGSTATS_CONFIG"); ok {
+		configPath = value
+	}
+
+	file, err := ioutil.ReadFile(configPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -243,10 +272,13 @@ func main() {
 	CreateDirIfNotExist("logs")
 	logFilePath = fmt.Sprintf("logs/collector-%s.log", time.Now().Format("15-04-05-01-02-2006"))
 	fmt.Println(logFilePath)
-	logFile, _ = os.Create(logFilePath)
+	logFile, err = os.Create(logFilePath)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	collectorID, _ = randomHex(16)
+	logOut("main", fmt.Sprintf("Collector ID: %s", collectorID))
 
 	logOut("main", fmt.Sprintf("Connecting to the database at %s...", config.Database.Address))
 	pdb, err := CreatePlayerDatabase(config.Database.ConnectionString())
@@ -272,7 +304,8 @@ func main() {
 	// collate a the kill entries from the channel here\
 	for kill := range entries {
 		pdb.uncommited = append(pdb.uncommited, kill)
-		if len(pdb.uncommited) > maxUncommited {
+		if len(pdb.uncommited) >= config.BulkLoadMax {
+			logOut("main", fmt.Sprintf("Commit %d new entries", len(pdb.uncommited)))
 			pdb.Total += len(pdb.uncommited)
 			err = pdb.Commit()
 			if err != nil {
