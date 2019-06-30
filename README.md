@@ -6,6 +6,8 @@ You can find out more about the game on the website: https://kag2d.com/en/
 This is a stats collector for the game, it connects to the game server using the open
 TCP socket and listens for specific events. The events are then logged into a database.
 
+You can view the trello board with road map of items to be done and backlog: https://trello.com/b/WR8dcqD7/kag-stats
+
 ## Stats Mod
 
 The game server runs a mod that captures events and writes formatted information to the TCP connection.
