@@ -4,6 +4,7 @@ import (
 	"log"
 
 	. "github.com/Harrison-Miller/kagstats/indexer"
+	. "github.com/Harrison-Miller/kagstats/models"
 )
 
 type HittersIndexer struct {
@@ -11,6 +12,10 @@ type HittersIndexer struct {
 
 func (i *HittersIndexer) Name() string {
 	return "top_hitters"
+}
+
+func (i *HittersIndexer) Version() int {
+	return 1
 }
 
 func (i *HittersIndexer) Keys() []IndexKey {

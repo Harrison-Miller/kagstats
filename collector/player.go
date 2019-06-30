@@ -7,40 +7,13 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	// _ "github.com/mattn/go-sqlite3"
+	. "github.com/Harrison-Miller/kagstats/models"
 )
-
-// players (id, username, charactername, clantag)
-// kills (killedId, victimId, killerClass, victimClass, assistId, hitter, time)
-
-type ServerInfo struct {
-	ID   int64
-	name string
-	tags string
-}
-
-type KillEntry struct {
-	killerID     sql.NullInt64
-	victimID     int64
-	assistID     sql.NullInt64
-	killerClasss string
-	victimClass  string
-	hitter       int64
-	time         int64
-	serverID     int64
-	teamKill     bool
-}
-
-type PlayerInfo struct {
-	ID            int64
-	username      string
-	charactername string
-	clantag       string
-}
 
 type PlayerDatabase struct {
 	db          *sql.DB
-	playerCache map[string]*PlayerInfo
-	uncommited  []KillEntry
+	playerCache map[string]*Player
+	uncommited  []Kill
 	Total       int
 }
 
@@ -51,8 +24,8 @@ func CreatePlayerDatabase(connection string) (PlayerDatabase, error) {
 	}
 	return PlayerDatabase{
 		db,
-		make(map[string]*PlayerInfo),
-		make([]KillEntry, 0, 100),
+		make(map[string]*Player),
+		make([]Kill, 0, 100),
 		0,
 	}, nil
 }
@@ -108,7 +81,7 @@ func (pdb *PlayerDatabase) Init() {
 	}
 }
 
-func (pdb *PlayerDatabase) UpdatePlayerInfo(p *PlayerInfo, charactername string, clantag string) error {
+func (pdb *PlayerDatabase) UpdatePlayerInfo(p *Player, charactername string, clantag string) error {
 	tx, err := pdb.db.Begin()
 	if err != nil {
 		return err
@@ -124,20 +97,20 @@ func (pdb *PlayerDatabase) UpdatePlayerInfo(p *PlayerInfo, charactername string,
 		return err
 	}
 
-	p.charactername = charactername
-	p.clantag = clantag
+	p.Charactername = charactername
+	p.Clantag = clantag
 	return nil
 }
 
-func (pdb *PlayerDatabase) GetOrCreatePlayer(username string, charactername string, clantag string) (*PlayerInfo, error) {
+func (pdb *PlayerDatabase) GetOrCreatePlayer(username string, charactername string, clantag string) (*Player, error) {
 	tx, err := pdb.db.Begin()
 	if err != nil {
 		return nil, err
 	}
 
-	var p PlayerInfo
+	var p Player
 	row := tx.QueryRow("SELECT * FROM kagstats.players WHERE username=?", username)
-	err = row.Scan(&p.ID, &p.username, &p.charactername, &p.clantag)
+	err = row.Scan(&p.ID, &p.Username, &p.Charactername, &p.Clantag)
 
 	// at this point if we don't have an error we should have a valid id
 	if err != nil {
@@ -155,9 +128,9 @@ func (pdb *PlayerDatabase) GetOrCreatePlayer(username string, charactername stri
 		}
 
 		p.ID = ID
-		p.username = username
-		p.charactername = charactername
-		p.clantag = clantag
+		p.Username = username
+		p.Charactername = charactername
+		p.Clantag = clantag
 
 		if err = tx.Commit(); err != nil {
 			// the insert might not have succeeded
@@ -165,7 +138,7 @@ func (pdb *PlayerDatabase) GetOrCreatePlayer(username string, charactername stri
 		}
 
 		return &p, nil
-	} else if p.charactername != charactername || p.clantag != clantag {
+	} else if p.Charactername != charactername || p.Clantag != clantag {
 		// update charactername or clantag
 		_, err = tx.Exec("UPDATE kagstats.players SET charactername=?, clantag=? WHERE id=?", charactername, clantag, p.ID)
 		if err != nil {
@@ -174,8 +147,8 @@ func (pdb *PlayerDatabase) GetOrCreatePlayer(username string, charactername stri
 			return &p, err
 		}
 
-		p.charactername = charactername
-		p.clantag = clantag
+		p.Charactername = charactername
+		p.Clantag = clantag
 	}
 
 	if err = tx.Commit(); err != nil {
@@ -186,14 +159,14 @@ func (pdb *PlayerDatabase) GetOrCreatePlayer(username string, charactername stri
 	return &p, nil
 }
 
-func (pdb *PlayerDatabase) GetOrUpdatePlayer(username string, charactername string, clantag string) (*PlayerInfo, error) {
+func (pdb *PlayerDatabase) GetOrUpdatePlayer(username string, charactername string, clantag string) (*Player, error) {
 	if username == "" {
 		return nil, fmt.Errorf("not a valid username")
 	}
 
 	// first check the player cache
 	if p, ok := pdb.playerCache[username]; ok {
-		if p.charactername != charactername || p.clantag != clantag {
+		if p.Charactername != charactername || p.Clantag != clantag {
 			err := pdb.UpdatePlayerInfo(p, charactername, clantag)
 			if err != nil {
 				// unable to update player name but it was retrieved
@@ -221,7 +194,7 @@ func (pdb *PlayerDatabase) Commit() error {
 	sqlStr := "INSERT INTO kagstats.kills (killerID, victimID, assistID, killerClass, victimClass, hitter, epoch, serverID, teamKill) VALUES "
 	for _, v := range pdb.uncommited {
 		sqlStr += "(?,?,?,?,?,?,?,?,?),"
-		values = append(values, v.killerID, v.victimID, v.assistID, v.killerClasss, v.victimClass, v.hitter, v.time, v.serverID, v.teamKill)
+		values = append(values, v.KillerID, v.VictimID, v.AssistID, v.KillerClass, v.VictimClass, v.Hitter, v.Time, v.ServerID, v.TeamKill)
 	}
 	sqlStr = strings.TrimSuffix(sqlStr, ",")
 
@@ -242,54 +215,54 @@ func (pdb *PlayerDatabase) Commit() error {
 		return err
 	}
 
-	pdb.uncommited = make([]KillEntry, 0, 100)
+	pdb.uncommited = make([]Kill, 0, 100)
 	return nil
 }
 
-func (pdb *PlayerDatabase) GetOrUpdateServer(name string, tags []string) (ServerInfo, error) {
+func (pdb *PlayerDatabase) GetOrUpdateServer(name string, tags []string) (Server, error) {
 	tagsStr := strings.Join(tags, ",")
 	tx, err := pdb.db.Begin()
 	if err != nil {
-		return ServerInfo{}, err
+		return Server{}, err
 	}
 
-	var s ServerInfo
+	var s Server
 	row := tx.QueryRow("SELECT * FROM kagstats.servers WHERE name=?", name)
-	err = row.Scan(&s.ID, &s.name, &s.tags)
+	err = row.Scan(&s.ID, &s.Name, &s.Tags)
 
 	if err != nil {
 		// time to create the new server
 		res, err := tx.Exec("INSERT INTO kagstats.servers (name, tags) VALUES(?, ?)", name, tagsStr)
 		if err != nil {
 			tx.Rollback()
-			return ServerInfo{}, err
+			return Server{}, err
 		}
 
 		ID, err := res.LastInsertId()
 		if err != nil {
 			tx.Rollback()
-			return ServerInfo{}, err
+			return Server{}, err
 		}
 
 		s.ID = ID
-		s.name = name
-		s.tags = tagsStr
+		s.Name = name
+		s.Tags = tagsStr
 
 		if err = tx.Commit(); err != nil {
-			return ServerInfo{}, err
+			return Server{}, err
 		}
 
 		return s, nil
 	}
 
 	// check if we need to update the tags
-	if s.tags != tagsStr {
+	if s.Tags != tagsStr {
 		_, err = tx.Exec("UPDATE kagstats.servers SET tags=?", tagsStr)
 		if err != nil {
 			tx.Rollback()
 			return s, err
 		}
-		s.tags = tagsStr
+		s.Tags = tagsStr
 	}
 
 	if err = tx.Commit(); err != nil {

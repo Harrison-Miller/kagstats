@@ -4,6 +4,7 @@ import (
 	"log"
 
 	. "github.com/Harrison-Miller/kagstats/indexer"
+	. "github.com/Harrison-Miller/kagstats/models"
 )
 
 type NemesisIndexer struct {
@@ -11,6 +12,10 @@ type NemesisIndexer struct {
 
 func (i *NemesisIndexer) Name() string {
 	return "nemesis"
+}
+
+func (i *NemesisIndexer) Version() int {
+	return 1
 }
 
 func (i *NemesisIndexer) Keys() []IndexKey {

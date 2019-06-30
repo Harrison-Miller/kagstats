@@ -4,20 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
-)
 
-type Kill struct {
-	ID          int64
-	KillerID    sql.NullInt64
-	VictimID    int64
-	AssistID    sql.NullInt64
-	KillerClass string
-	VictimClass string
-	Hitter      int64
-	Time        int64
-	ServerID    int64
-	TeamKill    bool
-}
+	. "github.com/Harrison-Miller/kagstats/models"
+)
 
 type IndexKey struct {
 	Name   string
@@ -58,6 +47,7 @@ func (a Index) Add(b Index) error {
 
 type Indexer interface {
 	Name() string
+	Version() int
 
 	Keys() []IndexKey
 	Counters() []string
@@ -97,6 +87,34 @@ func Init(indexer Indexer, db *sql.DB) error {
 		)`)
 	if err != nil {
 		return err
+	}
+
+	db.Exec("INSERT INTO indexer_info (key_name, value) VALUES(?, ?)", indexer.Name()+"_version", indexer.Version())
+	row := db.QueryRow("SELECT value FROM indexer_info WHERE key_name=?", indexer.Name()+"_version")
+	var currentVersion int64
+	err = row.Scan(&currentVersion)
+	if err != nil {
+		return err
+	}
+
+	if currentVersion < int64(indexer.Version()) {
+		fmt.Printf("Currently deployed version %d, updating %s to newest version: %d\n", currentVersion, indexer.Name(), indexer.Version())
+		_, err = db.Exec("UPDATE indexer_info SET value=? WHERE key_name=?", indexer.Version(), indexer.Name()+"_version")
+		if err != nil {
+			return err
+		}
+
+		_, err = db.Exec("UPDATE indexer_info SET value=? WHERE key_name=?", 0, indexer.Name())
+		if err != nil {
+			return err
+		}
+
+		_, err = db.Exec(fmt.Sprintf("DROP TABLE %s", indexer.Name()))
+		if err != nil {
+			return err
+		}
+	} else if currentVersion > int64(indexer.Version()) {
+		panic(fmt.Sprintf("Current deployed version %d of %s, version %d is too old to be deployed", currentVersion, indexer.Name(), indexer.Version()))
 	}
 
 	db.Exec("INSERT INTO indexer_info (key_name, value) VALUES(?, ?)", indexer.Name(), 0)

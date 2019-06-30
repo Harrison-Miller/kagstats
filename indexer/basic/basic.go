@@ -4,6 +4,7 @@ import (
 	"log"
 
 	. "github.com/Harrison-Miller/kagstats/indexer"
+	. "github.com/Harrison-Miller/kagstats/models"
 )
 
 type BasicIndexer struct {
@@ -11,6 +12,10 @@ type BasicIndexer struct {
 
 func (i *BasicIndexer) Name() string {
 	return "basic_stats"
+}
+
+func (i *BasicIndexer) Version() int {
+	return 3
 }
 
 func (i *BasicIndexer) Keys() []IndexKey {

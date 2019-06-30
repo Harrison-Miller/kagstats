@@ -69,6 +69,8 @@ func ReadConfig() (Config, error) {
 }
 
 func Run(indexer Indexer) error {
+	fmt.Printf("Starting Indexer: %s Version %d\n", indexer.Name(), indexer.Version())
+
 	config, err := ReadConfig()
 	if err != nil {
 		return fmt.Errorf("Error reading indexer configuration\n%v", err)
@@ -89,7 +91,6 @@ func Run(indexer Indexer) error {
 		return fmt.Errorf("Error initing indexer tables\n%v", err)
 	}
 
-	fmt.Printf("Starting Indexer: %s\n", indexer.Name())
 	fmt.Printf("Batch Size: %d\n", config.Indexer.BatchSize)
 	fmt.Printf("Processing Interval: %s\n", config.Indexer.Interval)
 
@@ -111,5 +112,4 @@ func Run(indexer Indexer) error {
 		time.Sleep(config.Indexer.IntervalTime)
 	}
 
-	return nil
 }
