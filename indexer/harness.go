@@ -73,18 +73,32 @@ func Run(indexer Indexer) error {
 
 	config, err := ReadConfig()
 	if err != nil {
-		return fmt.Errorf("Error reading indexer configuration\n%v", err)
+		return fmt.Errorf("Error reading indexer configuration\n%v\n", err)
 	}
 
-	db, err := sql.Open("mysql", config.DatabaseConnection)
-	if err != nil {
-		return err
+	var db *sql.DB
+	attempts := 0
+	for {
+		db, err = sql.Open("mysql", config.DatabaseConnection)
+		if err != nil {
+			log.Printf("%v", err)
+		}
+
+		err = db.Ping()
+		if err != nil {
+			fmt.Printf("Error connecting to database %s\n%v\n", config.DatabaseConnection, err)
+		} else {
+			break
+		}
+
+		attempts=attempts+1
+		if attempts > 10 {
+			return fmt.Errorf("Could not connect to database after 10 attempts")
+		}
+
+		time.Sleep(5 * time.Second)
 	}
 
-	err = db.Ping()
-	if err != nil {
-		return fmt.Errorf("Error connecting to database %s\n%v", config.DatabaseConnection, err)
-	}
 
 	err = Init(indexer, db)
 	if err != nil {

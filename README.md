@@ -33,3 +33,18 @@ write out stats such as k/d, nemesis, most played server, etc.
 
 The webserver is responsible for displaying and browsing stats. It will also have an API layer that talks to the database
 to fetch stats compiled by the ingestion.
+
+## Building and Running
+Install docker and docker-compose
+
+`docker-compose build` will build all the images
+`docker-compose build <service name>` will build the image for a specific service
+
+`docker-compose up -d` Will start all the services
+After that you can do docker logs -f kagstats_basic-indexer_1 to see the logs of one of the indexers.
+Or you can use the mysql command line to access the database. The API is also setup by the docker-compose file
+at localhost:8080
+
+
+To tear down the environment run:
+`docker-compose down` and `docker-compose stop`
