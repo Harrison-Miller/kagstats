@@ -44,7 +44,9 @@ func main() {
 	r.HandleFunc("/kills/{id:[0-9]+}", getKill).Methods("GET")
 
 	BasicStatsRoutes(r)
-
+	NemesisRoutes(r)
+	HitterRoutes(r)
+	
 	http.Handle("/", r)
 
 	err = http.ListenAndServe(":8080", r)

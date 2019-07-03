@@ -3,14 +3,13 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/Harrison-Miller/kagstats/models"
 	"github.com/gorilla/mux"
 )
 
 type BasicStats struct {
-	models.Player
+	models.Player `json:"player"`
 	PlayerID      int64 `json:"-" db:"playerID"`
 	Suicides      int64 `json:"suicides"`
 	TeamKills     int64 `json:"teamKills"`
@@ -33,10 +32,9 @@ func BasicStatsRoutes(r *mux.Router) {
 }
 
 func getBasicStats(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	playerID, err := strconv.Atoi(vars["id"])
+	playerID, err := GetIntURLArg("id", r)
 	if err != nil {
-		http.Error(w, "Could not parse id", http.StatusBadRequest)
+		http.Error(w, "could not get id", http.StatusBadRequest)
 		return
 	}
 
