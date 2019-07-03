@@ -36,6 +36,7 @@ func main() {
 
 	r.HandleFunc("/players", getPlayers).Methods("GET")
 	r.HandleFunc("/players/{id:[0-9]+}", getPlayer).Methods("GET")
+	r.HandleFunc("/players/{id:[0-9]+}/kills", getPlayerKills).Methods("GET")
 
 	r.HandleFunc("/servers", getServers).Methods("GET")
 	r.HandleFunc("/servers/{id:[0-9]+}", getServer).Methods("GET")
@@ -46,7 +47,7 @@ func main() {
 	BasicStatsRoutes(r)
 	NemesisRoutes(r)
 	HitterRoutes(r)
-	
+
 	http.Handle("/", r)
 
 	err = http.ListenAndServe(":8080", r)

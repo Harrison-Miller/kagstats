@@ -16,7 +16,7 @@ type Hitter struct {
 }
 
 func HitterRoutes(r *mux.Router) {
-  r.HandleFunc("/hitters/{id:[0-9]+}", getHitters).Methods("GET")
+  r.HandleFunc("/players/{id:[0-9]+}/hitters", getHitters).Methods("GET")
 }
 
 func getHitters(w http.ResponseWriter, r *http.Request) {

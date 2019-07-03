@@ -24,11 +24,11 @@ type BasicStats struct {
 }
 
 func BasicStatsRoutes(r *mux.Router) {
-	r.HandleFunc("/basic/{id:[0-9]+}", getBasicStats).Methods("GET")
-	r.HandleFunc("/basic/leaderboard", getBasicLeaderBoard).Methods("GET")
-	r.HandleFunc("/basic/leaderboard/archer", getArcherLeaderBoard).Methods("GET")
-	r.HandleFunc("/basic/leaderboard/builder", getBuilderLeaderBoard).Methods("GET")
-	r.HandleFunc("/basic/leaderboard/knight", getKnightLeaderBoard).Methods("GET")
+	r.HandleFunc("/players/{id:[0-9]+}/basic", getBasicStats).Methods("GET")
+	r.HandleFunc("/leaderboard", getBasicLeaderBoard).Methods("GET")
+	r.HandleFunc("/leaderboard/archer", getArcherLeaderBoard).Methods("GET")
+	r.HandleFunc("/leaderboard/builder", getBuilderLeaderBoard).Methods("GET")
+	r.HandleFunc("/leaderboard/knight", getKnightLeaderBoard).Methods("GET")
 }
 
 func getBasicStats(w http.ResponseWriter, r *http.Request) {

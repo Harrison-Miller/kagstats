@@ -16,7 +16,7 @@ type Nemesis struct {
 }
 
 func NemesisRoutes(r *mux.Router) {
-  r.HandleFunc("/nemesis/{id:[0-9]+}", getNemesis).Methods("GET")
+  r.HandleFunc("/players/{id:[0-9]+}/nemesis", getNemesis).Methods("GET")
 }
 
 func getNemesis(w http.ResponseWriter, r *http.Request) {
