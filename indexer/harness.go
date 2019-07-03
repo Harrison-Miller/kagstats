@@ -2,67 +2,39 @@ package indexer
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"strconv"
 	"time"
 
+	stats "github.com/Harrison-Miller/kagstats/common/config"
+	"github.com/pkg/errors"
+	// The harness run is used to wrap the entire functionality of an indexer including connecting to the database
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type IndexerConfig struct {
-	BatchSize    int    `json:"batchSize"`
-	Interval     string `json:"interval"`
-	IntervalTime time.Duration
-}
-
-type Config struct {
-	DatabaseConnection string        `json:"databaseConnection"`
-	Indexer            IndexerConfig `json:"indexer"`
-}
-
-func ReadConfig() (Config, error) {
-	path := "settings.json"
-	if value, ok := os.LookupEnv("KAGSTATS_CONFIG"); ok {
-		path = value
-	}
-
-	config := Config{
-		Indexer: IndexerConfig{
-			BatchSize: 100,
-			Interval:  "30s",
-		},
-	}
-
-	file, err := ioutil.ReadFile(path)
-	if err == nil {
-		err = json.Unmarshal([]byte(file), &config)
-		if err != nil {
-			return config, fmt.Errorf("Error parsing indexer json settings %v", err)
-		}
-	}
+func ReadConfig() (stats.Config, error) {
+	config, _ := stats.Get()
 
 	if value, ok := os.LookupEnv("INDEXER_DB"); ok {
 		config.DatabaseConnection = value
 	}
 
+	var err error
 	if value, ok := os.LookupEnv("INDEXER_BATCHSIZE"); ok {
 		config.Indexer.BatchSize, err = strconv.Atoi(value)
 		if err != nil {
-			return config, fmt.Errorf("INDEXER_BATCHSIZE set to %s could not be parsed", value)
+			return config, errors.Wrap(err, "could convert INDEXER_BATCHSIZE to int")
 		}
 	}
 
 	if value, ok := os.LookupEnv("INDEXER_INTERVAL"); ok {
 		config.Indexer.Interval = value
-	}
-
-	config.Indexer.IntervalTime, err = time.ParseDuration(config.Indexer.Interval)
-	if err != nil {
-		return config, fmt.Errorf("Indexer interval set to %s could not be parsed", config.Indexer.Interval)
+		err := stats.ParseDuration(config.Indexer.Interval, &config.Indexer.IntervalDuration)
+		if err != nil {
+			return config, errors.Wrap(err, "error parsing indexer interval")
+		}
 	}
 
 	return config, nil
@@ -109,7 +81,7 @@ func Run(indexer Indexer) error {
 			log.Printf("Processed %d rows\n", processed)
 		}
 
-		time.Sleep(config.Indexer.IntervalTime)
+		time.Sleep(config.Indexer.IntervalDuration)
 	}
 
 }

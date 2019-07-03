@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
+	stats "github.com/Harrison-Miller/kagstats/common/config"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
@@ -13,8 +15,17 @@ import (
 var db *sqlx.DB
 
 func main() {
+	config, _ := stats.Get()
+	if value, ok := os.LookupEnv("API_HOST"); ok {
+		config.API.Host = value
+	}
+
+	if value, ok := os.LookupEnv("API_DB"); ok {
+		config.DatabaseConnection = value
+	}
+
 	var err error
-	db, err = sqlx.Connect("mysql", "root:password@tcp(192.168.56.101:3306)/kagstats")
+	db, err = sqlx.Connect("mysql", config.DatabaseConnection)
 	if err != nil {
 		log.Fatal(fmt.Errorf("Couldn't connect to database: %v", err))
 	}
@@ -34,7 +45,7 @@ func main() {
 
 	http.Handle("/", r)
 
-	err = http.ListenAndServe(":8080", r)
+	err = http.ListenAndServe(config.API.Host, r)
 	if err != nil {
 		log.Fatal(err)
 	}

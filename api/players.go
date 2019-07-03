@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Harrison-Miller/kagstats/models"
+	"github.com/Harrison-Miller/kagstats/common/models"
 	"github.com/gorilla/mux"
 )
 

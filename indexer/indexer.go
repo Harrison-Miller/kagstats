@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	. "github.com/Harrison-Miller/kagstats/models"
+	. "github.com/Harrison-Miller/kagstats/common/models"
 )
 
 type IndexKey struct {
