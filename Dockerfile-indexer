@@ -1,0 +1,25 @@
+FROM golang:1.12 AS build
+
+WORKDIR $GOPATH/src/github.com/Harrison-Miller/kagstats
+
+ADD . .
+
+ARG indexer=basic
+
+WORKDIR $GOPATH/src/github.com/Harrison-Miller/kagstats/indexer/${indexer}
+
+RUN go get -d -v ./...
+
+RUN GOARCH=386 CGO_ENABLED=0 GOOS=linux go build -o indexer -i -v ./...
+
+RUN cp indexer /
+
+FROM scratch
+
+COPY --from=build /indexer /
+
+ENV INDEXER_DB="root:password@tcp(mysql:3306)/kagstats"
+ENV INDEXER_BATCHSIZE="100"
+ENV INDEXER_INTERVAL="30s"
+
+CMD ["/indexer"]

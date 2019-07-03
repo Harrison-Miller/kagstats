@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	stats "github.com/Harrison-Miller/kagstats/common/config"
 	_ "github.com/go-sql-driver/mysql"
@@ -25,15 +26,27 @@ func main() {
 	}
 
 	var err error
-	db, err = sqlx.Connect("mysql", config.DatabaseConnection)
-	if err != nil {
-		log.Fatal(fmt.Errorf("Couldn't connect to database: %v", err))
+	attempts := 0
+	for {
+		db, err = sqlx.Connect("mysql", config.DatabaseConnection)
+		if err != nil {
+			log.Printf("%v\n", fmt.Errorf("Couldn't connect to database: %v", err))
+		} else {
+			break
+		}
+
+		attempts = attempts + 1
+		if attempts > 10 {
+			log.Fatal("Could not connect to database after 10 attempts")
+		}
+		time.Sleep(5 * time.Second)
 	}
 
 	r := mux.NewRouter()
 
 	r.HandleFunc("/players", getPlayers).Methods("GET")
 	r.HandleFunc("/players/{id:[0-9]+}", getPlayer).Methods("GET")
+	r.HandleFunc("/players/{id:[0-9]+}/kills", getPlayerKills).Methods("GET")
 
 	r.HandleFunc("/servers", getServers).Methods("GET")
 	r.HandleFunc("/servers/{id:[0-9]+}", getServer).Methods("GET")
@@ -42,6 +55,8 @@ func main() {
 	r.HandleFunc("/kills/{id:[0-9]+}", getKill).Methods("GET")
 
 	BasicStatsRoutes(r)
+	NemesisRoutes(r)
+	HitterRoutes(r)
 
 	http.Handle("/", r)
 

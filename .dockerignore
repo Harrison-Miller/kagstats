@@ -1,0 +1,6 @@
+*.exe
+*.git
+README.md
+Dockerfile-*
+settings.json
+StatsMod/*
