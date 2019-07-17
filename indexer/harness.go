@@ -63,14 +63,13 @@ func Run(indexer Indexer) error {
 			break
 		}
 
-		attempts=attempts+1
+		attempts = attempts + 1
 		if attempts > 10 {
 			return fmt.Errorf("Could not connect to database after 10 attempts")
 		}
 
 		time.Sleep(5 * time.Second)
 	}
-
 
 	err = Init(indexer, db)
 	if err != nil {

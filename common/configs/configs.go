@@ -1,4 +1,4 @@
-package config
+package configs
 
 import (
 	"bytes"
@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -13,10 +14,8 @@ import (
 
 type Config struct {
 	Name                   string           `json:"name"`
-	RCONTimeout            string           `json:"rconTimeout"`
-	RCONMaxAttempts        int              `json:"rconMaxattempts"`
 	BatchSize              int              `json:"batchSize"`
-	CommitInterval         string           `json:"CommitInterval"`
+	CommitInterval         string           `json:"commitInterval"`
 	CommitIntervalDuration time.Duration    `json:"-"`
 	DatabaseConnection     string           `json:"databaseConnection"`
 	Monitoring             MonitoringConfig `json:"monitoring"`
@@ -40,6 +39,10 @@ type ServerConfig struct {
 	Password string   `json:"password"`
 }
 
+func (s ServerConfig) TagsString() string {
+	return strings.Join(s.Tags, ",")
+}
+
 type IndexerConfig struct {
 	BatchSize        int           `json:"batchSize"`
 	Interval         string        `json:"interval"`
@@ -53,8 +56,6 @@ type APIConfig struct {
 func NewConfig() Config {
 	c := Config{
 		Name:               "Default Collector",
-		RCONTimeout:        "10s",
-		RCONMaxAttempts:    100,
 		BatchSize:          20,
 		CommitInterval:     "1m",
 		DatabaseConnection: "root:password@tcp(127.0.0.1:3306)/kagstats",

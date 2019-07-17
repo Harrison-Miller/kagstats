@@ -1,7 +1,6 @@
 package models
 
 import (
-	"database/sql"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -27,16 +26,15 @@ type Server struct {
 type Killer = Player
 
 type Kill struct {
-	ID          int64         `json:"ID" db:"ID"`
-	KillerID    sql.NullInt64 `json:"-" db:"killerID"`
-	VictimID    int64         `json:"-" db:"victimID"`
-	AssistID    sql.NullInt64 `json:"-" db:"assistID"`
-	KillerClass string        `json:"killerClass" db:"killerClass"`
-	VictimClass string        `json:"victimClass" db:"victimClass"`
-	Hitter      int64         `json:"hitter" db:"hitter"`
-	Time        int64         `json:"time" db:"epoch"`
-	ServerID    int64         `json:"serverID" db:"serverID"`
-	TeamKill    bool          `json:"teamKill" db:"teamKill"`
+	ID          int64  `json:"ID" db:"ID"`
+	KillerID    int64  `json:"-" db:"killerID"`
+	VictimID    int64  `json:"-" db:"victimID"`
+	KillerClass string `json:"killerClass" db:"killerClass"`
+	VictimClass string `json:"victimClass" db:"victimClass"`
+	Hitter      int64  `json:"hitter" db:"hitter"`
+	Time        int64  `json:"time" db:"epoch"`
+	ServerID    int64  `json:"serverID" db:"serverID"`
+	TeamKill    bool   `json:"teamKill" db:"teamKill"`
 
 	Player `json:"victim" db:"victim,prefix=victim."`
 	Killer `json:"killer" db:"killer,prefix=killer."`

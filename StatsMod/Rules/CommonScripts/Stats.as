@@ -2,27 +2,75 @@
 
 void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ killer, u8 customData)
 {
+	if(!this.isMatchRunning())
+	{
+		return;
+	}
+
 	if(sv_tcpr && victim !is null)
 	{
-		array<string> jsonProps = {
-			JSONString("VictimUsername", victim.getUsername()),
-			JSONString("VictimCharacterName", victim.getCharacterName()),
-			JSONString("VictimClantag", victim.getClantag()),
-			JSONString("VictimClass", victim.lastBlobName),
-			JSONInt("Hitter", customData)
-		};
+		string victimObject = JSONPlayer(victim);
+		string victimClass = victim.lastBlobName;
+
+		string killerObject = victimObject;
+		string killerClass = victimClass;
 
 		if(killer !is null)
 		{
-			jsonProps.push_back(JSONString("KillerUsername", killer.getUsername()));
-			jsonProps.push_back(JSONString("KillerCharacterName", killer.getCharacterName()));
-			jsonProps.push_back(JSONString("KillerClantag", killer.getClantag()));
-			jsonProps.push_back(JSONString("KillerClass", killer.lastBlobName));
+			killerObject = JSONPlayer(killer);
+			killerClass = killer.lastBlobName;
 		}
 
-		string object = "{" + join(jsonProps, ",") + "}";
-		tcpr("*STATS " + object);
+		array<string> jsonProps = {
+			"\"victim\":" + victimObject,
+			"\"killer\":" + killerObject,
+			JSONString("victimClass", victimClass),
+			JSONString("killerClass", killerClass),
+			JSONInt("Hitter", customData)
+		};
+
+		if(killer !is null && killer.getTeamNum() == victim.getTeamNum())
+		{
+			jsonProps.push_back(JSONBool("teamKill", true));
+
+		}
+
+		tcpr("PlayerDied " + JSON(join(jsonProps, ",")));
 	}
+}
+
+void onNewPlayerJoin( CRules@ this, CPlayer@ player ) {
+	if(sv_tcpr)
+	{
+		print("player joined");
+		tcpr("PlayerJoined " + JSONPlayer(player));
+
+	}
+}
+
+void onPlayerLeave( CRules@ this, CPlayer@ player ) {
+	if(sv_tcpr)
+	{
+		print("player left");
+		tcpr("PlayerLeft " + JSONPlayer(player));
+	}
+}
+
+string JSONPlayer(CPlayer@ player)
+{
+	array<string> props = {
+		JSONString("username", player.getUsername()),
+		JSONString("charactername", player.getCharacterName()),
+		JSONString("clantag", player.getClantag())
+	};
+
+	if(player.exists("stats_id"))
+	{
+		props.push_back(JSONInt("ID", player.get_u32("stats_id")));
+
+	}
+
+	return JSON(join(props,","));
 }
 
 string JSONProp(string name)
@@ -46,4 +94,20 @@ string JSONInt(string name, int value)
 {
 	return JSONProp(name) + value;
 
+}
+
+string JSONBool(string name, bool value)
+{
+	return JSONProp(name) + value;
+}
+
+string JSONObject(string name, string object)
+{
+	return JSONProp(name) + JSON(object);
+
+}
+
+string JSON(string object)
+{
+	return "{" + object + "}";
 }
