@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	. "github.com/Harrison-Miller/kagstats/models"
+	. "github.com/Harrison-Miller/kagstats/common/models"
 )
 
 type IndexKey struct {
@@ -173,16 +173,16 @@ func BuildInsert(indexer Indexer, tx *sql.Tx) (*sql.Stmt, error) {
 
 func Process(indexer KillsIndexer, batchSize int, db *sql.DB) (int, error) {
 	tx, err := db.Begin()
+	defer tx.Rollback()
 	if err != nil {
 		return 0, err
 	}
 
 	currentIndex, rows, err := UnprocessedRows(indexer, batchSize, tx)
+	defer rows.Close()
 	if err != nil {
-		tx.Rollback()
 		return 0, err
 	}
-	defer rows.Close()
 
 	newIndex := currentIndex
 	updates := make(map[string]Index)
@@ -190,14 +190,12 @@ func Process(indexer KillsIndexer, batchSize int, db *sql.DB) (int, error) {
 		var kill Kill
 		if err := rows.Scan(&kill.ID, &kill.KillerID, &kill.VictimID, &kill.AssistID, &kill.KillerClass,
 			&kill.VictimClass, &kill.Hitter, &kill.Time, &kill.ServerID, &kill.TeamKill); err != nil {
-			tx.Rollback()
 			return 0, err
 		}
 
 		indices := indexer.Index(kill)
 		for _, index := range indices {
 			if len(index.Keys) != len(indexer.Keys()) {
-				tx.Rollback()
 				return 0, fmt.Errorf("Indexer failed to return the correct number of keys\n\texpected: %d got %d", len(indexer.Keys()), len(index.Keys))
 			}
 
@@ -206,7 +204,6 @@ func Process(indexer KillsIndexer, batchSize int, db *sql.DB) (int, error) {
 			if _, ok := updates[mapKey]; ok {
 				err := updates[mapKey].Add(index)
 				if err != nil {
-					tx.Rollback()
 					return 0, err
 				}
 
@@ -223,12 +220,10 @@ func Process(indexer KillsIndexer, batchSize int, db *sql.DB) (int, error) {
 	}
 
 	stmnt, err := BuildInsert(indexer, tx)
+	defer stmnt.Close()
 	if err != nil {
-		tx.Rollback()
 		return 0, err
 	}
-
-	defer stmnt.Close()
 
 	for _, u := range updates {
 		keysCount := len(indexer.Keys())
@@ -248,7 +243,6 @@ func Process(indexer KillsIndexer, batchSize int, db *sql.DB) (int, error) {
 
 		_, err = stmnt.Exec(args...)
 		if err != nil {
-			tx.Rollback()
 			return 0, err
 		}
 	}
@@ -256,7 +250,6 @@ func Process(indexer KillsIndexer, batchSize int, db *sql.DB) (int, error) {
 	if currentIndex != newIndex {
 		_, err = tx.Exec("UPDATE indexer_info SET value=? WHERE key_name=? AND value=?", newIndex, indexer.Name(), currentIndex)
 		if err != nil {
-			tx.Rollback()
 			return 0, err
 		}
 

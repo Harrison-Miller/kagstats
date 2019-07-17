@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
+	. "github.com/Harrison-Miller/kagstats/common/models"
 	. "github.com/Harrison-Miller/kagstats/indexer"
-	. "github.com/Harrison-Miller/kagstats/models"
 )
 
 type HittersIndexer struct {

@@ -3,14 +3,13 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 
-	"github.com/Harrison-Miller/kagstats/models"
+	"github.com/Harrison-Miller/kagstats/common/models"
 	"github.com/gorilla/mux"
 )
 
 type BasicStats struct {
-	models.Player
+	models.Player `json:"player"`
 	PlayerID      int64 `json:"-" db:"playerID"`
 	Suicides      int64 `json:"suicides"`
 	TeamKills     int64 `json:"teamKills"`
@@ -25,18 +24,17 @@ type BasicStats struct {
 }
 
 func BasicStatsRoutes(r *mux.Router) {
-	r.HandleFunc("/basic/{id:[0-9]+}", getBasicStats).Methods("GET")
-	r.HandleFunc("/basic/leaderboard", getBasicLeaderBoard).Methods("GET")
-	r.HandleFunc("/basic/leaderboard/archer", getArcherLeaderBoard).Methods("GET")
-	r.HandleFunc("/basic/leaderboard/builder", getBuilderLeaderBoard).Methods("GET")
-	r.HandleFunc("/basic/leaderboard/knight", getKnightLeaderBoard).Methods("GET")
+	r.HandleFunc("/players/{id:[0-9]+}/basic", getBasicStats).Methods("GET")
+	r.HandleFunc("/leaderboard", getBasicLeaderBoard).Methods("GET")
+	r.HandleFunc("/leaderboard/archer", getArcherLeaderBoard).Methods("GET")
+	r.HandleFunc("/leaderboard/builder", getBuilderLeaderBoard).Methods("GET")
+	r.HandleFunc("/leaderboard/knight", getKnightLeaderBoard).Methods("GET")
 }
 
 func getBasicStats(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	playerID, err := strconv.Atoi(vars["id"])
+	playerID, err := GetIntURLArg("id", r)
 	if err != nil {
-		http.Error(w, "Could not parse id", http.StatusBadRequest)
+		http.Error(w, "could not get id", http.StatusBadRequest)
 		return
 	}
 
