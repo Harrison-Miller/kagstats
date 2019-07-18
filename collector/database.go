@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"strings"
 	"time"
 
@@ -39,14 +38,12 @@ func UpdatePlayerInfo(player *models.Player) error {
 	return nil
 }
 
-func UpdateJoinTime(player models.Player) error {
-	log.Printf("%s join at %v", player.Username, time.Now())
-	return nil
+func UpdateJoinTime(playerID int64, serverID int64) error {
+	return AddEvent(playerID, "joined", serverID)
 }
 
-func UpdateLeaveTime(player models.Player) error {
-	log.Printf("%s left at %v", player.Username, time.Now())
-	return nil
+func UpdateLeaveTime(playerID int64, serverID int64) error {
+	return AddEvent(playerID, "left", serverID)
 }
 
 func UpdateServerInfo(server configs.ServerConfig) (models.Server, error) {
@@ -115,6 +112,19 @@ func InitDB() error {
 	if err != nil {
 		return errors.Wrap(err, "error creating kills table")
 	}
+
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS events (
+		ID INTEGER PRIMARY KEY AUTO_INCREMENT,
+		playerID INT NOT NULL,
+		type varchar(30) NOT NULL,
+		time INT NOT NULL,
+		serverID INT NOT NULL,
+		FOREIGN KEY(playerID) REFERENCES players(ID),
+		FOREIGN KEY(serverID) REFERENCES servers(ID)
+	)`)
+	if err != nil {
+		return errors.Wrap(err, "error creating events table")
+	}
 	return nil
 }
 
@@ -152,5 +162,25 @@ func Commit() error {
 	}
 
 	uncommitted = make([]models.Kill, 0, 100)
+	return nil
+}
+
+func AddEvent(playerID int64, eventType string, serverID int64) error {
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec("INSERT INTO events (playerID,Type,Time,ServerID) VALUES(?,?,?,?)",
+		playerID, eventType, time.Now().Unix(), serverID)
+
+	if err != nil {
+		return errors.Wrap(err, "error inserting event")
+	}
+
+	if err := tx.Commit(); err != nil {
+		return errors.Wrap(err, "error committing event")
+	}
 	return nil
 }

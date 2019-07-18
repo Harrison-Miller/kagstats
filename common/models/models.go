@@ -39,3 +39,13 @@ type Kill struct {
 	Player `json:"victim" db:"victim,prefix=victim."`
 	Killer `json:"killer" db:"killer,prefix=killer."`
 }
+
+type Event struct {
+	ID       int64  `json:"ID" db:"ID"`
+	PlayerID int64  `json:"-" db:"playerID"`
+	Type     string `json:"type"`
+	Time     int64  `json:"time"`
+	ServerID int64  `json:"serverID" db:"serverID"`
+
+	Player `json:"player" db:"player,prefix=player."`
+}

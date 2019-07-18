@@ -55,7 +55,7 @@ func (c *Collector) OnPlayerJoined(m rcon.Message, r *rcon.Client) error {
 		if err != nil {
 			return err
 		}
-		UpdateJoinTime(player)
+		UpdateJoinTime(player.ID, c.server.ID)
 		c.logger.Printf("%s (%d) joined the game", player.Username, player.ID)
 	}
 	return nil
@@ -73,7 +73,7 @@ func (c *Collector) OnPlayerLeave(m rcon.Message, r *rcon.Client) error {
 		if err != nil {
 			return err
 		}
-		err = UpdateLeaveTime(player)
+		err = UpdateLeaveTime(player.ID, c.server.ID)
 		if err != nil {
 
 		}
@@ -122,7 +122,7 @@ func (c *Collector) PlayerList(m rcon.Message, r *rcon.Client) error {
 			if err != nil {
 				return err
 			}
-			err = UpdateJoinTime(p)
+			err = UpdateJoinTime(p.ID, c.server.ID)
 			if err != nil {
 				return err
 			}
