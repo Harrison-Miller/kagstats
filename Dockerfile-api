@@ -16,4 +16,9 @@ FROM scratch
 
 COPY --from=build /api /
 
+ENV API_HOST=":8080"
+ENV API_DB="root:password@tcp(mysql:3306)/kagstats"
+
+EXPOSE 8080
+
 CMD ["/api"]

@@ -4,6 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-mysql
+    image: gcr.io/kagstats/mysql:${TAG:-latest}
     ports:
       - "3306:3306"
     environment:

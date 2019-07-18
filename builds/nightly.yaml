@@ -5,7 +5,38 @@ steps:
   args:
   - "build"
 
+- name: "docker/compose:1.24.0"
+  env:
+  - "TAG=nightly"
+  args:
+  - "push"
+
+- name: "gcr.io/cloud-builders/gcloud"
+  entrypoint: "bash"
+  args:
+  - "-c"
+  - |
+    echo "Starting deployment"
+    gcloud compute ssh cloudbuild@staging --zone=us-central1-a --strict-host-key-checking=no -- -T << EOF
+    y
+
+
+    EOF
+    gcloud compute ssh cloudbuild@staging --zone=us-central1-a --strict-host-key-checking=no -- -T << EOF
+    sudo rm -rf /staging
+    sudo mkdir -p /staging
+    sudo chown cloudbuild /staging
+    cd /staging
+    curl https://raw.githubusercontent.com/Harrison-Miller/kagstats/master/docker-compose.yaml --output docker-compose.yaml
+    sudo docker-compose down --remove-orphans -v
+    sudo docker system prune -a --volumes -f
+    sudo TAG=nightly docker-compose pull
+    sudo TAG=nightly docker-compose up -d
+    EOF
+    echo "Deployment finsihed"
+
 images:
+  - "gcr.io/kagstats/mysql:nightly"
   - "gcr.io/kagstats/api:nightly"
   - "gcr.io/kagstats/basic-indexer:nightly"
   - "gcr.io/kagstats/nemesis-indexer:nightly"
