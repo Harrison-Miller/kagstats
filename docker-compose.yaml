@@ -13,7 +13,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-api
-    image: kagstats-api:0.1
+    image: harrisonmiller/kagstats-api:${TAG:-latest}
     ports:
       - "8080:8080"
     links:
@@ -24,7 +24,7 @@ services:
       dockerfile: Dockerfile-indexer
       args:
         indexer: basic
-    image: kagstats-basic-indexer:0.1
+    image: harrisonmiller/kagstats-basic-indexer:${TAG:-latest}
     environment:
       - INDEXER_INTERVAL=10s
     links:
@@ -35,7 +35,7 @@ services:
       dockerfile: Dockerfile-indexer
       args:
         indexer: nemesis
-    image: kagstats-nemesis-indexer:0.1
+    image: harrisonmiller/kagstats-nemesis-indexer:${TAG:-latest}
     environment:
       - INDEXER_INTERVAL=10s
     links:
@@ -46,7 +46,7 @@ services:
       dockerfile: Dockerfile-indexer
       args:
         indexer: hitters
-    image: kagstats-hitters-indexer:0.1
+    image: harrisonmiller/kagstats-hitters-indexer:${TAG:-latest}
     environment:
       - INDEXER_INTERVAL=10s
     links:
