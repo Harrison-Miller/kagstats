@@ -4,8 +4,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Harrison-Miller/kagstats/common/configs"
-
 	"github.com/Harrison-Miller/kagstats/common/models"
 	"github.com/pkg/errors"
 )
@@ -46,33 +44,30 @@ func UpdateLeaveTime(playerID int64, serverID int64) error {
 	return AddEvent(playerID, "left", serverID)
 }
 
-func UpdateServerInfo(server configs.ServerConfig) (models.Server, error) {
+func UpdateServerInfo(server *models.Server) error {
 	tx, err := db.Begin()
 	if err != nil {
-		return models.Server{}, err
+		return err
 	}
 	defer tx.Rollback()
 
-	_, err = tx.Exec("INSERT INTO servers (name, tags) VALUE (?,?) ON DUPLICATE KEY UPDATE name=?, tags=?",
-		server.Name, server.TagsString(), server.Name, server.TagsString())
+	_, err = tx.Exec("INSERT INTO servers (name, description, gamemode, tags) VALUE (?,?,?,?) ON DUPLICATE KEY UPDATE name=?, description=?, gamemode=?, tags=?",
+		server.Name, server.Description, server.Gamemode, server.Tags,
+		server.Name, server.Description, server.Gamemode, server.Tags)
 	if err != nil {
-		return models.Server{}, errors.Wrap(err, "error creating/updating server info")
+		return errors.Wrap(err, "error creating/updating server info")
 	}
 
-	s := models.Server{
-		Name: server.Name,
-		Tags: server.TagsString(),
-	}
 	row := tx.QueryRow("SELECT ID FROM servers WHERE name=?", server.Name)
-	err = row.Scan(&s.ID)
+	err = row.Scan(&server.ID)
 	if err != nil {
-		return s, errors.Wrap(err, "error getting server ID")
+		return errors.Wrap(err, "error getting server ID")
 	}
 
 	if err := tx.Commit(); err != nil {
-		return s, errors.Wrap(err, "error committing server info")
+		return errors.Wrap(err, "error committing server info")
 	}
-	return s, nil
+	return nil
 }
 
 func InitDB() error {
@@ -89,6 +84,8 @@ func InitDB() error {
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS servers (
 			ID INTEGER PRIMARY KEY AUTO_INCREMENT,
 			name varchar(255) NOT NULL UNIQUE,
+			description varchar(255) NOT NULL,
+			gamemode varchar(30) NOT NULL,
 			tags varchar(1000)
 	)`)
 	if err != nil {

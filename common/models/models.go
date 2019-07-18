@@ -18,9 +18,11 @@ func GetPlayer(playerID int, db *sqlx.DB) (Player, error) {
 }
 
 type Server struct {
-	ID   int64  `json:"ID" db:"ID"`
-	Name string `json:"name"`
-	Tags string `json:"tags"`
+	ID          int64  `json:"ID" db:"ID"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Gamemode    string `json:"gamemode"`
+	Tags        string `json:"tags"`
 }
 
 type Killer = Player

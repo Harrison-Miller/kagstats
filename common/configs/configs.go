@@ -32,7 +32,6 @@ type MonitoringConfig struct {
 }
 
 type ServerConfig struct {
-	Name     string   `json:"name"`
 	Tags     []string `json:"tags"`
 	Address  string   `json:"address"`
 	Port     string   `json:"port"`

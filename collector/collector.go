@@ -16,8 +16,8 @@ import (
 
 type Collector struct {
 	config configs.ServerConfig
-	server models.Server
 	logger *log.Logger
+	server models.Server
 }
 
 func UpdatePlayer(p *models.Player) error {
@@ -48,6 +48,7 @@ func (c *Collector) OnPlayerJoined(m rcon.Message, r *rcon.Client) error {
 	err := json.Unmarshal([]byte(m.Args["object"]), &player)
 	if err != nil {
 		c.logger.Println(err)
+		return nil
 	}
 
 	if (player != models.Player{}) {
@@ -66,6 +67,7 @@ func (c *Collector) OnPlayerLeave(m rcon.Message, r *rcon.Client) error {
 	err := json.Unmarshal([]byte(m.Args["object"]), &player)
 	if err != nil {
 		c.logger.Println(err)
+		return nil
 	}
 
 	if (player != models.Player{}) {
@@ -87,6 +89,7 @@ func (c *Collector) OnPlayerDie(m rcon.Message, r *rcon.Client) error {
 	err := json.Unmarshal([]byte(m.Args["object"]), &kill)
 	if err != nil {
 		c.logger.Println(err)
+		return nil
 	}
 
 	if (kill != models.Kill{}) {
@@ -114,6 +117,7 @@ func (c *Collector) PlayerList(m rcon.Message, r *rcon.Client) error {
 	err := json.Unmarshal([]byte(m.Args["object"]), &players)
 	if err != nil {
 		c.logger.Println(err)
+		return nil
 	}
 
 	if len(players) > 0 {
@@ -132,6 +136,31 @@ func (c *Collector) PlayerList(m rcon.Message, r *rcon.Client) error {
 	return nil
 }
 
+func (c *Collector) ServerInfo(m rcon.Message, r *rcon.Client) error {
+	var server models.Server
+	err := json.Unmarshal([]byte(m.Args["object"]), &server)
+	if err != nil {
+		c.logger.Println(err)
+		return nil
+	}
+	server.Tags = c.config.TagsString()
+
+	err = UpdateServerInfo(&server)
+	if err != nil {
+		return errors.Wrap(err, "can't start collector without server info")
+	}
+
+	c.logger.Printf("%+v", server)
+
+	c.server = server
+	c.logger.SetPrefix(fmt.Sprintf("[%s] ", server.Name))
+
+	r.RunScript("scripts/PlayerList.as")
+	AddHandlers(r, c)
+
+	return nil
+}
+
 func AddHandlers(client *rcon.Client, collector *Collector) {
 	client.HandleFunc("^PlayerJoined (?P<object>.*)", collector.OnPlayerJoined).RemoveTimestamp()
 	client.HandleFunc("^PlayerLeft (?P<object>.*)", collector.OnPlayerLeave).RemoveTimestamp()
@@ -140,15 +169,13 @@ func AddHandlers(client *rcon.Client, collector *Collector) {
 }
 
 func Collect(sconfig configs.ServerConfig) {
-	logger := log.New(os.Stdout, fmt.Sprintf("[%s] ", sconfig.Name), log.LstdFlags)
 	address := net.JoinHostPort(sconfig.Address, sconfig.Port)
+	logger := log.New(os.Stdout, fmt.Sprintf("[%s] ", address), log.LstdFlags)
 
-	serverInfo, err := UpdateServerInfo(sconfig)
-	if err != nil {
-		log.Println("can't get server ID not starting collector", err)
-		return
+	collector := Collector{
+		config: sconfig,
+		logger: logger,
 	}
-	collector := Collector{sconfig, serverInfo, logger}
 
 	for {
 		delay := 1
@@ -171,14 +198,10 @@ func Collect(sconfig configs.ServerConfig) {
 		defer client.Close()
 		logger.Printf("Connected to %s!\n", address)
 
-		err := client.RunScript("scripts/PlayerList.as")
-		if err != nil {
-			logger.Println("wat", err)
-		}
+		client.RunScript("scripts/ServerInfo.as")
+		client.HandleFunc("^ServerInfo (?P<object>.*)", collector.ServerInfo).RemoveTimestamp()
 
-		AddHandlers(&client, &collector)
-
-		err = client.Handle()
+		err := client.Handle()
 		if err != nil {
 			logger.Println(err)
 		}

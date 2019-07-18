@@ -18,7 +18,6 @@ create a file: settings.json
 	"databaseConnection": "root:password@tcp(127.0.0.1:3306)/kagstats",
 	"servers": [
 		{
-			"name": "TDM Server",
 			"address": "127.0.0.1",
 			"port": "50301",
 			"password": "admin"
