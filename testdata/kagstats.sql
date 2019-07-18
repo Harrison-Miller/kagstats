@@ -19,6 +19,37 @@ CREATE DATABASE IF NOT EXISTS kagstats;
 USE kagstats;
 
 --
+-- Table structure for table `events`
+--
+
+DROP TABLE IF EXISTS `events`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `events` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `playerID` int(11) NOT NULL,
+  `type` varchar(30) NOT NULL,
+  `time` int(11) NOT NULL,
+  `serverID` int(11) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `playerID` (`playerID`),
+  KEY `serverID` (`serverID`),
+  CONSTRAINT `events_ibfk_1` FOREIGN KEY (`playerID`) REFERENCES `players` (`ID`),
+  CONSTRAINT `events_ibfk_2` FOREIGN KEY (`serverID`) REFERENCES `servers` (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `events`
+--
+
+LOCK TABLES `events` WRITE;
+/*!40000 ALTER TABLE `events` DISABLE KEYS */;
+INSERT INTO `events` VALUES (1,12,'joined',1563410049,3),(2,20,'joined',1563410049,3),(3,1,'joined',1563410081,3),(4,1,'left',1563410102,3),(5,1,'joined',1563410109,3),(6,1,'left',1563410116,3),(7,1,'joined',1563410122,3),(8,1,'left',1563410125,3);
+/*!40000 ALTER TABLE `events` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `kills`
 --
 
@@ -93,8 +124,9 @@ CREATE TABLE `servers` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL UNIQUE,
   `tags` varchar(1000) DEFAULT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -103,7 +135,7 @@ CREATE TABLE `servers` (
 
 LOCK TABLES `servers` WRITE;
 /*!40000 ALTER TABLE `servers` DISABLE KEYS */;
-INSERT INTO `servers` VALUES (1,'Verra\'s TDM with stats - US East','US,TDM,Test'),(2,'Verra\'s TDM with stats - EU','EU,TDM,Test');
+INSERT INTO `servers` VALUES (1,'Verra\'s TDM with stats - US East','US,TDM,Test'),(2,'Verra\'s TDM with stats - EU','EU,TDM,Test'),(3,'Verra\'s Testing Server','');
 /*!40000 ALTER TABLE `servers` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -116,4 +148,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-07-17 16:01:25
+-- Dump completed on 2019-07-17 19:35:59
