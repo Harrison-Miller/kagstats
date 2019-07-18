@@ -122,7 +122,9 @@ DROP TABLE IF EXISTS `servers`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `servers` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL UNIQUE,
+  `name` varchar(255) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `gamemode` varchar(30) NOT NULL,
   `tags` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `name` (`name`)
@@ -135,7 +137,7 @@ CREATE TABLE `servers` (
 
 LOCK TABLES `servers` WRITE;
 /*!40000 ALTER TABLE `servers` DISABLE KEYS */;
-INSERT INTO `servers` VALUES (1,'Verra\'s TDM with stats - US East','US,TDM,Test'),(2,'Verra\'s TDM with stats - EU','EU,TDM,Test'),(3,'Verra\'s Testing Server','');
+INSERT INTO `servers` VALUES (1,'Verra\'s TDM with stats - US East','...','TDM','US,TDM,Test'),(2,'Verra\'s TDM with stats - EU','...','TDM','EU,TDM,Test'),(3,'Verra\'s Testing Server','...','TDM','');
 /*!40000 ALTER TABLE `servers` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
