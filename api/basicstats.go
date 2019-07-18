@@ -17,7 +17,7 @@ type BasicStats struct {
 	ArcherDeaths  int64 `json:"archerDeaths" db:"archer_deaths"`
 	BuilderKills  int64 `json:"builderKills" db:"builder_kills"`
 	BuilderDeaths int64 `json:"builderDeaths" db:"builder_deaths"`
-	KnightKills   int64 `json:"kngihtKills" db:"knight_kills"`
+	KnightKills   int64 `json:"knightKills" db:"knight_kills"`
 	KnightDeaths  int64 `json:"knightDeaths" db:"knight_deaths"`
 	OtherKills    int64 `json:"otherKills" db:"other_kills"`
 	OtherDeaths   int64 `json:"otherDeaths" db:"other_deaths"`
@@ -59,10 +59,10 @@ func getBasicLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	}
 
 	JSONResponse(w, struct {
-		Size int `json:"size"`
+		Size        int          `json:"size"`
 		LeaderBoard []BasicStats `json:"leaderboard"`
 	}{
-		Size: len(stats),
+		Size:        len(stats),
 		LeaderBoard: stats,
 	})
 }
@@ -77,10 +77,10 @@ func getArcherLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	}
 
 	JSONResponse(w, struct {
-		Size int `json:"size"`
+		Size        int          `json:"size"`
 		LeaderBoard []BasicStats `json:"leaderboard"`
 	}{
-		Size: len(stats),
+		Size:        len(stats),
 		LeaderBoard: stats,
 	})
 }
@@ -95,10 +95,10 @@ func getBuilderLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	}
 
 	JSONResponse(w, struct {
-		Size int `json:"size"`
+		Size        int          `json:"size"`
 		LeaderBoard []BasicStats `json:"leaderboard"`
 	}{
-		Size: len(stats),
+		Size:        len(stats),
 		LeaderBoard: stats,
 	})
 }
@@ -113,10 +113,10 @@ func getKnightLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	}
 
 	JSONResponse(w, struct {
-		Size int `json:"size"`
+		Size        int          `json:"size"`
 		LeaderBoard []BasicStats `json:"leaderboard"`
 	}{
-		Size: len(stats),
+		Size:        len(stats),
 		LeaderBoard: stats,
 	})
 }
