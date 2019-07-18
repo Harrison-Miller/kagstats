@@ -62,15 +62,15 @@ func OneIfNotIn(a string, b []string) int {
 func (i *BasicIndexer) Index(kill Kill) []Index {
 	var indices []Index
 
-	if kill.KillerID.Valid && kill.KillerID.Int64 != kill.VictimID {
+	if kill.KillerID != kill.VictimID {
 		if kill.TeamKill {
 			indices = append(indices, Index{
-				Keys:     []int{int(kill.KillerID.Int64)},
+				Keys:     []int{int(kill.KillerID)},
 				Counters: map[string]int{"teamkills": 1},
 			})
 		} else {
 			indices = append(indices, Index{
-				Keys: []int{int(kill.KillerID.Int64)},
+				Keys: []int{int(kill.KillerID)},
 				Counters: map[string]int{
 					"archer_kills":  OneIfEqual(kill.KillerClass, "archer"),
 					"builder_kills": OneIfEqual(kill.KillerClass, "builder"),
@@ -84,7 +84,7 @@ func (i *BasicIndexer) Index(kill Kill) []Index {
 	indices = append(indices, Index{
 		Keys: []int{int(kill.VictimID)},
 		Counters: map[string]int{
-			"suicides":       ToInt(!kill.KillerID.Valid || kill.KillerID.Int64 == kill.VictimID),
+			"suicides":       ToInt(kill.KillerID == kill.VictimID),
 			"archer_deaths":  OneIfEqual(kill.VictimClass, "archer"),
 			"builder_deaths": OneIfEqual(kill.VictimClass, "builder"),
 			"knight_deaths":  OneIfEqual(kill.VictimClass, "knight"),

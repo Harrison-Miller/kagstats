@@ -8,14 +8,14 @@ import (
 	"strconv"
 	"time"
 
-	stats "github.com/Harrison-Miller/kagstats/common/config"
+	"github.com/Harrison-Miller/kagstats/common/configs"
 	"github.com/pkg/errors"
 	// The harness run is used to wrap the entire functionality of an indexer including connecting to the database
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func ReadConfig() (stats.Config, error) {
-	config, _ := stats.Get()
+func ReadConfig() (configs.Config, error) {
+	config, _ := configs.Get()
 
 	if value, ok := os.LookupEnv("INDEXER_DB"); ok {
 		config.DatabaseConnection = value
@@ -31,7 +31,7 @@ func ReadConfig() (stats.Config, error) {
 
 	if value, ok := os.LookupEnv("INDEXER_INTERVAL"); ok {
 		config.Indexer.Interval = value
-		err := stats.ParseDuration(config.Indexer.Interval, &config.Indexer.IntervalDuration)
+		err := configs.ParseDuration(config.Indexer.Interval, &config.Indexer.IntervalDuration)
 		if err != nil {
 			return config, errors.Wrap(err, "error parsing indexer interval")
 		}

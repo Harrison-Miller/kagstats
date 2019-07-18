@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/Harrison-Miller/kagstats/common/models"
-	"github.com/gorilla/mux"
 )
 
 const killsQuery = `SELECT kills.*,
@@ -14,7 +13,6 @@ const killsQuery = `SELECT kills.*,
 	killer.ID "killer.ID", killer.username "killer.username", killer.charactername "killer.charactername", killer.clantag "killer.clantag" FROM kills
 	INNER JOIN players as victim ON kills.victimID=victim.ID
 	INNER JOIN players as killer ON kills.killerID=killer.ID `
-
 
 func getKills(w http.ResponseWriter, r *http.Request) {
 	var kills []models.Kill
@@ -34,28 +32,28 @@ func getKills(w http.ResponseWriter, r *http.Request) {
 		start = int64(s)
 	}
 
-	err := db.Select(&kills, killsQuery + "ORDER BY kills.ID DESC LIMIT ?,?", start, limit)
+	err := db.Select(&kills, killsQuery+"ORDER BY kills.ID DESC LIMIT ?,?", start, limit)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return
 	}
 
-	next := int(start)+len(kills)
+	next := int(start) + len(kills)
 	if len(kills) < int(limit) {
 		next = -1
 	}
 
 	JSONResponse(w, struct {
-		Limit int `json:"limit"`
-		Start int `json:"start"`
-		Size int `json:"size"`
-		Next int `json:"next"`
+		Limit int           `json:"limit"`
+		Start int           `json:"start"`
+		Size  int           `json:"size"`
+		Next  int           `json:"next"`
 		Kills []models.Kill `json:"kills"`
 	}{
 		Limit: int(limit),
 		Start: int(start),
-		Size: len(kills),
-		Next: next,
+		Size:  len(kills),
+		Next:  next,
 		Kills: kills,
 	})
 }
@@ -93,31 +91,31 @@ func getPlayerKills(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var kills []models.Kill
-	err = db.Select(&kills, killsQuery + "WHERE killerID=? OR victimID=? ORDER BY kills.ID DESC LIMIT ?,?", playerID, playerID, start, limit)
+	err = db.Select(&kills, killsQuery+"WHERE killerID=? OR victimID=? ORDER BY kills.ID DESC LIMIT ?,?", playerID, playerID, start, limit)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("error getting kills: %v", err), http.StatusInternalServerError)
 		return
 	}
 
-	next := int(start)+len(kills)
+	next := int(start) + len(kills)
 	if len(kills) < int(limit) {
 		next = -1
 	}
 
-	JSONResponse(w, struct{
+	JSONResponse(w, struct {
 		Player models.Player `json:"player"`
-		Limit int `json:"limit"`
-		Start int `json:"start"`
-		Size int `json:"size"`
-		Next int `json:"next"`
-		Kills []models.Kill `json:"kills"`
+		Limit  int           `json:"limit"`
+		Start  int           `json:"start"`
+		Size   int           `json:"size"`
+		Next   int           `json:"next"`
+		Kills  []models.Kill `json:"kills"`
 	}{
 		Player: player,
-		Limit: limit,
-		Start: start,
-		Size: len(kills),
-		Next: next,
-		Kills: kills,
+		Limit:  limit,
+		Start:  start,
+		Size:   len(kills),
+		Next:   next,
+		Kills:  kills,
 	})
 
 }
@@ -130,7 +128,7 @@ func getKill(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var kill models.Kill
-	err = db.Get(&kill, killsQuery + "WHERE kills.ID=?", int64(killID))
+	err = db.Get(&kill, killsQuery+"WHERE kills.ID=?", int64(killID))
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Kill not found: %v", err), http.StatusInternalServerError)
 		return

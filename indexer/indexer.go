@@ -188,7 +188,7 @@ func Process(indexer KillsIndexer, batchSize int, db *sql.DB) (int, error) {
 	updates := make(map[string]Index)
 	for rows.Next() {
 		var kill Kill
-		if err := rows.Scan(&kill.ID, &kill.KillerID, &kill.VictimID, &kill.AssistID, &kill.KillerClass,
+		if err := rows.Scan(&kill.ID, &kill.KillerID, &kill.VictimID, &kill.KillerClass,
 			&kill.VictimClass, &kill.Hitter, &kill.Time, &kill.ServerID, &kill.TeamKill); err != nil {
 			return 0, err
 		}

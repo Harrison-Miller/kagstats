@@ -39,9 +39,9 @@ func (i *NemesisIndexer) Counters() []string {
 func (i *NemesisIndexer) Index(kill Kill) []Index {
 	var indices []Index
 
-	if kill.KillerID.Valid && kill.KillerID.Int64 != kill.VictimID {
+	if kill.KillerID != kill.VictimID {
 		indices = append(indices, Index{
-			Keys:     []int{int(kill.VictimID), int(kill.KillerID.Int64)},
+			Keys:     []int{int(kill.VictimID), int(kill.KillerID)},
 			Counters: map[string]int{"deaths": 1},
 		})
 	}

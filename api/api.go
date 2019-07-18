@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	stats "github.com/Harrison-Miller/kagstats/common/config"
+	"github.com/Harrison-Miller/kagstats/common/configs"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
@@ -16,7 +16,7 @@ import (
 var db *sqlx.DB
 
 func main() {
-	config, _ := stats.Get()
+	config, _ := configs.Get()
 	if value, ok := os.LookupEnv("API_HOST"); ok {
 		config.API.Host = value
 	}
