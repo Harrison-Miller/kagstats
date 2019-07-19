@@ -7,6 +7,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/felixge/httpsnoop"
+
 	"github.com/Harrison-Miller/kagstats/common/configs"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -14,6 +16,13 @@ import (
 )
 
 var db *sqlx.DB
+
+func LogHandler(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		m := httpsnoop.CaptureMetrics(next, w, r)
+		log.Printf("%s - %s %v %d %dms\n", r.RemoteAddr, r.Method, r.URL, m.Code, m.Duration/time.Millisecond)
+	})
+}
 
 func main() {
 	config, _ := configs.Get()
@@ -58,7 +67,9 @@ func main() {
 	NemesisRoutes(r)
 	HitterRoutes(r)
 
-	http.Handle("/", r)
+	r.Use(LogHandler)
+
+	log.Println("Ready to accept connections on ", config.API.Host)
 
 	err = http.ListenAndServe(config.API.Host, r)
 	if err != nil {
