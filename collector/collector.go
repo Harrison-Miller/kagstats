@@ -155,6 +155,7 @@ func (c *Collector) ServerInfo(m rcon.Message, r *rcon.Client) error {
 	c.server = server
 	c.logger.SetPrefix(fmt.Sprintf("[%s] ", server.Name))
 
+	r.RunScript("scripts/AddMod.as")
 	r.RunScript("scripts/PlayerList.as")
 	AddHandlers(r, c)
 
