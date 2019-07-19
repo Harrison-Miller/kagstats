@@ -3,3 +3,4 @@
 *.log
 collector/logs
 settings.json
+.idea
