@@ -51,7 +51,7 @@ func getPlayers(w http.ResponseWriter, r *http.Request) {
 		Start int `json:"start"`
 		Size int `json:"size"`
 		Next int `json:"next"`
-		Players []models.Player `json:"players"`
+		Players []models.Player `json:"values"`
 	}{
 		Limit: int(limit),
 		Start: int(start),

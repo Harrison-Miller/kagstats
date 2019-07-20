@@ -44,17 +44,15 @@ func main() {
 
 	r := mux.NewRouter()
 
-	apiPath := `/api`
+	r.HandleFunc("/players", getPlayers).Methods("GET")
+	r.HandleFunc("/players/{id:[0-9]+}", getPlayer).Methods("GET")
+	r.HandleFunc("/players/{id:[0-9]+}/kills", getPlayerKills).Methods("GET")
 
-	r.HandleFunc(apiPath+"/players", getPlayers).Methods("GET")
-	r.HandleFunc(apiPath+"/players/{id:[0-9]+}", getPlayer).Methods("GET")
-	r.HandleFunc(apiPath+"/players/{id:[0-9]+}/kills", getPlayerKills).Methods("GET")
+	r.HandleFunc("/servers", getServers).Methods("GET")
+	r.HandleFunc("/servers/{id:[0-9]+}", getServer).Methods("GET")
 
-	r.HandleFunc(apiPath+"/servers", getServers).Methods("GET")
-	r.HandleFunc(apiPath+"/servers/{id:[0-9]+}", getServer).Methods("GET")
-
-	r.HandleFunc(apiPath+"/kills", getKills).Methods("GET")
-	r.HandleFunc(apiPath+"/kills/{id:[0-9]+}", getKill).Methods("GET")
+	r.HandleFunc("/kills", getKills).Methods("GET")
+	r.HandleFunc("/kills/{id:[0-9]+}", getKill).Methods("GET")
 
 	BasicStatsRoutes(r)
 	NemesisRoutes(r)

@@ -48,7 +48,7 @@ func getKills(w http.ResponseWriter, r *http.Request) {
 		Start int           `json:"start"`
 		Size  int           `json:"size"`
 		Next  int           `json:"next"`
-		Kills []models.Kill `json:"kills"`
+		Kills []models.Kill `json:"values"`
 	}{
 		Limit: int(limit),
 		Start: int(start),
@@ -108,7 +108,7 @@ func getPlayerKills(w http.ResponseWriter, r *http.Request) {
 		Start  int           `json:"start"`
 		Size   int           `json:"size"`
 		Next   int           `json:"next"`
-		Kills  []models.Kill `json:"kills"`
+		Kills  []models.Kill `json:"values"`
 	}{
 		Player: player,
 		Limit:  limit,
