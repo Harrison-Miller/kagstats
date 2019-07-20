@@ -133,6 +133,8 @@ func (c *Collector) PlayerList(m rcon.Message, r *rcon.Client) error {
 			c.logger.Printf("%s (%d) was in the game", p.Username, p.ID)
 		}
 	}
+
+	r.RemoveHandler("^PlayerList (?P<object>.*)")
 	return nil
 }
 
@@ -154,6 +156,8 @@ func (c *Collector) ServerInfo(m rcon.Message, r *rcon.Client) error {
 
 	c.server = server
 	c.logger.SetPrefix(fmt.Sprintf("[%s] ", server.Name))
+
+	r.RemoveHandler("^ServerInfo (?P<object>.*)")
 
 	r.RunScript("scripts/AddMod.as")
 	r.RunScript("scripts/PlayerList.as")
