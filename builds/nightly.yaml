@@ -1,4 +1,14 @@
 steps:
+- name: "gcr.io/cloud-builds/gcloud"
+  entrypoint: "bash"
+  args:
+  - "-c"
+  - |
+    if [[ "$BRANCH_NAME" != "master" ]]; then
+      echo "Not running staging pipeline on none master branch: $BRANCH_NAME"
+      exit 1
+    fi
+
 - name: "docker/compose:1.24.0"
   env:
   - "TAG=nightly"
@@ -31,12 +41,13 @@ steps:
     sudo docker-compose down --remove-orphans -v
     sudo docker system prune -a --volumes -f
     sudo TAG=nightly docker-compose pull
-    sudo TAG=nightly docker-compose up -d
+    sudo SETTINGS=/settings.json TAG=nightly docker-compose up -d
     EOF
     echo "Deployment finsihed"
 
 images:
   - "gcr.io/kagstats/mysql:nightly"
+  - "gcr.io/kagstats/collector:nightly"
   - "gcr.io/kagstats/api:nightly"
   - "gcr.io/kagstats/basic-indexer:nightly"
   - "gcr.io/kagstats/nemesis-indexer:nightly"

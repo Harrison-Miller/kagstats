@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 	"time"
 
 	"github.com/Harrison-Miller/kagstats/common/configs"
@@ -30,6 +31,14 @@ func main() {
 	config, err = configs.Get()
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	if value, ok := os.LookupEnv("DB"); ok {
+		config.DatabaseConnection = value
+	}
+
+	if value, ok := os.LookupEnv("MONITOR_HOST"); ok {
+		config.Monitoring.Host = value
 	}
 
 	db, err = utils.ConnectToDatabase(config.DatabaseConnection, 10)

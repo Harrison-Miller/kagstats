@@ -1,0 +1,29 @@
+FROM golang:1.12 AS build
+
+WORKDIR $GOPATH/src/github.com/Harrison-Miller/kagstats
+
+ADD . .
+
+WORKDIR $GOPATH/src/github.com/Harrison-Miller/kagstats/collector
+
+RUN go get -d -v ./...
+
+RUN GOARCH=386 CGO_ENABLED=0 GOOS=linux go build -o collector -i -v ./...
+
+RUN cp collector / && cp -r templates / && cp -r scripts /
+
+FROM alpine
+
+COPY --from=build /collector /
+
+RUN mkdir -p /templates /scripts
+COPY --from=build /templates/ /templates
+COPY --from=build /scripts/ /scripts
+
+ENV MONITOR_HOST=":8081"
+ENV DB="root:password@tcp(mysql:3306)/kagstats"
+ENV KAGSTATS_CONFIG="settings.json"
+
+EXPOSE 8081
+
+CMD ["/collector"]
