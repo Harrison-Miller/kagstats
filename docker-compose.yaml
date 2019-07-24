@@ -10,6 +10,17 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_DATABASE=kagstats
+  collector:
+    build:
+      context: .
+      dockerfile: Dockerfile-collector
+    image: gcr.io/kagstats/collector:${TAG:-latest}
+    ports:
+      - "8081:8081"
+    links:
+      - mysql
+    volumes:
+      - ${SETTINGS:-./settings.json}:/settings.json
   api:
     build:
       context: .

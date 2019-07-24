@@ -13,7 +13,7 @@ create a file: settings.json
 	"monitoring": {
 		"enabled": true,
 		"refreshRate": "30s",
-		"host": ":8080"
+		"host": ":8081"
 	},
 	"databaseConnection": "root:password@tcp(127.0.0.1:3306)/kagstats",
 	"servers": [
