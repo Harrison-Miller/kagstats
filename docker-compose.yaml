@@ -30,6 +30,7 @@ services:
       - "8080:8080"
     links:
       - mysql
+    hostname: api
   basic-indexer:
     build:
       context: .
@@ -63,3 +64,12 @@ services:
       - INDEXER_INTERVAL=10s
     links:
       - mysql
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile-ui
+    image: gcr.io/kagstats/ui:${TAG:-latest}
+    ports:
+      - "80:80"
+    links:
+      - api
