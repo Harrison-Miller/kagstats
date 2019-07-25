@@ -36,8 +36,8 @@ export class BaseLeaderboardComponent implements OnInit, OnDestroy {
     return leader.archerDeaths + leader.builderDeaths + leader.knightDeaths;
   }
 
-  kd(leader: BasicStats): Number {
+  kd(leader: BasicStats): string {
     const deaths = this.totalDeaths(leader);
-    return this.totalKills(leader) / (deaths === 0 ? 1 : deaths);
+    return (this.totalKills(leader) / (deaths === 0 ? 1 : deaths)).toFixed(2);
   }
 }
