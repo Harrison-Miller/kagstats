@@ -8,12 +8,24 @@ import { HttpClientModule } from '@angular/common/http';
 import { KagTableComponent } from './shared/kag-table/kag-table.component';
 import { HomeComponent } from './pages/home/home.component';
 import { LeaderboardComponent } from './pages/leaderboard/leaderboard.component';
+import { BaseLeaderboardComponent } from './pages/leaderboard/base-leaderboard/base-leaderboard.component';
+import { ClassLeaderboardComponent } from './pages/leaderboard/class-leaderboard/class-leaderboard.component';
+import { LeaderboardService } from './services/leaderboard.service';
 import { ServersComponent } from './pages/servers/servers.component';
+import { ServersService } from './services/servers.service';
 
 @NgModule({
-  declarations: [AppComponent, KagTableComponent, HomeComponent, LeaderboardComponent, ServersComponent],
+  declarations: [
+    AppComponent,
+    KagTableComponent,
+    HomeComponent,
+    LeaderboardComponent,
+    BaseLeaderboardComponent,
+    ClassLeaderboardComponent,
+    ServersComponent
+  ],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule],
-  providers: [PlayersService],
+  providers: [LeaderboardService, PlayersService, ServersService],
   bootstrap: [AppComponent]
 })
 export class AppModule {}
