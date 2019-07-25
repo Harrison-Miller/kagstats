@@ -5,9 +5,12 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { PlayersService } from './services/players.service';
 import { HttpClientModule } from '@angular/common/http';
+import { KagTableComponent } from './shared/kag-table/kag-table.component';
+import { HomeComponent } from './pages/home/home.component';
+import { LeaderboardComponent } from './pages/leaderboard/leaderboard.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, KagTableComponent, HomeComponent, LeaderboardComponent],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule],
   providers: [PlayersService],
   bootstrap: [AppComponent]

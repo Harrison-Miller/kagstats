@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class PlayersService {
-  constructor(public http: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
   getPlayers(): Observable<PagedResult<Player>> {
     return this.http.get<PagedResult<Player>>('/api/players');
