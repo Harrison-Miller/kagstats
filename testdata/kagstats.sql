@@ -122,6 +122,8 @@ CREATE TABLE `servers` (
   `name` varchar(255) NOT NULL,
   `description` varchar(255) NOT NULL,
   `gamemode` varchar(30) NOT NULL,
+  `address` varchar(30) NOT NULL,
+  `port` varchar(30) NOT NULL,
   `tags` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `name` (`name`)
@@ -134,7 +136,7 @@ CREATE TABLE `servers` (
 
 LOCK TABLES `servers` WRITE;
 /*!40000 ALTER TABLE `servers` DISABLE KEYS */;
-INSERT INTO `servers` VALUES (1,'Verra\'s TDM with stats - US East','...','TDM','US,TDM,Test'),(2,'Verra\'s TDM with stats - EU','...','TDM','EU,TDM,Test'),(3,'Verra\'s Testing Server','...','TDM','');
+INSERT INTO `servers` VALUES (1,'Verra\'s TDM with stats - US East','...','TDM','127.0.0.1','50301','US,TDM,Test'),(2,'Verra\'s TDM with stats - EU','...','TDM','127.0.0.1','50301','EU,TDM,Test'),(3,'Verra\'s Testing Server','...','TDM','127.0.0.1','50301','');
 /*!40000 ALTER TABLE `servers` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
