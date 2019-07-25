@@ -47,9 +47,18 @@ export class ClassLeaderboardComponent implements OnInit, OnDestroy {
     this.componentDestroyed$.next();
   }
 
+  totalKills(leader: BasicStats): number {
+    return leader[`${this.class.toLowerCase()}Kills`]
+  }
+
+  totalDeaths(leader: BasicStats): number {
+    return leader[`${this.class.toLowerCase()}Deaths`]
+  }
+
   kd(leader: BasicStats): string {
+    const c = this.class.toLowerCase();
     return (
-      leader.archerKills / (leader.archerDeaths === 0 ? 1 : leader.archerDeaths)
+      leader[`${c}Kills`] / (leader[`${c}Deaths`] === 0 ? 1 : leader[`${c}Deaths`])
     ).toFixed(2);
   }
 }
