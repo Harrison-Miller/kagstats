@@ -30,6 +30,8 @@ export interface Server {
   name: String;
   description: String;
   gameMode: String;
+  address: String;
+  port: String;
   tags: String;
 }
 
