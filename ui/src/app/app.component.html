@@ -1,0 +1,6 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<ng-container *ngIf="players$ | async as players">
+  <div *ngFor="let player of players">
+    Player: {{ player.username }}&nbsp;<span *ngIf="player.clanTag != null && player.clanTag.length > 0">[{{player.clanTag}}]</span>
+  </div>
+</ng-container>
