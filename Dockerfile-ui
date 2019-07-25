@@ -13,4 +13,4 @@ FROM nginx:latest
 RUN rm /etc/nginx/conf.d/default.conf
 
 COPY ui/kagstats.conf /etc/nginx/conf.d
-COPY --from=node /ui/dist/* /var/www/html
+COPY --from=node /ui/dist/ui /var/www/html
