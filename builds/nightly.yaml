@@ -38,8 +38,8 @@ steps:
     sudo chown cloudbuild /staging
     cd /staging
     curl https://raw.githubusercontent.com/Harrison-Miller/kagstats/master/docker-compose.yaml --output docker-compose.yaml
-    sudo docker-compose down --remove-orphans -v
-    sudo docker system prune -a --volumes -f
+    sudo docker-compose down --remove-orphans
+    sudo docker system prune -a -f
     sudo TAG=nightly docker-compose pull
     sudo SETTINGS=/settings.json TAG=nightly docker-compose up -d
     EOF
