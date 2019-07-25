@@ -1,8 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { PlayersService } from './services/players.service';
-import { takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
-import { Player } from './models';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({

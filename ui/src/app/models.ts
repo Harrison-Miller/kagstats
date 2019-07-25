@@ -1,42 +1,61 @@
+export interface BasicStats {
+  player: Player;
+  suicides: number;
+  teamKills: number;
+  archerKills: number;
+  archerDeaths: number;
+  builderKills: number;
+  builderDeaths: number;
+  knightKills: number;
+  knightDeaths: number;
+  otherKills: number;
+  otherDeaths: number;
+}
+
 export interface Event {
-  id: Number;
-  type: String;
-  time: Number;
-  serverId: Number;
+  id: number;
+  type: string;
+  time: number;
+  serverId: number;
   player: Player;
 }
 
 export interface Kill {
-  id: Number;
-  killerClass: String;
-  victimClass: String;
-  hitter: Number;
-  time: Number;
-  serverId: Number;
-  teamKill: Number;
+  id: number;
+  killerClass: string;
+  victimClass: string;
+  hitter: number;
+  time: number;
+  serverId: number;
+  teamKill: number;
   player: Player;
   killer: Player;
 }
 
 export interface Player {
-  id: Number;
-  username: String;
-  characterName: String;
-  clanTag: String;
+  id: number;
+  username: string;
+  characterName: string;
+  clanTag: string;
 }
 
 export interface Server {
-  id: Number;
-  name: String;
-  description: String;
-  gameMode: String;
-  tags: String;
+  id: number;
+  name: string;
+  description: string;
+  gameMode: string;
+  tags: string;
+}
+
+export interface LeaderboardResult {
+  size: number;
+  leaderboard: BasicStats[];
 }
 
 export interface PagedResult<T> {
-  limit: Number;
-  start: Number;
-  size: Number;
-  next: Number;
+  limit: number;
+  start: number;
+  size: number;
+  next: number;
   values: T[];
 }

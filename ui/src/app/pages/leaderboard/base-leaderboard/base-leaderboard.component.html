@@ -1,0 +1,20 @@
+<h1>Kill/Death Ratio Leaderboard</h1>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Username</th>
+      <th>Kills</th>
+      <th>Deaths</th>
+      <th>Ratio</th>
+    </tr>
+  </thead>
+  <tbody *ngIf="leaderboard$ | async as leaderboard">
+    <tr *ngFor="let leader of leaderboard">
+      <td>{{leader.player.username}}</td>
+      <td>{{totalKills(leader)}}</td>
+      <td>{{totalDeaths(leader)}}</td>
+      <td>{{kd(leader)}}</td>
+    </tr>
+  </tbody>
+</table>
