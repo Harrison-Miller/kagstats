@@ -13,4 +13,8 @@ export class LeaderboardService {
   getBaseLeaderboard(): Observable<LeaderboardResult> {
     return this.http.get<LeaderboardResult>('/api/leaderboard')
   }
+
+  getLeaderboard(board: string): Observable<LeaderboardResult> {
+    return this.http.get<LeaderboardResult>(`/api/leaderboard/${board.toLowerCase()}`)
+  }
 }

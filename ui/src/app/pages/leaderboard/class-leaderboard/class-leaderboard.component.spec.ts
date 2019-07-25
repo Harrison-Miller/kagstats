@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ArcherLeaderboardComponent } from './archer-leaderboard.component';
+import { ClassLeaderboardComponent } from './class-leaderboard.component';
 
-describe('ArcherLeaderboardComponent', () => {
-  let component: ArcherLeaderboardComponent;
-  let fixture: ComponentFixture<ArcherLeaderboardComponent>;
+describe('ClassLeaderboardComponent', () => {
+  let component: ClassLeaderboardComponent;
+  let fixture: ComponentFixture<ClassLeaderboardComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ArcherLeaderboardComponent ]
+      declarations: [ ClassLeaderboardComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ArcherLeaderboardComponent);
+    fixture = TestBed.createComponent(ClassLeaderboardComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

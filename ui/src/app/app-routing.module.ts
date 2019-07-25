@@ -3,7 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import { LeaderboardComponent } from './pages/leaderboard/leaderboard.component';
 import { BaseLeaderboardComponent } from './pages/leaderboard/base-leaderboard/base-leaderboard.component';
-import { ArcherLeaderboardComponent } from './pages/leaderboard/archer-leaderboard/archer-leaderboard.component';
+import { ClassLeaderboardComponent } from './pages/leaderboard/class-leaderboard/class-leaderboard.component';
 
 const routes: Routes = [{
   path: '',
@@ -16,8 +16,8 @@ const routes: Routes = [{
     path: '',
     component: BaseLeaderboardComponent
   }, {
-    path: 'archer',
-    component: ArcherLeaderboardComponent
+    path: ':board',
+    component: ClassLeaderboardComponent
   }]
 }];
 

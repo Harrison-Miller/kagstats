@@ -9,7 +9,7 @@ import { KagTableComponent } from './shared/kag-table/kag-table.component';
 import { HomeComponent } from './pages/home/home.component';
 import { LeaderboardComponent } from './pages/leaderboard/leaderboard.component';
 import { BaseLeaderboardComponent } from './pages/leaderboard/base-leaderboard/base-leaderboard.component';
-import { ArcherLeaderboardComponent } from './pages/leaderboard/archer-leaderboard/archer-leaderboard.component';
+import { ClassLeaderboardComponent } from './pages/leaderboard/class-leaderboard/class-leaderboard.component';
 import { LeaderboardService } from './services/leaderboard.service';
 
 @NgModule({
@@ -19,7 +19,7 @@ import { LeaderboardService } from './services/leaderboard.service';
     HomeComponent,
     LeaderboardComponent,
     BaseLeaderboardComponent,
-    ArcherLeaderboardComponent
+    ClassLeaderboardComponent
   ],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule],
   providers: [LeaderboardService, PlayersService],
