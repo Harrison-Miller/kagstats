@@ -1,14 +1,16 @@
-FROM node:latest
+FROM node:latest as node
 
 COPY ui /ui
-WORKDIR /ui
-RUN npm install
-RUN npm run build --prod
 
+WORKDIR /ui
+
+RUN npm rebuild node-sass
+RUN npm install
+RUN npm run build -- --prod
 
 FROM nginx:latest
 
 RUN rm /etc/nginx/conf.d/default.conf
 
 COPY ui/kagstats.conf /etc/nginx/conf.d
-COPY ui/build /var/www/html
+COPY --from=node /ui/dist/* /var/www/html
