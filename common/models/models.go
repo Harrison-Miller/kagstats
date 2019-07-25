@@ -21,6 +21,8 @@ type Server struct {
 	ID          int64  `json:"id" db:"ID"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
+	Address     string `json:"address"`
+	Port        string `json:"port"`
 	Gamemode    string `json:"gameMode"`
 	Tags        string `json:"tags"`
 }

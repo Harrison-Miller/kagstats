@@ -51,9 +51,10 @@ func UpdateServerInfo(server *models.Server) error {
 	}
 	defer tx.Rollback()
 
-	_, err = tx.Exec("INSERT INTO servers (name, description, gamemode, tags) VALUE (?,?,?,?) ON DUPLICATE KEY UPDATE name=?, description=?, gamemode=?, tags=?",
-		server.Name, server.Description, server.Gamemode, server.Tags,
-		server.Name, server.Description, server.Gamemode, server.Tags)
+	_, err = tx.Exec(`INSERT INTO servers (name, description, gamemode, address, port, tags) VALUE (?,?,?,?,?,?)
+		ON DUPLICATE KEY UPDATE name=?, description=?, gamemode=?, address=?, port=?, tags=?`,
+		server.Name, server.Description, server.Gamemode, server.Address, server.Port, server.Tags,
+		server.Name, server.Description, server.Gamemode, server.Address, server.Port, server.Tags)
 	if err != nil {
 		return errors.Wrap(err, "error creating/updating server info")
 	}
@@ -82,29 +83,31 @@ func InitDB() error {
 	}
 
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS servers (
-			ID INTEGER PRIMARY KEY AUTO_INCREMENT,
-			name varchar(255) NOT NULL UNIQUE,
-			description varchar(255) NOT NULL,
-			gamemode varchar(30) NOT NULL,
-			tags varchar(1000)
+		ID INTEGER PRIMARY KEY AUTO_INCREMENT,
+		name varchar(255) NOT NULL UNIQUE,
+		description varchar(255) NOT NULL,
+		gamemode varchar(30) NOT NULL,
+		address varchar(30) NOT NULL,
+		port varchar(30) NOT NULL,
+		tags varchar(1000)
 	)`)
 	if err != nil {
 		return errors.Wrap(err, "error creating servers table")
 	}
 
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS kills (
-			ID INTEGER PRIMARY KEY AUTO_INCREMENT,
-			killerID INT NOT NULL,
-			victimID INT NOT NULL,
-			killerClass ENUM('archer', 'builder', 'knight', 'other', 'none') DEFAULT 'none',
-			victimClass ENUM('archer', 'builder', 'knight', 'other') DEFAULT 'archer' NOT NULL,
-			hitter INT DEFAULT 0,
-			epoch INT NOT NULL,
-			serverID INT NOT NULL,
-			teamKill BOOLEAN DEFAULT false,
-			FOREIGN KEY(killerID) REFERENCES players(ID),
-			FOREIGN KEY(victimID) REFERENCES players(ID),
-			FOREIGN KEY(serverID) REFERENCES servers(ID)
+		ID INTEGER PRIMARY KEY AUTO_INCREMENT,
+		killerID INT NOT NULL,
+		victimID INT NOT NULL,
+		killerClass ENUM('archer', 'builder', 'knight', 'other', 'none') DEFAULT 'none',
+		victimClass ENUM('archer', 'builder', 'knight', 'other') DEFAULT 'archer' NOT NULL,
+		hitter INT DEFAULT 0,
+		epoch INT NOT NULL,
+		serverID INT NOT NULL,
+		teamKill BOOLEAN DEFAULT false,
+		FOREIGN KEY(killerID) REFERENCES players(ID),
+		FOREIGN KEY(victimID) REFERENCES players(ID),
+		FOREIGN KEY(serverID) REFERENCES servers(ID)
 	)`)
 	if err != nil {
 		return errors.Wrap(err, "error creating kills table")

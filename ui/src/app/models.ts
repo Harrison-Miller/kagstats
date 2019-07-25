@@ -44,6 +44,8 @@ export interface Server {
   name: string;
   description: string;
   gameMode: string;
+  address: string;
+  port: string;
   tags: string;
 }
 

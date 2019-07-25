@@ -145,6 +145,8 @@ func (c *Collector) ServerInfo(m rcon.Message, r *rcon.Client) error {
 		c.logger.Println(err)
 		return nil
 	}
+	server.Address = c.config.Address
+	server.Port = c.config.Port
 	server.Tags = c.config.TagsString()
 
 	err = UpdateServerInfo(&server)

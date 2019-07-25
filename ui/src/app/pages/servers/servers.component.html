@@ -1,0 +1,12 @@
+<h2>Servers</h2>
+<div class="d-flex flex-wrap">
+<div class="card buffer" *ngFor="let server of servers">
+  <div class="card-header">
+    <h4>{{server.name}}</h4>
+  </div>
+  <div class="card-body">
+    <p>{{server.description}}</p>
+    <img src="https://api.kag2d.com/server/ip/{{server.address}}/port/{{server.port}}/minimap">
+  </div>
+</div>
+</div>

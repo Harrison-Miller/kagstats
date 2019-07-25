@@ -9,7 +9,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-
 func getServers(w http.ResponseWriter, r *http.Request) {
 	var servers []models.Server
 	err := db.Select(&servers, "SELECT * FROM servers")
@@ -18,11 +17,7 @@ func getServers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	JSONResponse(w, struct {
-		Servers []models.Server `json:"servers"`
-	}{
-		Servers: servers,
-	})
+	JSONResponse(w, &servers)
 }
 
 func getServer(w http.ResponseWriter, r *http.Request) {

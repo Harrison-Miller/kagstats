@@ -11,6 +11,7 @@ import { LeaderboardComponent } from './pages/leaderboard/leaderboard.component'
 import { BaseLeaderboardComponent } from './pages/leaderboard/base-leaderboard/base-leaderboard.component';
 import { ClassLeaderboardComponent } from './pages/leaderboard/class-leaderboard/class-leaderboard.component';
 import { LeaderboardService } from './services/leaderboard.service';
+import { ServersComponent } from './pages/servers/servers.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { LeaderboardService } from './services/leaderboard.service';
     HomeComponent,
     LeaderboardComponent,
     BaseLeaderboardComponent,
-    ClassLeaderboardComponent
+    ClassLeaderboardComponent,
+    ServersComponent
   ],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule],
   providers: [LeaderboardService, PlayersService],
