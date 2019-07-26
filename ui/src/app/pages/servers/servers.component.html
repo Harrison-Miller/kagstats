@@ -8,8 +8,8 @@
       <div class="card-body">
         <div class="card-text">{{server.description}}</div>
         <div>Players:
-          <ng-container *ngIf="server.status; else elseBlock">{{server.status.currentPlayers}}/{{server.status.maxPlayers}}</ng-container>
-          <ng-template #elseBlock>0/0</ng-template>
+          <ng-container *ngIf="server.status; else playersBlock">{{server.status.currentPlayers}}/{{server.status.maxPlayers}}</ng-container>
+          <ng-template #playersBlock>0/0</ng-template>
         </div>
         <div>
           <img src="https://api.kag2d.com/server/ip/{{server.address}}/port/{{server.port}}/minimap" onError="this.src='/assets/unkownmap.png'">
@@ -17,8 +17,8 @@
       </div>
       <div class="card-footer">
         Last Update:
-        <ng-container *ngIf="server.status; else elseBlock">{{server.status.lastUpdate | date:'short'}}</ng-container>
-        <ng-template #elseBlock>never</ng-template>
+        <ng-container *ngIf="server.status; else statusBlock">{{server.status.lastUpdate | date:'short'}}</ng-container>
+        <ng-template #statusBlock>N/A</ng-template>
       </div>
     </div>
   </div>

@@ -10,6 +10,7 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_DATABASE=kagstats
+    restart: always
   collector:
     build:
       context: .
@@ -19,6 +20,7 @@ services:
       - "8081:8081"
     links:
       - mysql
+    restart: always
     volumes:
       - ${SETTINGS:-./settings.json}:/settings.json
   api:
@@ -31,6 +33,7 @@ services:
     links:
       - mysql
     hostname: api
+    restart: always
   basic-indexer:
     build:
       context: .
@@ -42,6 +45,7 @@ services:
       - INDEXER_INTERVAL=10s
     links:
       - mysql
+    restart: always
   nemesis-indexer:
     build:
       context: .
@@ -53,6 +57,7 @@ services:
       - INDEXER_INTERVAL=10s
     links:
       - mysql
+    restart: always
   hitters-indexer:
     build:
       context: .
@@ -64,6 +69,7 @@ services:
       - INDEXER_INTERVAL=10s
     links:
       - mysql
+    restart: always
   ui:
     build:
       context: .
@@ -73,3 +79,4 @@ services:
       - "80:80"
     links:
       - api
+    restart: always
