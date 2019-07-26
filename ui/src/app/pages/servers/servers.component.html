@@ -3,7 +3,13 @@
   <div class="col-4 buffer" style="min-height: 33vh" *ngFor="let server of servers">
     <div class="card h-100">
       <div class="card-header">
-        {{server.name}} <span [ngClass]="{'bg-success': server.status, 'bg-danger': !server.status }" class="dot float-right"></span>
+        {{server.name}} 
+        <ng-container *ngIf="server.status; else statusElse">
+            <span class="dot float-right {{ server.statuslastUpdate | statusClass }}"></span>
+        </ng-container>
+        <ng-template #statusElse>
+            <span class="dot float-right bg-secondary"></span>
+        </ng-template>
       </div>
       <div class="card-body">
         <div class="card-text">{{server.description}}</div>

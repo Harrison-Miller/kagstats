@@ -13,6 +13,11 @@ import { ClassLeaderboardComponent } from './pages/leaderboard/class-leaderboard
 import { LeaderboardService } from './services/leaderboard.service';
 import { ServersComponent } from './pages/servers/servers.component';
 import { ServersService } from './services/servers.service';
+import { PlayersComponent } from './pages/players/players.component';
+import { UnkownAvatarPipe } from './pipes/unkown-avatar.pipe';
+import { PlayerBannerComponent } from './shared/player-banner/player-banner.component';
+import { StatusClassPipe } from './pipes/status-class.pipe';
+import { KagRoleColorPipe } from './pipes/kag-role-color.pipe';
 
 @NgModule({
   declarations: [
@@ -22,7 +27,12 @@ import { ServersService } from './services/servers.service';
     LeaderboardComponent,
     BaseLeaderboardComponent,
     ClassLeaderboardComponent,
-    ServersComponent
+    ServersComponent,
+    PlayersComponent,
+    UnkownAvatarPipe,
+    PlayerBannerComponent,
+    StatusClassPipe,
+    KagRoleColorPipe
   ],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule],
   providers: [LeaderboardService, PlayersService, ServersService],

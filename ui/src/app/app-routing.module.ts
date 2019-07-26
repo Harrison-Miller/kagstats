@@ -5,6 +5,7 @@ import { ServersComponent } from './pages/servers/servers.component';
 import { LeaderboardComponent } from './pages/leaderboard/leaderboard.component';
 import { BaseLeaderboardComponent } from './pages/leaderboard/base-leaderboard/base-leaderboard.component';
 import { ClassLeaderboardComponent } from './pages/leaderboard/class-leaderboard/class-leaderboard.component';
+import { PlayersComponent } from './pages/players/players.component';
 
 const routes: Routes = [{
   path: '',
@@ -23,6 +24,9 @@ const routes: Routes = [{
 }, {
   path: 'servers',
   component: ServersComponent
+},{
+  path: 'players',
+  component: PlayersComponent
 }];
 
 @NgModule({

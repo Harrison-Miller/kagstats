@@ -1,0 +1,14 @@
+<h2>Players</h2>
+<div class="row h-100">
+  <div class="col-3 buffer" *ngFor="let player of players">
+    <div class="card h-100">
+      <div class="card-header">
+        <app-player-banner [player]="player"></app-player-banner>
+      </div>
+      <div class="card-body">
+        <div>Username: {{player.username}}</div>
+        <div *ngIf="player.clanTag!=''">Clan: {{player.clanTag}}</div>
+      </div>
+    </div>
+  </div>
+</div>
