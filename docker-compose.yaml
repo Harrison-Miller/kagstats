@@ -1,10 +1,14 @@
 version: "3.7"
+volumes:
+  kagstats-data:
 services:
   mysql:
     build:
       context: .
       dockerfile: Dockerfile-mysql
     image: gcr.io/kagstats/mysql:${TAG:-latest}
+    volumes:
+      - kagstats-data:/var/lib/mysql
     ports:
       - "3306:3306"
     environment:
