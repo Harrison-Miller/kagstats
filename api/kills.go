@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/Harrison-Miller/kagstats/common/models"
+	"github.com/gorilla/mux"
 )
 
 const killsQuery = `SELECT kills.*,
@@ -135,4 +136,22 @@ func getKill(w http.ResponseWriter, r *http.Request) {
 	}
 
 	JSONResponse(w, &kill)
+}
+
+func getServerKills(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	serverID, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		http.Error(w, "Could not parse id", http.StatusBadRequest)
+		return
+	}
+
+	var kills []models.Kill
+	err = db.Select(&kills, killsQuery+"WHERE serverID=? LIMIT 100", serverID)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("error getting kills: %s", err), http.StatusInternalServerError)
+		return
+	}
+
+	JSONResponse(w, &kills)
 }
