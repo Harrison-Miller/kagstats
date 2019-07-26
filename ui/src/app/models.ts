@@ -39,6 +39,13 @@ export interface Player {
   clanTag: string;
 }
 
+export interface APIServer {
+  currentPlayers: number;
+  maxPlayers: number;
+  firstSeen: string;
+  lastUpdate: string;
+}
+
 export interface Server {
   id: number;
   name: string;
@@ -47,6 +54,7 @@ export interface Server {
   address: string;
   port: string;
   tags: string;
+  status: APIServer;
 }
 
 export interface LeaderboardResult {

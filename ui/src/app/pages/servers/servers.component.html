@@ -1,12 +1,25 @@
 <h2>Servers</h2>
-<div class="d-flex flex-wrap">
-<div class="card buffer" *ngFor="let server of servers">
-  <div class="card-header">
-    <h4>{{server.name}}</h4>
+<div class="row h-100">
+  <div class="col-4 buffer" style="min-height: 33vh" *ngFor="let server of servers">
+    <div class="card h-100">
+      <div class="card-header">
+        {{server.name}} <span [ngClass]="{'bg-success': server.status, 'bg-danger': !server.status }" class="dot float-right"></span>
+      </div>
+      <div class="card-body">
+        <div class="card-text">{{server.description}}</div>
+        <div>Players:
+          <ng-container *ngIf="server.status; else elseBlock">{{server.status.currentPlayers}}/{{server.status.maxPlayers}}</ng-container>
+          <ng-template #elseBlock>0/0</ng-template>
+        </div>
+        <div>
+          <img src="https://api.kag2d.com/server/ip/{{server.address}}/port/{{server.port}}/minimap" onError="this.src='/assets/unkownmap.png'">
+        </div>
+      </div>
+      <div class="card-footer">
+        Last Update:
+        <ng-container *ngIf="server.status; else elseBlock">{{server.status.lastUpdate | date:'short'}}</ng-container>
+        <ng-template #elseBlock>never</ng-template>
+      </div>
+    </div>
   </div>
-  <div class="card-body">
-    <p>{{server.description}}</p>
-    <img src="https://api.kag2d.com/server/ip/{{server.address}}/port/{{server.port}}/minimap">
-  </div>
-</div>
 </div>

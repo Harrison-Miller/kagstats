@@ -5,7 +5,7 @@ import { ServersService } from '../../services/servers.service';
 @Component({
   selector: 'app-servers',
   templateUrl: './servers.component.html',
-  styleUrls: ['./servers.component.sass']
+  styleUrls: ['./servers.component.scss']
 })
 export class ServersComponent implements OnInit {
   servers: Server[];
@@ -19,6 +19,18 @@ export class ServersComponent implements OnInit {
   getServers(): void {
     this.serversService
       .getServers()
-      .subscribe(servers => (this.servers = servers));
+      .subscribe(servers => {
+        this.servers = servers;
+        this.getAPIServers();
+      });
+  }
+
+  getAPIServers(): void {
+    this.servers.forEach(server => {
+      this.serversService.getAPIServer(server.address, server.port)
+        .subscribe(status => {
+          server.status = status;
+        })
+    });
   }
 }
