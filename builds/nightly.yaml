@@ -10,14 +10,11 @@ steps:
     fi
 
 - name: "docker/compose:1.24.0"
-  env:
-  - "TAG=nightly"
   args:
   - "build"
+  - "--parallel"
 
 - name: "docker/compose:1.24.0"
-  env:
-  - "TAG=nightly"
   args:
   - "push"
 
@@ -39,16 +36,7 @@ steps:
     cd /staging
     curl https://raw.githubusercontent.com/Harrison-Miller/kagstats/master/docker-compose.yaml --output docker-compose.yaml
     sudo docker-compose down --remove-orphans
-    sudo docker system prune -a -f
-    sudo TAG=nightly docker-compose pull
-    sudo SETTINGS=/settings.json TAG=nightly docker-compose up -d
+    sudo docker-compose pull
+    sudo SETTINGS=/settings.json docker-compose up -d
     EOF
     echo "Deployment finsihed"
-
-images:
-  - "gcr.io/kagstats/mysql:nightly"
-  - "gcr.io/kagstats/collector:nightly"
-  - "gcr.io/kagstats/api:nightly"
-  - "gcr.io/kagstats/basic-indexer:nightly"
-  - "gcr.io/kagstats/nemesis-indexer:nightly"
-  - "gcr.io/kagstats/hitters-indexer:nightly"

@@ -6,9 +6,7 @@ ADD . .
 
 WORKDIR $GOPATH/src/github.com/Harrison-Miller/kagstats/api
 
-RUN go get -d -v ./...
-
-RUN GOARCH=386 CGO_ENABLED=0 GOOS=linux go build -o api -i -v ./...
+RUN GO111MODULE=on GOARCH=386 CGO_ENABLED=0 GOOS=linux go build -o api -mod=vendor ./...
 
 RUN cp api /
 

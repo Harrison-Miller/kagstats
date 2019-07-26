@@ -25,7 +25,7 @@ func ConnectToDatabase(connection string, maxAttempts int) (*sqlx.DB, error) {
 			return nil, errors.Wrap(err, fmt.Sprintf("could not connect to database after %d attempts", attempts))
 		}
 
-		time.Sleep(1 * time.Second)
+		time.Sleep(time.Duration(wait) * time.Second)
 		wait = wait * 2
 
 	}

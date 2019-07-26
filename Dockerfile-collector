@@ -6,9 +6,7 @@ ADD . .
 
 WORKDIR $GOPATH/src/github.com/Harrison-Miller/kagstats/collector
 
-RUN go get -d -v ./...
-
-RUN GOARCH=386 CGO_ENABLED=0 GOOS=linux go build -o collector -i -v ./...
+RUN GO111MODULE=on GOARCH=386 CGO_ENABLED=0 GOOS=linux go build -o collector -mod=vendor ./...
 
 RUN cp collector / && cp -r templates / && cp -r scripts /
 

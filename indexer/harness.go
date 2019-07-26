@@ -1,7 +1,6 @@
 package indexer
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
@@ -9,7 +8,9 @@ import (
 	"time"
 
 	"github.com/Harrison-Miller/kagstats/common/configs"
+	"github.com/Harrison-Miller/kagstats/common/utils"
 	"github.com/pkg/errors"
+
 	// The harness run is used to wrap the entire functionality of an indexer including connecting to the database
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -48,28 +49,12 @@ func Run(indexer Indexer) error {
 		return fmt.Errorf("Error reading indexer configuration\n%v\n", err)
 	}
 
-	var db *sql.DB
-	attempts := 0
-	for {
-		db, err = sql.Open("mysql", config.DatabaseConnection)
-		if err != nil {
-			log.Printf("%v", err)
-		}
-
-		err = db.Ping()
-		if err != nil {
-			fmt.Printf("Error connecting to database %s\n%v\n", config.DatabaseConnection, err)
-		} else {
-			break
-		}
-
-		attempts = attempts + 1
-		if attempts > 10 {
-			return fmt.Errorf("Could not connect to database after 10 attempts")
-		}
-
-		time.Sleep(5 * time.Second)
+	db, err := utils.ConnectToDatabase(config.DatabaseConnection, 10)
+	if err != nil {
+		log.Fatal(err)
 	}
+
+	log.Println("Connected to the database!")
 
 	err = Init(indexer, db)
 	if err != nil {

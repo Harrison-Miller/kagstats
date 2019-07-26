@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	. "github.com/Harrison-Miller/kagstats/common/models"
+	"github.com/jmoiron/sqlx"
 )
 
 type IndexKey struct {
@@ -79,7 +80,7 @@ func BuildTable(indexer Indexer) string {
 	return b.String()
 }
 
-func Init(indexer Indexer, db *sql.DB) error {
+func Init(indexer Indexer, db *sqlx.DB) error {
 	_, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS indexer_info (
 			key_name VARCHAR(30) PRIMARY KEY,
@@ -171,7 +172,7 @@ func BuildInsert(indexer Indexer, tx *sql.Tx) (*sql.Stmt, error) {
 	return stmnt, err
 }
 
-func Process(indexer KillsIndexer, batchSize int, db *sql.DB) (int, error) {
+func Process(indexer KillsIndexer, batchSize int, db *sqlx.DB) (int, error) {
 	tx, err := db.Begin()
 	defer tx.Rollback()
 	if err != nil {
