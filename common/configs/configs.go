@@ -22,6 +22,9 @@ type Config struct {
 	Servers                []ServerConfig   `json:"servers"`
 	Indexer                IndexerConfig    `json:"indexer"`
 	API                    APIConfig        `json:"api"`
+	MOTD                   string           `json:"motd"`
+	MOTDInterval           string           `json:"motdInterval"`
+	MOTDIntervalDuration   time.Duration    `json:"-"`
 }
 
 type MonitoringConfig struct {
@@ -58,6 +61,8 @@ func NewConfig() Config {
 		BatchSize:          20,
 		CommitInterval:     "1m",
 		DatabaseConnection: "root:password@tcp(127.0.0.1:3306)/kagstats",
+		MOTD:               "",
+		MOTDInterval:       "20m",
 	}
 	c.Monitoring = NewMonitoringConfig()
 	c.Indexer = NewIndexerConfig()
@@ -126,6 +131,11 @@ func ParseDurations(c *Config) error {
 	err = ParseDuration(c.Indexer.Interval, &c.Indexer.IntervalDuration)
 	if err != nil {
 		return errors.Wrap(err, "error parsing indexer interval")
+	}
+
+	err = ParseDuration(c.MOTDInterval, &c.MOTDIntervalDuration)
+	if err != nil {
+		return errors.Wrap(err, "error parsing motd interval")
 	}
 	return nil
 }

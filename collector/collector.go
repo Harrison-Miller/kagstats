@@ -208,7 +208,25 @@ func Collect(sconfig configs.ServerConfig) {
 		client.RunScript("scripts/ServerInfo.as")
 		client.HandleFunc("^ServerInfo (?P<object>.*)", collector.ServerInfo).RemoveTimestamp()
 
+		stopMOTD := make(chan bool)
+
+		go func() {
+			if config.MOTD == "" {
+				return
+			}
+
+			for {
+				select {
+				case <-stopMOTD:
+					return
+				case <-time.After(config.MOTDIntervalDuration):
+					client.Message(config.MOTD)
+				}
+			}
+		}()
+
 		err := client.Handle()
+		stopMOTD <- true
 		if err != nil {
 			logger.Println(err)
 		}
