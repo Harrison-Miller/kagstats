@@ -35,8 +35,9 @@ steps:
     sudo chown cloudbuild /staging
     cd /staging
     curl https://raw.githubusercontent.com/Harrison-Miller/kagstats/master/docker-compose.yaml --output docker-compose.yaml
-    sudo docker-compose down --remove-orphans
-    sudo docker-compose pull
-    sudo SETTINGS=/settings.json docker-compose up -d
+    curl https://raw.githubusercontent.com/Harrison-Miller/kagstats/master/builds/staging-compose.yaml --output staging-compose.yaml
+    sudo docker-compose -p staging down --remove-orphans
+    sudo docker-compose -f docker-compose.yaml -f staging-compose.yaml pull
+    sudo SETTINGS=/settings.json docker-compose -f docker-compose.yaml -f staging-compose.yaml -p staging up -d
     EOF
     echo "Deployment finsihed"
