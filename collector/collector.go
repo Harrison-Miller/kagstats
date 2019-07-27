@@ -214,7 +214,7 @@ func Collect(sconfig configs.ServerConfig) {
 			if config.MOTD == "" {
 				return
 			}
-
+			client.Message(config.MOTD)
 			for {
 				select {
 				case <-stopMOTD:
