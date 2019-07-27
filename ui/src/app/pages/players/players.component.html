@@ -1,14 +1,35 @@
-<h2>Players</h2>
-<div class="row h-100">
-  <div class="col-3 buffer" *ngFor="let player of players">
-    <div class="card h-100">
-      <div class="card-header">
-        <app-player-banner [player]="player"></app-player-banner>
-      </div>
-      <div class="card-body">
-        <div>Username: {{player.username}}</div>
-        <div *ngIf="player.clanTag!=''">Clan: {{player.clanTag}}</div>
+<div class="row">
+  <div class="col-8">
+    <h2>Players</h2>
+    
+  </div>
+  <div class="col-4">
+      <input type="text" [formControl]="search" class="form-control float-left buffer" style="margin-top: 10px" placeholder="search...">
+  </div>
+</div>
+<ng-container *ngIf="players; else noPlayers">
+<div class="row">
+    <div class="col-3 buffer" *ngFor="let player of players">
+      <div class="card h-100">
+        <div class="card-header">
+          <app-player-banner [player]="player"></app-player-banner>
+        </div>
+        <div class="card-body">
+          <div>Username: {{player.username}}</div>
+          <div *ngIf="player.clanTag!=''">Clan: {{player.clanTag}}</div>
+        </div>
       </div>
     </div>
   </div>
-</div>
+</ng-container>
+<ng-template #noPlayers>
+  <ng-container *ngIf="loading; else loadingElse">
+    <div class="spinner spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+  </ng-container>
+  <ng-template #loadingElse>
+      <h2 class="text-center">No Results</h2>
+  </ng-template>
+
+</ng-template>

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { PlayersService } from '../../services/players.service';
 import { Player } from '../../models';
 
@@ -9,21 +10,49 @@ import { Player } from '../../models';
 })
 export class PlayersComponent implements OnInit {
 
+  search = new FormControl('')
+
   players: Player[]
+  loading: boolean
 
   constructor(private playersService: PlayersService) { 
     this.getPlayers();
   }
 
   ngOnInit() {
+    this.search.valueChanges
+      .subscribe(value => {
+        if(value == '') {
+          this.getPlayers();
+        }
+        this.searchPlayers(value);
+      })
+  }
+
+  searchPlayers(search: string): void {
+    this.loading = true;
+    this.playersService.searchPlayers(search)
+      .subscribe( players => {
+        this.players = players;
+
+        if(this.players) {
+          if(this.players.length != 0) {
+            this.getAvatars();
+            this.getAPIPlayers();
+          }
+        }
+        this.loading = false;
+      });
   }
 
   getPlayers(): void {
+    this.loading = true;
     this.playersService.getPlayers()
       .subscribe( players => {
-        this.players = players.values
+        this.players = players.values;
         this.getAvatars();
         this.getAPIPlayers();
+        this.loading = false;
       });
   }
 

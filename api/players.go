@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -41,24 +42,40 @@ func getPlayers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	next := int(start)+len(players)
+	next := int(start) + len(players)
 	if len(players) < int(limit) {
 		next = -1
 	}
 
 	JSONResponse(w, struct {
-		Limit int `json:"limit"`
-		Start int `json:"start"`
-		Size int `json:"size"`
-		Next int `json:"next"`
+		Limit   int             `json:"limit"`
+		Start   int             `json:"start"`
+		Size    int             `json:"size"`
+		Next    int             `json:"next"`
 		Players []models.Player `json:"values"`
 	}{
-		Limit: int(limit),
-		Start: int(start),
-		Size: len(players),
-		Next: next,
+		Limit:   int(limit),
+		Start:   int(start),
+		Size:    len(players),
+		Next:    next,
 		Players: players,
 	})
+}
+
+func searchPlayers(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	search := vars["search"]
+	search = "%" + search + "%"
+
+	var players []models.Player
+	err := db.Select(&players, "SELECT * FROM players WHERE lower(username) LIKE ? OR lower(charactername) LIKE ? OR lower(clantag) LIKE ? LIMIT 30", search, search, search)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error search for players %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	JSONResponse(w, &players)
 }
 
 func getPlayer(w http.ResponseWriter, r *http.Request) {

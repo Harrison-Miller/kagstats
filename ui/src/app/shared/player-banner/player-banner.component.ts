@@ -16,6 +16,5 @@ export class PlayerBannerComponent implements OnInit {
 
   ngOnInit() {
   }
-  
 
 }

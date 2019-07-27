@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -18,6 +19,7 @@ import { UnkownAvatarPipe } from './pipes/unkown-avatar.pipe';
 import { PlayerBannerComponent } from './shared/player-banner/player-banner.component';
 import { StatusClassPipe } from './pipes/status-class.pipe';
 import { KagRoleColorPipe } from './pipes/kag-role-color.pipe';
+import { DefaultImageDirective } from './default-image.directive';
 
 @NgModule({
   declarations: [
@@ -32,9 +34,10 @@ import { KagRoleColorPipe } from './pipes/kag-role-color.pipe';
     UnkownAvatarPipe,
     PlayerBannerComponent,
     StatusClassPipe,
-    KagRoleColorPipe
+    KagRoleColorPipe,
+    DefaultImageDirective
   ],
-  imports: [BrowserModule, AppRoutingModule, HttpClientModule],
+  imports: [BrowserModule, AppRoutingModule, HttpClientModule, ReactiveFormsModule],
   providers: [LeaderboardService, PlayersService, ServersService],
   bootstrap: [AppComponent]
 })

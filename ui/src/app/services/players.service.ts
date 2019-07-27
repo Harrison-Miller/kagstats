@@ -14,6 +14,11 @@ export class PlayersService {
     return this.http.get<PagedResult<Player>>('/api/players');
   }
 
+  searchPlayers(search: string): Observable<Player[]> {
+    search = search.toLowerCase();
+    return this.http.get<Player[]>(`/api/players/search/${search}`);
+  }
+
   getPlayerAvatar(username: string): Observable<string> {
     let path = `https://api.kag2d.com/v1/player/${username}/avatar`
     return this.http.get<{large:string}>(path).pipe(
@@ -22,7 +27,7 @@ export class PlayersService {
   }
 
   getAPIPlayer(username: string): Observable<{playerInfo:APIPlayerInfo, playerStatus:APIPlayerStatus}> {
-    let path = `https://api.kag2d.com/v1/player/${username}`
+    let path = `https://api.kag2d.com/v1/player/${username}`;
     return this.http.get<{playerInfo:APIPlayerInfo, playerStatus:APIPlayerStatus}>(path);
   }
 }
