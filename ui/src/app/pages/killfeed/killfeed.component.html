@@ -1,0 +1,9 @@
+<div class="col-4 buffer" *ngFor="let kill of kills.slice(0, 15)">
+    <div>
+        <div class="float-left">
+            <img id="kavatar" src="{{ kill.killerClass | kagClassImg }}" class="rounded-circle" style="width: 50px; height: 50px;">
+            <span>{{kill.killer.username}} slew {{kill.victim.username}}</span>
+            <img id="vavatar" src="{{ kill.victimClass | kagClassImg }}" class="rounded-circle" style="width: 50px; height: 50px;">
+        </div>
+  </div>
+</div>

@@ -20,6 +20,9 @@ import { PlayerBannerComponent } from './shared/player-banner/player-banner.comp
 import { StatusClassPipe } from './pipes/status-class.pipe';
 import { KagRoleColorPipe } from './pipes/kag-role-color.pipe';
 import { DefaultImageDirective } from './default-image.directive';
+import { KillfeedComponent } from './pages/killfeed/killfeed.component';
+import { KillsService } from './services/kills.service';
+import { KagClassImgPipe } from './pipes/kag-class-img.pipe';
 
 @NgModule({
   declarations: [
@@ -35,10 +38,12 @@ import { DefaultImageDirective } from './default-image.directive';
     PlayerBannerComponent,
     StatusClassPipe,
     KagRoleColorPipe,
-    DefaultImageDirective
+    DefaultImageDirective,
+    KillfeedComponent,
+    KagClassImgPipe
   ],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule, ReactiveFormsModule],
-  providers: [LeaderboardService, PlayersService, ServersService],
+  providers: [LeaderboardService, PlayersService, ServersService, KillsService],
   bootstrap: [AppComponent]
 })
 export class AppModule {}
