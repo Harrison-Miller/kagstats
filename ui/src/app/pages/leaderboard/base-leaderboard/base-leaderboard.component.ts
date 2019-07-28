@@ -17,11 +17,13 @@ export class BaseLeaderboardComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.leaderboardService
-      .getBaseLeaderboard()
+      .leaderboard
       .pipe(takeUntil(this.componentDestroyed$))
       .subscribe(result => {
         this.leaderboard$.next(result.leaderboard);
       });
+
+    this.leaderboardService.getBaseLeaderboard();
   }
 
   ngOnDestroy() {

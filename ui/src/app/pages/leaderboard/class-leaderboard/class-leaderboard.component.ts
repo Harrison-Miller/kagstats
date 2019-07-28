@@ -35,11 +35,13 @@ export class ClassLeaderboardComponent implements OnInit, OnDestroy {
         }
 
         this.leaderboardService
-          .getLeaderboard(this.class)
+          .leaderboard
           .pipe(takeUntil(this.componentDestroyed$))
           .subscribe(result => {
             this.leaderboard$.next(result.leaderboard);
           });
+
+        this.leaderboardService.getLeaderboard(this.class);
       });
   }
 
