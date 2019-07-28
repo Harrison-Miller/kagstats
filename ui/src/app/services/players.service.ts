@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { PagedResult, Player } from '../models';
+import { PagedResult, Player, BasicStats } from '../models';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -9,6 +9,10 @@ import { map } from 'rxjs/operators';
 })
 export class PlayersService {
   constructor(private http: HttpClient) {}
+
+  getPlayer(playerId): Observable<BasicStats> {
+    return this.http.get<BasicStats>(`/api/players/${playerId}/basic`);
+  }
 
   getPlayers(): Observable<PagedResult<Player>> {
     return this.http.get<PagedResult<Player>>('/api/players');

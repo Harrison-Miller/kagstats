@@ -1,0 +1,70 @@
+<ng-container *ngIf="player">
+<h2 class="{{ player.role | kagRoleColor }}">
+    {{player.clanTag}} {{player.characterName}}
+    <ng-container *ngIf="player.characterName != player.username">
+        ({{player.username}})
+    </ng-container>
+</h2>
+
+<ng-container *ngIf="player.avatar != ''; else avatarElse">
+    <img id="avatar" src="{{player.avatar}}" default="/assets/portrait1.png" class="rounded-circle" style="width: 100px; height: 100px;">
+</ng-container>
+<ng-template #avatarElse>
+    <img id="avatar" src="{{ player.id | unkownAvatar }}" class="rounded-circle" style="width: 100px; height: 100px;">
+</ng-template>
+
+<h3>Overview</h3>
+<ng-container *ngIf="player">
+<div class="row">
+    <div class="shadow-sm col text-center">
+        <h3>Archer</h3>
+        <div class="icon archerIcon"></div>
+        <h4>{{archerKD()}}</h4>
+        <div class="row">
+            <div class="col">
+                <div>Kills</div>
+                <h5>{{basicStats.archerKills}}</h5>
+            </div>
+            <div class="col">
+                <div>Deaths</div>
+                <h5>{{basicStats.archerDeaths}}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="shadow-sm col text-center">
+        <h3>Builder</h3>
+        <div class="icon builderIcon"></div>
+        <h4>{{builderKD()}}</h4>
+        <div class="row">
+            <div class="col">
+                <div>Kills</div>
+                <h5>{{basicStats.builderKills}}</h5>
+            </div>
+            <div class="col">
+                <div>Deaths</div>
+                <h5>{{basicStats.builderDeaths}}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="shadow-sm col text-center">
+        <h3>Knight</h3>
+        <div class="icon knightIcon"></div>
+        <h4>{{knightKD()}}</h4>
+        <div class="row">
+            <div class="col">
+                <div>Kills</div>
+                <h5>{{basicStats.knightKills}}</h5>
+            </div>
+            <div class="col">
+                <div>Deaths</div>
+                <h5>{{basicStats.knightDeaths}}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="shadow-sm col text-center">
+        <h3>Suicides</h3>
+        <div class="icon suicideIcon"></div>
+        <h4>{{basicStats.suicides}}</h4>
+    </div>
+</div>
+</ng-container>

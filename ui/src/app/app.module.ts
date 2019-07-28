@@ -20,6 +20,7 @@ import { PlayerBannerComponent } from './shared/player-banner/player-banner.comp
 import { StatusClassPipe } from './pipes/status-class.pipe';
 import { KagRoleColorPipe } from './pipes/kag-role-color.pipe';
 import { DefaultImageDirective } from './default-image.directive';
+import { PlayerDetailComponent } from './pages/player-detail/player-detail.component';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { DefaultImageDirective } from './default-image.directive';
     StatusClassPipe,
     KagRoleColorPipe,
     DefaultImageDirective,
+    PlayerDetailComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule, ReactiveFormsModule],
   providers: [LeaderboardService, PlayersService, ServersService],
