@@ -1,7 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { KillsService } from 'src/app/services/kills.service';
 import { Kill } from '../../models';
-import { Observable, timer } from 'rxjs';
+import { Observable, Subject, timer } from 'rxjs';
+import { map, take } from 'rxjs/operators';
 
 /**
  * The KillfeedComponent periodically queries for new kills,
@@ -17,17 +18,15 @@ import { Observable, timer } from 'rxjs';
 })
 export class KillfeedComponent implements OnInit {
   @Input() limit: number = 100;
-  kills: Kill[];
+  kills$: Observable<Kill[]>;
 
   constructor(private killsService: KillsService) {}
 
   ngOnInit() {
-    // Routinely query for new kills. 
-    timer(0, 30000).subscribe(() => {
-      this.killsService.getKills().subscribe(kills => {
-        // Map kills to values prop of returned PagedResults.
-        this.kills = kills.values.slice(0, this.limit);
-      });
-    });
+    this.kills$ = this.killsService.kills$.pipe(
+      map(kills => {
+        return kills.slice(0, this.limit);
+      })
+    );
   }
 }

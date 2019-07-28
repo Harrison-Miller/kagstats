@@ -1,3 +1,4 @@
+<!--
 <div class="row" *ngFor="let kill of kills">
     <div class="col text-center">
         <app-player-banner [player]=kill.killer></app-player-banner>
@@ -9,5 +10,19 @@
             <app-player-banner [player]=kill.victim></app-player-banner>
     </div>
 </div>
+-->
 
-
+<div class="row">
+  <table class="table" *ngIf="kills$ | async as kills">
+    <thead>
+      <th>Killer</th>
+      <th>Victim</th>
+      <th>Time</th>
+    </thead>
+    <tbody *ngFor="let kill of kills">
+      <td><app-player-banner [player]="kill.killer"></app-player-banner></td>
+      <td><app-player-banner [player]=kill.victim></app-player-banner></td>
+      <td>{{kill.time | date: 'long'}}</td>
+    </tbody>
+  </table>
+</div>
