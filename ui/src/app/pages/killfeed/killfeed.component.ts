@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { KillsService } from 'src/app/services/kills.service';
 import { Kill } from '../../models';
 import { Observable, timer } from 'rxjs';
@@ -16,6 +16,7 @@ import { Observable, timer } from 'rxjs';
   styleUrls: ['./killfeed.component.sass']
 })
 export class KillfeedComponent implements OnInit {
+  @Input() limit: number = 100;
   kills: Kill[];
 
   constructor(private killsService: KillsService) {}
@@ -25,7 +26,7 @@ export class KillfeedComponent implements OnInit {
     timer(0, 30000).subscribe(() => {
       this.killsService.getKills().subscribe(kills => {
         // Map kills to values prop of returned PagedResults.
-        this.kills = kills.values;
+        this.kills = kills.values.slice(0, this.limit);
       });
     });
   }

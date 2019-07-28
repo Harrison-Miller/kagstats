@@ -28,7 +28,7 @@ export interface Kill {
   time: number;
   serverId: number;
   teamKill: number;
-  player: Player;
+  victim: Player;
   killer: Player;
 }
 

@@ -11,7 +11,9 @@ import (
 
 const killsQuery = `SELECT kills.*,
 	victim.ID "victim.ID", victim.username "victim.username", victim.charactername "victim.charactername", victim.clantag "victim.clantag",
-	killer.ID "killer.ID", killer.username "killer.username", killer.charactername "killer.charactername", killer.clantag "killer.clantag" FROM kills
+	victim.avatar "victim.avatar", victim.oldgold "victim.oldgold", victim.registered "victim.registered", victim.role "victim.role", victim.tier "victim.tier",
+	killer.ID "killer.ID", killer.username "killer.username", killer.charactername "killer.charactername", killer.clantag "killer.clantag",
+	killer.avatar "killer.avatar", killer.oldgold "killer.oldgold", killer.registered "killer.registered", killer.role "killer.role", killer.tier "killer.tier" FROM kills
 	INNER JOIN players as victim ON kills.victimID=victim.ID
 	INNER JOIN players as killer ON kills.killerID=killer.ID `
 
