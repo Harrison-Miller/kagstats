@@ -45,8 +45,6 @@ services:
       args:
         indexer: basic
     image: gcr.io/kagstats/basic-indexer:${TAG:-latest}
-    environment:
-      - INDEXER_INTERVAL=10s
     links:
       - mysql
     restart: always
@@ -57,8 +55,6 @@ services:
       args:
         indexer: nemesis
     image: gcr.io/kagstats/nemesis-indexer:${TAG:-latest}
-    environment:
-      - INDEXER_INTERVAL=10s
     links:
       - mysql
     restart: always
@@ -69,8 +65,18 @@ services:
       args:
         indexer: hitters
     image: gcr.io/kagstats/hitters-indexer:${TAG:-latest}
+    links:
+      - mysql
+    restart: always
+  apicache:
+    build:
+      context: .
+      dockerfile: Dockerfile-indexer
+      args:
+        indexer: apicache
+    image: gcr.io/kagstats/apicache:${TAG:-latest}
     environment:
-      - INDEXER_INTERVAL=10s
+      - INDEXER_INTERVAL=5m
     links:
       - mysql
     restart: always

@@ -1,10 +1,14 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"strings"
-	"time"
+
+	"github.com/Harrison-Miller/kagstats/common/utils"
 
 	"github.com/Harrison-Miller/kagstats/common/models"
+	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
 
@@ -125,6 +129,21 @@ func InitDB() error {
 	if err != nil {
 		return errors.Wrap(err, "error creating events table")
 	}
+
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS stats_info (
+		key_name VARCHAR(30) PRIMARY KEY,
+		value INT NOT NULL	
+	)`)
+	if err != nil {
+		return err
+	}
+
+	db.Exec("INSERT INTO stats_info (key_name, value) VALUES(?,?)", "database_version", 0)
+
+	err = RunMigrations(db)
+	if err != nil {
+		return errors.Wrap(err, "error running migrations")
+	}
 	return nil
 }
 
@@ -173,7 +192,7 @@ func AddEvent(playerID int64, eventType string, serverID int64) error {
 	defer tx.Rollback()
 
 	_, err = tx.Exec("INSERT INTO events (playerID,Type,Time,ServerID) VALUES(?,?,?,?)",
-		playerID, eventType, time.Now().Unix(), serverID)
+		playerID, eventType, utils.NowAsUnixMilliseconds(), serverID)
 
 	if err != nil {
 		return errors.Wrap(err, "error inserting event")
@@ -182,5 +201,92 @@ func AddEvent(playerID int64, eventType string, serverID int64) error {
 	if err := tx.Commit(); err != nil {
 		return errors.Wrap(err, "error committing event")
 	}
+	return nil
+}
+
+func RunMigrations(db *sqlx.DB) error {
+	err := RunMigration(1, APICacheChanges, db)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func RunMigration(version int64, migrations func(db *sqlx.DB) error, db *sqlx.DB) error {
+	db.Exec("INSERT INTO stats_info (key_name, value) VALUES(?,?)", "database_version", version)
+	row := db.QueryRow("SELECT value FROM stats_info WHERE key_name=?", "database_version")
+	var currentVersion int64
+	err := row.Scan(&currentVersion)
+	if err != nil {
+		return errors.Wrap(err, "error getting current database version")
+	}
+
+	if currentVersion < version {
+		log.Printf("Running migrations for version %d", version)
+		err = migrations(db)
+		if err != nil {
+			return errors.Wrap(err, fmt.Sprintf("error running migrations for version %d", version))
+		}
+
+		_, err = db.Exec("UPDATE stats_info SET value=? WHERE key_name=?", version, "database_version")
+	} else {
+		log.Printf("Skipping migrations for version %d", version)
+	}
+
+	return nil
+}
+
+func AddColumn(table string, name string, props string, defaultVal string, db *sqlx.DB) error {
+	stmnt := fmt.Sprintf("ALTER TABLE %s ADD %s %s DEFAULT %s", table, name, props, defaultVal)
+	_, err := db.Exec(stmnt)
+	return err
+}
+
+func APICacheChanges(db *sqlx.DB) error {
+	err := AddColumn("players", "oldgold", "BOOLEAN NOT NULL", "FALSE", db)
+	if err != nil {
+		return err
+	}
+
+	err = AddColumn("players", "registered", "VARCHAR(100) NOT NULL", "''", db)
+	if err != nil {
+		return err
+	}
+
+	err = AddColumn("players", "role", "INT NOT NULL", "0", db)
+	if err != nil {
+		return err
+	}
+
+	err = AddColumn("players", "avatar", "VARCHAR(255) NOT NULL", "''", db)
+	if err != nil {
+		return err
+	}
+
+	err = AddColumn("players", "tier", "INT NOT NULL", "0", db)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec("ALTER TABLE events MODIFY time BIGINT UNSIGNED NOT NULL")
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec("UPDATE events SET time=time*1000")
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec("ALTER TABLE kills MODIFY epoch BIGINT UNSIGNED NOT NULL")
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec("UPDATE kills SET epoch=epoch*1000")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

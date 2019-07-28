@@ -32,25 +32,18 @@ export interface Kill {
   killer: Player;
 }
 
-export interface APIPlayerInfo {
-  old_gold: boolean;
-  registered: string;
-  role: number;
-}
-
-export interface APIPlayerStatus {
-  action: number;
-  lastUpdate: string;
-}
-
 export interface Player {
   id: number;
   username: string;
   characterName: string;
   clanTag: string;
   avatar: string;
-  info: APIPlayerInfo;
-  status: APIPlayerStatus;
+  oldGold: boolean;
+  registered: string;
+  role: number;
+  tier: number;
+  lastEvent: string;
+  lastEventTime: number;
 }
 
 export interface APIServer {

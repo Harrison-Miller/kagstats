@@ -9,6 +9,16 @@ type Player struct {
 	Username      string `json:"username"`
 	Charactername string `json:"characterName"`
 	Clantag       string `json:"clanTag"`
+
+	//Information cached from api.kag2d.com
+	OldGold    bool   `json:"oldGold"`
+	Registered string `json:"registered"`
+	Role       int64  `json:"role"`
+	Avatar     string `json:"avatar"`
+	Tier       int64  `json:"tier"`
+
+	LastEvent     string `json:"lastEvent" db:"lastEvent"`
+	LastEventTime int64  `json:"lastEventTime" db:"lastEventTime"`
 }
 
 func GetPlayer(playerID int, db *sqlx.DB) (Player, error) {

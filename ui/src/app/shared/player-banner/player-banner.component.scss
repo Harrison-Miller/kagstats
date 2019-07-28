@@ -3,9 +3,9 @@
     width: 15px;
     border-radius: 50%;
     display: inline-block;
-    position: absolute;
-    top: 45px;
-    left: 55px;
+    position: relative;
+    top: 22px;
+    left: -17px;
 }
 
 .dev {
@@ -14,4 +14,40 @@
 
 .guard {
     color: #A0FFA0;
+}
+
+//Badges
+.oldGoldBadge {
+    width: 16px;
+    height: 16px;
+    background-image: url(/assets/AccoladeBadges.png);
+    background-position: -128px 0px;
+}
+
+.tier1Badge {
+    width: 16px;
+    height: 16px;
+    background-image: url(/assets/AccoladeBadges.png);
+    background-position: 0px -16px;
+}
+
+.tier2Badge {
+    width: 16px;
+    height: 16px;
+    background-image: url(/assets/AccoladeBadges.png);
+    background-position: -16px -16px;
+}
+
+.tier3Badge {
+    width: 16px;
+    height: 16px;
+    background-image: url(/assets/AccoladeBadges.png);
+    background-position: -32px -16px;
+}
+
+.tier4Badge {
+    width: 16px;
+    height: 16px;
+    background-image: url(/assets/AccoladeBadges.png);
+    background-position: -48px -16px;
 }

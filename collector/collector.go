@@ -8,6 +8,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/Harrison-Miller/kagstats/common/utils"
+
 	"github.com/Harrison-Miller/kagstats/common/configs"
 	"github.com/Harrison-Miller/kagstats/common/models"
 	"github.com/Harrison-Miller/rcon"
@@ -56,7 +58,10 @@ func (c *Collector) OnPlayerJoined(m rcon.Message, r *rcon.Client) error {
 		if err != nil {
 			return err
 		}
-		UpdateJoinTime(player.ID, c.server.ID)
+		err = UpdateJoinTime(player.ID, c.server.ID)
+		if err != nil {
+			return err
+		}
 		c.logger.Printf("%s (%d) joined the game", player.Username, player.ID)
 	}
 	return nil
@@ -77,7 +82,7 @@ func (c *Collector) OnPlayerLeave(m rcon.Message, r *rcon.Client) error {
 		}
 		err = UpdateLeaveTime(player.ID, c.server.ID)
 		if err != nil {
-
+			return err
 		}
 		c.logger.Printf("%s (%d) left the game", player.Username, player.ID)
 	}
@@ -104,7 +109,7 @@ func (c *Collector) OnPlayerDie(m rcon.Message, r *rcon.Client) error {
 
 		kill.VictimID = kill.Player.ID
 		kill.KillerID = kill.Killer.ID
-		kill.Time = time.Now().Unix()
+		kill.Time = utils.NowAsUnixMilliseconds()
 		kill.ServerID = c.server.ID
 		c.logger.Printf("%+v", kill)
 		kills <- kill

@@ -35,7 +35,7 @@ import { DefaultImageDirective } from './default-image.directive';
     PlayerBannerComponent,
     StatusClassPipe,
     KagRoleColorPipe,
-    DefaultImageDirective
+    DefaultImageDirective,
   ],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule, ReactiveFormsModule],
   providers: [LeaderboardService, PlayersService, ServersService],

@@ -2,7 +2,12 @@ FROM golang:1.12 AS build
 
 WORKDIR $GOPATH/src/github.com/Harrison-Miller/kagstats
 
-ADD . .
+ADD go.mod .
+ADD go.sum .
+ADD vendor/ ./vendor
+
+ADD common/ ./common
+ADD collector/ ./collector
 
 WORKDIR $GOPATH/src/github.com/Harrison-Miller/kagstats/collector
 

@@ -4,7 +4,16 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+First make sure all the other services are running and the database/api are available.
+`docker-compose up -d`
+
+Then start then start angular building and watching the files from the ui folder
+`npm run build -- --watch`
+Make sure for this step to finish and be ready before launching the docker container
+
+Then from the ui folder start an nginx container, mount the development angular files and attach it to the network with the api
+`docker run --rm --network=kagstats_default -v $(pwd)/dist/ui:/var/www/html -p 4200:80 gcr.io/kagstats/ui`
+
 
 ## Code scaffolding
 

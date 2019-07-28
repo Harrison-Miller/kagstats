@@ -34,13 +34,6 @@ export class PlayersComponent implements OnInit {
     this.playersService.searchPlayers(search)
       .subscribe( players => {
         this.players = players;
-
-        if(this.players) {
-          if(this.players.length != 0) {
-            this.getAvatars();
-            this.getAPIPlayers();
-          }
-        }
         this.loading = false;
       });
   }
@@ -50,27 +43,8 @@ export class PlayersComponent implements OnInit {
     this.playersService.getPlayers()
       .subscribe( players => {
         this.players = players.values;
-        this.getAvatars();
-        this.getAPIPlayers();
         this.loading = false;
       });
-  }
-
-  getAvatars(): void {
-    this.players.forEach(player => {
-      this.playersService.getPlayerAvatar(player.username)
-        .subscribe(avatar => player.avatar = avatar)
-    });
-  }
-  
-  getAPIPlayers(): void {
-    this.players.forEach(player => {
-      this.playersService.getAPIPlayer(player.username)
-        .subscribe(p => {
-          player.info = p.playerInfo;
-          player.status = p.playerStatus;
-        })
-    });
   }
 
 }

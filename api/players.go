@@ -6,9 +6,14 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Harrison-Miller/kagstats/common/utils"
+
 	"github.com/Harrison-Miller/kagstats/common/models"
 	"github.com/gorilla/mux"
 )
+
+const playersQuery = `SELECT players.*, event.type "lastEvent", event.time "lastEventTime" FROM players
+	INNER JOIN events as event ON event.ID = (SELECT e.ID FROM events as e WHERE e.playerID=players.ID ORDER BY e.ID DESC LIMIT 1) `
 
 func getPlayers(w http.ResponseWriter, r *http.Request) {
 	var players []models.Player
@@ -36,7 +41,7 @@ func getPlayers(w http.ResponseWriter, r *http.Request) {
 		limit = Min(int64(l), limit)
 	}
 
-	err := db.Select(&players, "SELECT * FROM players LIMIT ?,?", start, limit)
+	err := db.Select(&players, playersQuery+"LIMIT ?,?", start, limit)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return
@@ -68,7 +73,7 @@ func searchPlayers(w http.ResponseWriter, r *http.Request) {
 	search = "%" + search + "%"
 
 	var players []models.Player
-	err := db.Select(&players, "SELECT * FROM players WHERE lower(username) LIKE ? OR lower(charactername) LIKE ? OR lower(clantag) LIKE ? LIMIT 30", search, search, search)
+	err := db.Select(&players, playersQuery+"WHERE lower(username) LIKE ? OR lower(charactername) LIKE ? OR lower(clantag) LIKE ? LIMIT 30", search, search, search)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error search for players %v", err), http.StatusInternalServerError)
@@ -87,11 +92,44 @@ func getPlayer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var player models.Player
-	err = db.Get(&player, "SELECT * FROM players WHERE ID=?", int64(playerID))
+	err = db.Get(&player, playersQuery+"WHERE players.ID=?", int64(playerID))
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Player not found: %v", err), http.StatusInternalServerError)
 		return
 	}
 
 	JSONResponse(w, &player)
+}
+
+func refreshPlayer(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	playerID, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		http.Error(w, "could not parse id", http.StatusBadRequest)
+		return
+	}
+
+	var player models.Player
+	err = db.Get(&player, playersQuery+"WHERE players.ID=?", int64(playerID))
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Player not found: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	utils.GetPlayerAvatar(&player)
+	utils.GetPlayerTier(&player)
+	utils.GetPlayerInfo(&player)
+
+	_, err = db.Exec("UPDATE players SET oldgold=?,registered=?,role=?,avatar=?,tier=? WHERE ID=?",
+		player.OldGold, player.Registered, player.Role, player.Avatar, player.Tier, player.ID)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("error updating player info: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	JSONResponse(w, &struct {
+		Message string `json:"message"`
+	}{
+		Message: "success",
+	})
 }

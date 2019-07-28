@@ -9,6 +9,7 @@ import { Player } from '../../models';
 export class PlayerBannerComponent implements OnInit {
 
   @Input() player: Player;
+  today: number = Date.now();
 
   constructor() { 
 
