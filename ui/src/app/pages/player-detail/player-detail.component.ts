@@ -19,9 +19,10 @@ export class PlayerDetailComponent implements OnInit {
     private playersService: PlayersService) { }
 
   ngOnInit() {
-    this.playerId = +this.route.snapshot.paramMap.get('id')
-
-    this.getPlayer();
+    this.route.paramMap.subscribe(params => {
+      this.playerId = +params.get('id');
+      this.getPlayer();
+    });
   }
 
   getPlayer(): void {
