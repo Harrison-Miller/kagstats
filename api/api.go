@@ -54,6 +54,7 @@ func main() {
 	r.HandleFunc("/servers", getServers).Methods("GET")
 	r.HandleFunc("/servers/{id:[0-9]+}", getServer).Methods("GET")
 	r.HandleFunc("/servers/{id:[0-9]+}/events", getServerEvents).Methods("GET")
+	r.HandleFunc("/servers/{id:[0-9]+}/kills", getServerKills).Methods("GET")
 
 	r.HandleFunc("/kills", getKills).Methods("GET")
 	r.HandleFunc("/kills/{id:[0-9]+}", getKill).Methods("GET")
