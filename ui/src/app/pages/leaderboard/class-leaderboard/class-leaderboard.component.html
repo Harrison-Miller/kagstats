@@ -11,7 +11,7 @@
   </thead>
   <tbody *ngIf="leaderboard$ | async as leaderboard">
   <tr *ngFor="let leader of leaderboard">
-    <td>{{leader.player.characterName}} ({{leader.player.username}})</td>
+    <td style="width: 250px"><app-player-banner [player]="leader.player"></app-player-banner></td>
     <td>{{totalKills(leader)}}</td>
     <td>{{totalDeaths(leader)}}</td>
     <td>{{kd(leader)}}</td>
