@@ -26,6 +26,20 @@
     background-position: 0px -16px;
 }
 
+.drill {
+    width: 32px;
+    height: 16px;
+    background-image: url(/assets/KillfeedIcons.png);
+    background-position: -32px -16px;
+}
+
+.saw {
+    width: 32px;
+    height: 16px;
+    background-image: url(/assets/KillfeedIcons.png);
+    background-position: -64px -16px;
+}
+
 .builder {
     width: 32px;
     height: 16px;
@@ -73,6 +87,13 @@
     height: 16px;
     background-image: url(/assets/KillfeedIcons.png);
     background-position: -64px -64px;
+}
+
+.cata_stones {
+    width: 32px;
+    height: 16px;
+    background-image: url(/assets/KillfeedIcons.png);
+    background-position: -96px -64px;
 }
 
 .arrow {

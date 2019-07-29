@@ -87,8 +87,8 @@ export  const HITTER_DESCRIPTION: string[] = [
     "Arrow",
     "Bomb Arrow",
     "Ballista Bolt",
-    "Catapult Stones",
-    "Catapult Boulder",
+    "Catapult",
+    "Catapult",
     "Boulder",
     "Ram",
     "Explosion",
@@ -97,6 +97,7 @@ export  const HITTER_DESCRIPTION: string[] = [
     "Mine", //mine_special
     "Spikes",
     "Saw",
+    "Drill",
     "Muscles",
     "Carnage"
 ];
