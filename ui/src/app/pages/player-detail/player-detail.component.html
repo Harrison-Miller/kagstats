@@ -14,8 +14,8 @@
 </ng-template>
 
 <div class="top-margin">
-<ngb-tabset [justify]="center">
-    <ngb-tab>
+<ngb-tabset [justify]="center" #t="ngbTabset">
+    <ngb-tab id="overview">
     <ng-template ngbTabTitle><h3>Overview</h3></ng-template>
     <ng-template ngbTabContent>
     <div class="top-margin">
@@ -79,15 +79,25 @@
     <ngb-tab>
     <ng-template ngbTabTitle><h3>Fact Sheet</h3></ng-template>
     <ng-template ngbTabContent>
+        <div class="margin-top">
         <div class="row">
-            <div class="shadow-sm col text-center" routerLink="/players/{{nemesis.nemesis.id}}">
+            <div class="shadow-sm col text-center">
                 <h3>Nemesis</h3>
-                <app-player-banner [player]="nemesis.nemesis"></app-player-banner>
-                <h4>Has killed you {{nemesis.deaths}} times!</h4>
+                <div class="row margin-top">
+                    <div class="col offset-4" routerLink="/players/{{nemesis.nemesis.id}}">
+                        <app-player-banner [player]="nemesis.nemesis"></app-player-banner>
+                    </div>
+                </div>
+                <h5 class="margin-top">Has killed {{player.clanTag}} {{player.characterName}} {{nemesis.deaths}} times!</h5>
             </div>
             <div class="shadow-sm col text-center">
                 <h3>Top Weapons</h3>
+                <div *ngFor="let hitter of hitters">
+                    <h5>{{hitter.kills}} kills with {{descriptions[hitter.hitter]}}</h5>
+                    <div class="{{ hitter.hitter | hitterIcon }}" style="margin: auto"></div>
+                </div>
             </div>
+        </div>
         </div>
     </ng-template>
     </ngb-tab>

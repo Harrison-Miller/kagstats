@@ -7,12 +7,12 @@ import { BaseLeaderboardComponent } from './pages/leaderboard/base-leaderboard/b
 import { ClassLeaderboardComponent } from './pages/leaderboard/class-leaderboard/class-leaderboard.component';
 import { PlayersComponent } from './pages/players/players.component';
 import { PlayerDetailComponent } from './pages/player-detail/player-detail.component';
-import { KillfeedComponent } from './pages/killfeed/killfeed.component';
+import { KillsComponent } from './pages/kills/kills.component';
 
 const routes: Routes = [{
   path: '',
-  pathMatch: 'full',
-  component: HomeComponent
+  redirectTo: 'leaderboards',
+  pathMatch: 'full'
 }, {
   path: 'leaderboards',
   component: LeaderboardComponent,
@@ -34,7 +34,7 @@ const routes: Routes = [{
   component: PlayerDetailComponent
 },{
   path: 'kills',
-  component: KillfeedComponent
+  component: KillsComponent
 }];
 
 @NgModule({

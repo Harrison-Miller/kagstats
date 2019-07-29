@@ -67,16 +67,16 @@ export enum Hitters {
 
 export  const HITTER_DESCRIPTION: string[] = [
     "Died",
-    "Crushed",
-    "Fell",
-    "Drowned", //water
-    "Drowned", //water_stun
-    "Drowned", //water_stun_force
-    "Drowned", //drown
-    "Burned", //fire
-    "Burned", //fire
+    "Crushing",
+    "Fall",
+    "Drowing", //water
+    "Drowing", //water_stun
+    "Drowing", //water_stun_force
+    "Drowing", //drown
+    "Burning", //fire
+    "Burning", //fire
     "Flying??",
-    "Stomped",
+    "Stomping",
     "Suicide",
     "Bite",
     "Pickaxe", //builder

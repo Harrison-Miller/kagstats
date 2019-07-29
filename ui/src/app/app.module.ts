@@ -22,11 +22,12 @@ import { StatusClassPipe } from './pipes/status-class.pipe';
 import { KagRoleColorPipe } from './pipes/kag-role-color.pipe';
 import { DefaultImageDirective } from './default-image.directive';
 import { PlayerDetailComponent } from './pages/player-detail/player-detail.component';
-import { KillfeedComponent } from './pages/killfeed/killfeed.component';
 import { KillsService } from './services/kills.service';
 import { KagClassImgPipe } from './pipes/kag-class-img.pipe';
 import { TimeAgoPipe } from 'time-ago-pipe';
 import { HitterIconPipe } from './pipes/hitter-icon.pipe';
+import { KillsComponent } from './pages/kills/kills.component';
+import { KillfeedComponent } from './shared/killfeed/killfeed.component';
 
 @NgModule({
   declarations: [
@@ -47,7 +48,8 @@ import { HitterIconPipe } from './pipes/hitter-icon.pipe';
     KillfeedComponent,
     KagClassImgPipe,
     TimeAgoPipe,
-    HitterIconPipe
+    HitterIconPipe,
+    KillsComponent
   ],
   imports: [
     BrowserModule,

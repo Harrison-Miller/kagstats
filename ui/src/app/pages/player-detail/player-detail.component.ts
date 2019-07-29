@@ -1,14 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PlayersService } from '../../services/players.service';
-import { Player, BasicStats, Nemesis } from '../../models';
+import { Player, BasicStats, Nemesis, Hitter } from '../../models';
 import { NemesisService } from '../../services/nemesis.service';
 import { takeUntil } from 'rxjs/operators';
+import { HITTER_DESCRIPTION } from '../../hitters';
+import { HittersService } from '../../services/hitters.service';
 
 @Component({
   selector: 'app-player-detail',
   templateUrl: './player-detail.component.html',
-  styleUrls: ['./player-detail.component.scss']
+  styleUrls: ['./player-detail.component.scss', '../../shared/killfeed/killfeed.component.scss']
 })
 export class PlayerDetailComponent implements OnInit {
 
@@ -16,20 +18,35 @@ export class PlayerDetailComponent implements OnInit {
   player: Player;
   basicStats: BasicStats;
   nemesis: Nemesis;
+  hitters: Hitter[];
+  descriptions: string[] = HITTER_DESCRIPTION;
+
+  @ViewChild('t') t;
 
   constructor(
     private route: ActivatedRoute,
     private playersService: PlayersService,
-    private nemesisService: NemesisService) { }
+    private nemesisService: NemesisService,
+    private hittersService: HittersService) { }
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
       this.playerId = +params.get('id');
+      window.scrollTo(0, 0);
+
+      if(this.t) {
+        this.t.select('overview');
+      }
+      
       this.getPlayer();
       this.nemesisService.getNemesis(this.playerId)
         .subscribe( nemeses => {
           this.nemesis = nemeses[0];
-        })
+        });
+      this.hittersService.getHitters(this.playerId)
+        .subscribe( hitters => {
+          this.hitters = hitters.slice(0, 3);
+        });
     });
   }
 

@@ -17,6 +17,11 @@ export interface Nemesis {
   deaths: number;
 }
 
+export interface Hitter {
+  hitter: number;
+  kills: number;
+}
+
 export interface Event {
   id: number;
   type: string;
