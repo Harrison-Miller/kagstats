@@ -13,60 +13,91 @@
     <img id="avatar" src="{{ player.id | unkownAvatar }}" class="rounded-circle" style="width: 100px; height: 100px;">
 </ng-template>
 
-<h3>Overview</h3>
-<ng-container *ngIf="player">
-<div class="row">
-    <div class="shadow-sm col text-center">
-        <h3>Archer</h3>
-        <div class="icon archerIcon"></div>
-        <h4>{{archerKD()}}</h4>
+<div class="top-margin">
+<ngb-tabset [justify]="center">
+    <ngb-tab>
+    <ng-template ngbTabTitle><h3>Overview</h3></ng-template>
+    <ng-template ngbTabContent>
+    <div class="top-margin">
+    <ng-container *ngIf="player">
         <div class="row">
-            <div class="col">
-                <div>Kills</div>
-                <h5>{{basicStats.archerKills}}</h5>
+            <div class="shadow-sm col text-center">
+                <h3>Archer</h3>
+                <div class="icon archerIcon"></div>
+                <h4>{{archerKD()}}</h4>
+                <div class="row">
+                    <div class="col">
+                        <div>Kills</div>
+                        <h5>{{basicStats.archerKills}}</h5>
+                    </div>
+                    <div class="col">
+                        <div>Deaths</div>
+                        <h5>{{basicStats.archerDeaths}}</h5>
+                    </div>
+                </div>
             </div>
-            <div class="col">
-                <div>Deaths</div>
-                <h5>{{basicStats.archerDeaths}}</h5>
+            <div class="shadow-sm col text-center">
+                <h3>Builder</h3>
+                <div class="icon builderIcon"></div>
+                <h4>{{builderKD()}}</h4>
+                <div class="row">
+                    <div class="col">
+                        <div>Kills</div>
+                        <h5>{{basicStats.builderKills}}</h5>
+                    </div>
+                    <div class="col">
+                        <div>Deaths</div>
+                        <h5>{{basicStats.builderDeaths}}</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="shadow-sm col text-center">
+                <h3>Knight</h3>
+                <div class="icon knightIcon"></div>
+                <h4>{{knightKD()}}</h4>
+                <div class="row">
+                    <div class="col">
+                        <div>Kills</div>
+                        <h5>{{basicStats.knightKills}}</h5>
+                    </div>
+                    <div class="col">
+                        <div>Deaths</div>
+                        <h5>{{basicStats.knightDeaths}}</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="shadow-sm col text-center">
+                <h3>Suicides</h3>
+                <div class="icon suicideIcon"></div>
+                <h4>{{basicStats.suicides}}</h4>
             </div>
         </div>
+    </ng-container>
     </div>
-    <div class="shadow-sm col text-center">
-        <h3>Builder</h3>
-        <div class="icon builderIcon"></div>
-        <h4>{{builderKD()}}</h4>
+    </ng-template>
+    </ngb-tab>
+    <ngb-tab>
+    <ng-template ngbTabTitle><h3>Fact Sheet</h3></ng-template>
+    <ng-template ngbTabContent>
         <div class="row">
-            <div class="col">
-                <div>Kills</div>
-                <h5>{{basicStats.builderKills}}</h5>
+            <div class="shadow-sm col text-center" routerLink="/players/{{nemesis.nemesis.id}}">
+                <h3>Nemesis</h3>
+                <app-player-banner [player]="nemesis.nemesis"></app-player-banner>
+                <h4>Has killed you {{nemesis.deaths}} times!</h4>
             </div>
-            <div class="col">
-                <div>Deaths</div>
-                <h5>{{basicStats.builderDeaths}}</h5>
+            <div class="shadow-sm col text-center">
+                <h3>Top Weapons</h3>
             </div>
         </div>
-    </div>
-    <div class="shadow-sm col text-center">
-        <h3>Knight</h3>
-        <div class="icon knightIcon"></div>
-        <h4>{{knightKD()}}</h4>
-        <div class="row">
-            <div class="col">
-                <div>Kills</div>
-                <h5>{{basicStats.knightKills}}</h5>
-            </div>
-            <div class="col">
-                <div>Deaths</div>
-                <h5>{{basicStats.knightDeaths}}</h5>
-            </div>
+    </ng-template>
+    </ngb-tab>
+    <ngb-tab>
+    <ng-template ngbTabTitle><h3>Kill History</h3></ng-template>
+    <ng-template ngbTabContent>
+        <div class="top-margin">
+            <app-killfeed [url]="'/api/players/' + player.id + '/kills'" [limit]="10"></app-killfeed>
         </div>
-    </div>
-    <div class="shadow-sm col text-center">
-        <h3>Suicides</h3>
-        <div class="icon suicideIcon"></div>
-        <h4>{{basicStats.suicides}}</h4>
-    </div>
+    </ng-template>
+    </ngb-tab>
+</ngb-tabset>
 </div>
-</ng-container>
-<h3>Kill Feed</h3>
-<app-killfeed [limit]="10"></app-killfeed>

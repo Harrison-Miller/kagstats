@@ -14,15 +14,26 @@
 
 <div class="row">
   <table class="table" *ngIf="kills$ | async as kills">
-    <thead>
-      <th>Killer</th>
-      <th>Victim</th>
-      <th>Time</th>
-    </thead>
     <tbody *ngFor="let kill of kills">
-      <td><app-player-banner [player]="kill.killer"></app-player-banner></td>
-      <td><app-player-banner [player]=kill.victim></app-player-banner></td>
-      <td>{{kill.time | date: 'long'}}</td>
+      <td routerLink="/players/{{kill.killer.id}}">
+        <div style="width: 250px">
+            <app-player-banner [status]="false" [player]="kill.killer"></app-player-banner>
+        </div>
+      </td>
+      <ng-container *ngIf="kill.killer.id==kill.victim.id">
+          <td>killed themself</td>
+      </ng-container>
+      <td>
+        <div class="{{kill.hitter | hitterIcon }}" placement="top" ngbTooltip="{{descriptions[kill.hitter]}}"></div>
+      </td>
+      <ng-container *ngIf="kill.killer.id != kill.victim.id">
+          <td routerLink="/players/{{kill.victim.id}}">
+            <div style="width: 250px">
+                <app-player-banner [status]="false" [player]=kill.victim></app-player-banner>
+            </div>
+          </td>
+      </ng-container>
+      <td>{{kill.time | timeAgo }}</td>
     </tbody>
   </table>
 </div>

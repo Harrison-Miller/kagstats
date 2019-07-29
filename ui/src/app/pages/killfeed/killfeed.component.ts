@@ -1,8 +1,9 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnChanges } from '@angular/core';
 import { KillsService } from 'src/app/services/kills.service';
 import { Kill } from '../../models';
 import { Observable, Subject, timer } from 'rxjs';
 import { map, take } from 'rxjs/operators';
+import { HITTER_DESCRIPTION } from '../../hitters';
 
 /**
  * The KillfeedComponent periodically queries for new kills,
@@ -14,11 +15,13 @@ import { map, take } from 'rxjs/operators';
 @Component({
   selector: 'app-killfeed',
   templateUrl: './killfeed.component.html',
-  styleUrls: ['./killfeed.component.sass']
+  styleUrls: ['./killfeed.component.scss']
 })
-export class KillfeedComponent implements OnInit {
+export class KillfeedComponent implements OnInit, OnChanges {
   @Input() limit: number = 100;
+  @Input() url: string = '/api/kills';
   kills$: Observable<Kill[]>;
+  descriptions: string[] = HITTER_DESCRIPTION;
 
   constructor(private killsService: KillsService) {}
 
@@ -28,5 +31,9 @@ export class KillfeedComponent implements OnInit {
         return kills.slice(0, this.limit);
       })
     );
+  }
+
+  ngOnChanges() {
+    this.killsService.url$.next(this.url);
   }
 }

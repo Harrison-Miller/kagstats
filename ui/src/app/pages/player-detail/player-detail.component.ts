@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PlayersService } from '../../services/players.service';
-import { Player, BasicStats } from '../../models';
+import { Player, BasicStats, Nemesis } from '../../models';
+import { NemesisService } from '../../services/nemesis.service';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-player-detail',
@@ -13,15 +15,21 @@ export class PlayerDetailComponent implements OnInit {
   playerId: number;
   player: Player;
   basicStats: BasicStats;
+  nemesis: Nemesis;
 
   constructor(
     private route: ActivatedRoute,
-    private playersService: PlayersService) { }
+    private playersService: PlayersService,
+    private nemesisService: NemesisService) { }
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
       this.playerId = +params.get('id');
       this.getPlayer();
+      this.nemesisService.getNemesis(this.playerId)
+        .subscribe( nemeses => {
+          this.nemesis = nemeses[0];
+        })
     });
   }
 

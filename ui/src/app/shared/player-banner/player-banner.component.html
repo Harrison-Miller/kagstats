@@ -1,32 +1,43 @@
 <div>
-  <div class="float-left">
+  <div class="float-left" *ngIf="avatar">
       <ng-container *ngIf="player.avatar != ''; else avatarElse">
-        <img id="avatar" src="{{player.avatar}}" default="/assets/portrait1.png" class="rounded-circle" style="width: 50px; height: 50px; position: relative">
+        <img id="avatar" src="{{player.avatar}}" default="/assets/portrait1.png" class="rounded-circle" style="width: 50px; height: 50px;">
       </ng-container>
       <ng-template #avatarElse>
         <img id="avatar" src="{{ player.id | unkownAvatar }}" class="rounded-circle" style="width: 50px; height: 50px;">
       </ng-template>
 
-      <ng-container *ngIf="player.lastEvent == 'joined'; else statusElse">
-          <span class="dot bg-success"></span>
+      <ng-container *ngIf="status">
+        <ng-container *ngIf="player.lastEvent == 'joined'; else statusElse">
+                <span class="dot bg-success"></span>
+            </ng-container>
+            <ng-template #statusElse>
+                <ng-container *ngIf="today - player.lastEventTime < 150000; else idleStatus">
+                    <span class="dot bg-warning"></span>
+                </ng-container>
+                <ng-template #idleStatus>
+                    <span class="dot bg-secondary"></span>
+                </ng-template>
+        
+            </ng-template>
       </ng-container>
-      <ng-template #statusElse>
-          <ng-container *ngIf="today - player.lastEventTime < 150000; else idleStatus">
-              <span class="dot bg-warning"></span>
-          </ng-container>
-          <ng-template #idleStatus>
-              <span class="dot bg-secondary"></span>
-          </ng-template>
-
-      </ng-template>
   </div>
-  
-  <div *ngIf="player.oldGold" class="float-left oldGoldBadge" placement="top" ngbTooltip="gold member who bought the game pre-F2P launch"></div>
-  <div *ngIf="player.tier == 1" class="float-left tier1Badge" placement="top" ngbTooltip="tier 1 patreon supporter"></div>
-  <div *ngIf="player.tier == 2" class="float-left tier2Badge" placement="top" ngbTooltip="tier 2 patreon supporter"></div>
-  <div *ngIf="player.tier == 3" class="float-left tier3Badge" placement="top" ngbTooltip="tier 3 patreon supporter"></div>
-  <div *ngIf="player.tier == 4" class="float-left tier4Badge" placement="top" ngbTooltip="tier 4 patreon supporter"></div>
 
+  <ng-container *ngIf="accolades">
+  <div class="row">
+    <div class="col">
+        <div *ngIf="player.oldGold" class="float-left oldGoldBadge" placement="top" ngbTooltip="gold member who bought the game pre-F2P launch"></div>
+        <div *ngIf="player.tier == 1" class="float-left tier1Badge" placement="top" ngbTooltip="tier 1 patreon supporter"></div>
+        <div *ngIf="player.tier == 2" class="float-left tier2Badge" placement="top" ngbTooltip="tier 2 patreon supporter"></div>
+        <div *ngIf="player.tier == 3" class="float-left tier3Badge" placement="top" ngbTooltip="tier 3 patreon supporter"></div>
+        <div *ngIf="player.tier == 4" class="float-left tier4Badge" placement="top" ngbTooltip="tier 4 patreon supporter"></div>
+    </div>
+  </div>
+  </ng-container>
 
-  <span class="float-right {{ player.role | kagRoleColor }}"> {{player.clanTag}} {{player.characterName}}</span>
+  <div class="row">
+    <div class="col">
+        <span class="float-left {{ player.role | kagRoleColor }}"> {{player.clanTag}} {{player.characterName}}</span>
+    </div>
+  </div>
 </div>

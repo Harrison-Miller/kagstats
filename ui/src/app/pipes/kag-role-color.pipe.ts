@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'kagRoleColor'
+  name: 'kagRoleColor',
+  pure: true
 })
 export class KagRoleColorPipe implements PipeTransform {
 

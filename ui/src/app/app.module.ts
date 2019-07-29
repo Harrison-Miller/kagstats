@@ -25,6 +25,8 @@ import { PlayerDetailComponent } from './pages/player-detail/player-detail.compo
 import { KillfeedComponent } from './pages/killfeed/killfeed.component';
 import { KillsService } from './services/kills.service';
 import { KagClassImgPipe } from './pipes/kag-class-img.pipe';
+import { TimeAgoPipe } from 'time-ago-pipe';
+import { HitterIconPipe } from './pipes/hitter-icon.pipe';
 
 @NgModule({
   declarations: [
@@ -43,7 +45,9 @@ import { KagClassImgPipe } from './pipes/kag-class-img.pipe';
     DefaultImageDirective,
     PlayerDetailComponent,
     KillfeedComponent,
-    KagClassImgPipe
+    KagClassImgPipe,
+    TimeAgoPipe,
+    HitterIconPipe
   ],
   imports: [
     BrowserModule,

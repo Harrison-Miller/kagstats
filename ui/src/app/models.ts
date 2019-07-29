@@ -12,6 +12,11 @@ export interface BasicStats {
   otherDeaths: number;
 }
 
+export interface Nemesis {
+  nemesis: Player;
+  deaths: number;
+}
+
 export interface Event {
   id: number;
   type: string;
