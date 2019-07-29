@@ -69,10 +69,10 @@ export  const HITTER_DESCRIPTION: string[] = [
     "Died",
     "Crushing",
     "Fall",
-    "Drowing", //water
-    "Drowing", //water_stun
-    "Drowing", //water_stun_force
-    "Drowing", //drown
+    "Drowning", //water
+    "Drowning", //water_stun
+    "Drowning", //water_stun_force
+    "Drowning", //drown
     "Burning", //fire
     "Burning", //fire
     "Flying??",

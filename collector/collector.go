@@ -235,5 +235,8 @@ func Collect(sconfig configs.ServerConfig) {
 		if err != nil {
 			logger.Println(err)
 		}
+
+		logger.Println("Waiting 1 minute before attempting to connect again")
+		time.Sleep(1 * time.Minute)
 	}
 }

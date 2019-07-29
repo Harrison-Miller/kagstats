@@ -15,8 +15,11 @@ export class HitterIconPipe implements PipeTransform {
   getHitterIcon(hitter: number): string {
     // logic mostly taken from Base/Rules/CommonScripts/KillMessages.as
     switch(hitter) {
+      case Hitters.saw:
+      case Hitters.drill:
       case Hitters.nothing:
       case Hitters.suicide:
+      case Hitters.crush:
         return Hitters[Hitters.fall];
       case Hitters.fire:
       case Hitters.burn:
@@ -27,6 +30,7 @@ export class HitterIconPipe implements PipeTransform {
       case Hitters.mine_special:
         return Hitters[Hitters.mine];
       case Hitters.cata_boulder:
+      case Hitters.cata_stones:
         return Hitters[Hitters.boulder];
     }
 
