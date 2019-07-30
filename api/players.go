@@ -41,7 +41,7 @@ func getPlayers(w http.ResponseWriter, r *http.Request) {
 		limit = Min(int64(l), limit)
 	}
 
-	err := db.Select(&players, playersQuery+"LIMIT ?,?", start, limit)
+	err := db.Select(&players, playersQuery+"ORDER BY lastEvent='joined' DESC, lastEventTime DESC LIMIT ?,?", start, limit)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return
