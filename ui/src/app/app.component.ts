@@ -8,5 +8,6 @@ import { Router } from '@angular/router';
 })
 export class AppComponent {
 
+  isNavbarCollapsed: boolean = true;
   constructor(public router: Router) {}
 }
