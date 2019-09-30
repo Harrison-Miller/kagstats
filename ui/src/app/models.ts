@@ -37,7 +37,7 @@ export interface Kill {
   hitter: number;
   time: number;
   serverId: number;
-  teamKill: number;
+  teamKill: boolean;
   victim: Player;
   killer: Player;
 }

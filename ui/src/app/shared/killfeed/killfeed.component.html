@@ -24,6 +24,9 @@
           <td>killed themself</td>
       </ng-container>
       <td>
+        <ng-container *ngIf="kill.teamKill">
+            <span>team killed</span>
+        </ng-container>
         <div class="{{kill.hitter | hitterIcon }}" placement="top" ngbTooltip="{{descriptions[kill.hitter]}}"></div>
       </td>
       <ng-container *ngIf="kill.killer.id != kill.victim.id">
