@@ -112,8 +112,12 @@ func (c *Collector) OnPlayerDie(m rcon.Message, r *rcon.Client) error {
 		kill.Time = utils.NowAsUnixMilliseconds()
 		kill.ServerID = c.server.ID
 
+		// players can't team kill themselves
 		if kill.KillerID == kill.VictimID {
 			kill.TeamKill = false
+		} else if kill.Hitter == 29 {
+			// only builders can get spike kills
+			kill.KillerClass = "builder"
 		}
 
 		c.logger.Printf("%+v", kill)
