@@ -10,6 +10,8 @@ export interface BasicStats {
   knightDeaths: number;
   otherKills: number;
   otherDeaths: number;
+  totalKills: number;
+  totalDeaths: number;
 }
 
 export interface Nemesis {

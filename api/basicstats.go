@@ -21,6 +21,8 @@ type BasicStats struct {
 	KnightDeaths  int64 `json:"knightDeaths" db:"knight_deaths"`
 	OtherKills    int64 `json:"otherKills" db:"other_kills"`
 	OtherDeaths   int64 `json:"otherDeaths" db:"other_deaths"`
+	TotalKills    int64 `json:"totalKills" db:"total_kills"`
+	TotalDeaths   int64 `json:"totalDeaths" db:"total_deaths"`
 }
 
 func BasicStatsRoutes(r *mux.Router) {
