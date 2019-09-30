@@ -15,7 +15,7 @@ func (i *HittersIndexer) Name() string {
 }
 
 func (i *HittersIndexer) Version() int {
-	return 1
+	return 2
 }
 
 func (i *HittersIndexer) Keys() []IndexKey {
@@ -36,7 +36,7 @@ func (i *HittersIndexer) Counters() []string {
 
 func (i *HittersIndexer) Index(kill Kill) []Index {
 	var indices []Index
-	if kill.KillerID != kill.VictimID {
+	if kill.KillerID != kill.VictimID && !kill.TeamKill {
 		indices = append(indices, Index{
 			Keys:     []int{int(kill.KillerID), int(kill.Hitter)},
 			Counters: map[string]int{"kills": 1},

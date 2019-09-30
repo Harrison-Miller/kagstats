@@ -15,7 +15,7 @@ func (i *BasicIndexer) Name() string {
 }
 
 func (i *BasicIndexer) Version() int {
-	return 3
+	return 4
 }
 
 func (i *BasicIndexer) Keys() []IndexKey {
@@ -31,7 +31,7 @@ func (i *BasicIndexer) Keys() []IndexKey {
 func (i *BasicIndexer) Counters() []string {
 	return []string{"suicides", "teamkills", "archer_kills", "archer_deaths",
 		"builder_kills", "builder_deaths", "knight_kills", "knight_deaths",
-		"other_kills", "other_deaths"}
+		"other_kills", "other_deaths", "total_kills", "total_deaths"}
 }
 
 func OneIfEqual(a string, b string) int {
@@ -76,21 +76,25 @@ func (i *BasicIndexer) Index(kill Kill) []Index {
 					"builder_kills": OneIfEqual(kill.KillerClass, "builder"),
 					"knight_kills":  OneIfEqual(kill.KillerClass, "knight"),
 					"other_kills":   OneIfNotIn(kill.KillerClass, []string{"archer", "builder", "knight"}),
+					"total_kills":   1,
 				},
 			})
 		}
 	}
 
-	indices = append(indices, Index{
-		Keys: []int{int(kill.VictimID)},
-		Counters: map[string]int{
-			"suicides":       ToInt(kill.KillerID == kill.VictimID),
-			"archer_deaths":  OneIfEqual(kill.VictimClass, "archer"),
-			"builder_deaths": OneIfEqual(kill.VictimClass, "builder"),
-			"knight_deaths":  OneIfEqual(kill.VictimClass, "knight"),
-			"other_deaths":   OneIfNotIn(kill.VictimClass, []string{"archer", "builder", "knight"}),
-		},
-	})
+	if !kill.TeamKill {
+		indices = append(indices, Index{
+			Keys: []int{int(kill.VictimID)},
+			Counters: map[string]int{
+				"suicides":       ToInt(kill.KillerID == kill.VictimID),
+				"archer_deaths":  OneIfEqual(kill.VictimClass, "archer"),
+				"builder_deaths": OneIfEqual(kill.VictimClass, "builder"),
+				"knight_deaths":  OneIfEqual(kill.VictimClass, "knight"),
+				"other_deaths":   OneIfNotIn(kill.VictimClass, []string{"archer", "builder", "knight"}),
+				"total_deaths":   1,
+			},
+		})
+	}
 
 	return indices
 }

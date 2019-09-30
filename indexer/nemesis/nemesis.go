@@ -15,7 +15,7 @@ func (i *NemesisIndexer) Name() string {
 }
 
 func (i *NemesisIndexer) Version() int {
-	return 1
+	return 2
 }
 
 func (i *NemesisIndexer) Keys() []IndexKey {
@@ -39,7 +39,7 @@ func (i *NemesisIndexer) Counters() []string {
 func (i *NemesisIndexer) Index(kill Kill) []Index {
 	var indices []Index
 
-	if kill.KillerID != kill.VictimID {
+	if kill.KillerID != kill.VictimID && !kill.TeamKill {
 		indices = append(indices, Index{
 			Keys:     []int{int(kill.VictimID), int(kill.KillerID)},
 			Counters: map[string]int{"deaths": 1},
