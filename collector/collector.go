@@ -111,6 +111,11 @@ func (c *Collector) OnPlayerDie(m rcon.Message, r *rcon.Client) error {
 		kill.KillerID = kill.Killer.ID
 		kill.Time = utils.NowAsUnixMilliseconds()
 		kill.ServerID = c.server.ID
+
+		if kill.KillerID == kill.VictimID {
+			kill.TeamKill = false
+		}
+
 		c.logger.Printf("%+v", kill)
 		kills <- kill
 	}

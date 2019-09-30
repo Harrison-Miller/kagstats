@@ -204,8 +204,14 @@ func AddEvent(playerID int64, eventType string, serverID int64) error {
 	return nil
 }
 
+// add datanase migrations here
 func RunMigrations(db *sqlx.DB) error {
 	err := RunMigration(1, APICacheChanges, db)
+	if err != nil {
+		return err
+	}
+
+	err = RunMigration(2, TeamKillChanges, db)
 	if err != nil {
 		return err
 	}
@@ -289,4 +295,9 @@ func APICacheChanges(db *sqlx.DB) error {
 	}
 
 	return nil
+}
+
+func TeamKillChanges(db *sqlx.DB) error {
+	_, err := db.Exec("UPDATE kills SET teamKill=0 WHERE killerID=victimID")
+	return err
 }
