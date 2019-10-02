@@ -8,6 +8,8 @@ import { map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class PlayersService {
+  searchText: string = "";
+
   constructor(private http: HttpClient) {}
 
   getPlayer(playerId): Observable<BasicStats> {

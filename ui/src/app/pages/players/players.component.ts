@@ -22,11 +22,13 @@ export class PlayersComponent implements OnInit {
   ngOnInit() {
     this.search.valueChanges
       .subscribe(value => {
+        this.playersService.searchText = value;
         if(value == '') {
           this.getPlayers();
         }
         this.searchPlayers(value);
-      })
+      });
+    this.search.patchValue(this.playersService.searchText);
   }
 
   searchPlayers(search: string): void {
