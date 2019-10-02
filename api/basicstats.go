@@ -28,6 +28,7 @@ type BasicStats struct {
 func BasicStatsRoutes(r *mux.Router) {
 	r.HandleFunc("/players/{id:[0-9]+}/basic", getBasicStats).Methods("GET")
 	r.HandleFunc("/leaderboard", getBasicLeaderBoard).Methods("GET")
+	r.HandleFunc("/leaderboard/kills", getKillsLeaderBoard).Methods("GET")
 	r.HandleFunc("/leaderboard/archer", getArcherLeaderBoard).Methods("GET")
 	r.HandleFunc("/leaderboard/builder", getBuilderLeaderBoard).Methods("GET")
 	r.HandleFunc("/leaderboard/knight", getKnightLeaderBoard).Methods("GET")
@@ -57,6 +58,26 @@ func getBasicLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	err := db.Select(&stats, `SELECT * FROM basic_stats INNER JOIN players ON basic_stats.playerID=players.ID 
 		WHERE basic_stats.total_kills > ? AND basic_stats.total_deaths > ? 
 		ORDER BY (basic_stats.total_kills / basic_stats.total_deaths) DESC LIMIT 20`, config.API.KDGate, config.API.KDGate)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error fetching leader board: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	JSONResponse(w, struct {
+		Size        int          `json:"size"`
+		LeaderBoard []BasicStats `json:"leaderboard"`
+	}{
+		Size:        len(stats),
+		LeaderBoard: stats,
+	})
+}
+
+func getKillsLeaderBoard(w http.ResponseWriter, r *http.Request) {
+	var stats []BasicStats
+
+	err := db.Select(&stats, `SELECT * FROM basic_stats INNER JOIN players ON basic_stats.playerID=players.ID 
+		WHERE basic_stats.total_kills > ? AND basic_stats.total_deaths > ? 
+		ORDER BY basic_stats.total_kills DESC LIMIT 20`, config.API.KDGate, config.API.KDGate)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error fetching leader board: %v", err), http.StatusInternalServerError)
 		return

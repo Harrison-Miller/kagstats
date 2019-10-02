@@ -5,7 +5,7 @@ import { BasicStats } from '../../../models';
 import { takeUntil } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 
-const availableClasses = ['Archer', 'Builder', 'Knight'];
+const availableClasses = ['Archer', 'Builder', 'Knight', 'Kills'];
 
 @Component({
   selector: 'app-class-leaderboard',
@@ -50,17 +50,21 @@ export class ClassLeaderboardComponent implements OnInit, OnDestroy {
   }
 
   totalKills(leader: BasicStats): number {
+    if(this.class == "Kills") {
+      return leader.totalKills;
+    }
     return leader[`${this.class.toLowerCase()}Kills`]
   }
 
   totalDeaths(leader: BasicStats): number {
+    if(this.class == "Kills") {
+      return leader.totalDeaths;
+    }
     return leader[`${this.class.toLowerCase()}Deaths`]
   }
-
+  
   kd(leader: BasicStats): string {
-    const c = this.class.toLowerCase();
-    return (
-      leader[`${c}Kills`] / (leader[`${c}Deaths`] === 0 ? 1 : leader[`${c}Deaths`])
-    ).toFixed(2);
+    const deaths = this.totalDeaths(leader);
+    return (this.totalKills(leader) / (deaths === 0 ? 1 : deaths)).toFixed(2);
   }
 }

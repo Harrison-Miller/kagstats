@@ -31,11 +31,11 @@ export class BaseLeaderboardComponent implements OnInit, OnDestroy {
   }
 
   totalKills(leader: BasicStats): number {
-    return leader.archerKills + leader.builderKills + leader.knightKills;
+    return leader.totalKills;
   }
 
   totalDeaths(leader: BasicStats): number {
-    return leader.archerDeaths + leader.builderDeaths + leader.knightDeaths;
+    return leader.totalDeaths;
   }
 
   kd(leader: BasicStats): string {
