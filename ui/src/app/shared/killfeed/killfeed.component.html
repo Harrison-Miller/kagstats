@@ -15,7 +15,7 @@
 <div class="row">
   <table class="table" *ngIf="kills$ | async as kills">
     <tbody *ngFor="let kill of kills">
-      <td routerLink="/players/{{kill.killer.id}}">
+      <td>
         <div style="width: 250px">
             <app-player-banner [status]="false" [player]="kill.killer"></app-player-banner>
         </div>
@@ -30,7 +30,7 @@
         <div class="{{kill.hitter | hitterIcon }}" placement="top" ngbTooltip="{{descriptions[kill.hitter]}}"></div>
       </td>
       <ng-container *ngIf="kill.killer.id != kill.victim.id">
-          <td routerLink="/players/{{kill.victim.id}}">
+          <td>
             <div style="width: 250px">
                 <app-player-banner [status]="false" [player]=kill.victim></app-player-banner>
             </div>

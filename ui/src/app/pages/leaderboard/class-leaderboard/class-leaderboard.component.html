@@ -11,7 +11,11 @@
   </thead>
   <tbody *ngIf="leaderboard$ | async as leaderboard">
   <tr *ngFor="let leader of leaderboard">
-    <td routerLink="/players/{{leader.player.id}}"><div style="width: 300px"><app-player-banner [player]="leader.player"></app-player-banner></div></td>
+    <td>
+      <div style="width: 300px">
+        <app-player-banner [player]="leader.player"></app-player-banner>
+      </div>
+    </td>
     <td>{{totalKills(leader)}}</td>
     <td>{{totalDeaths(leader)}}</td>
     <td>{{kd(leader)}}</td>

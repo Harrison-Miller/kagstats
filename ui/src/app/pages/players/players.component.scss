@@ -10,3 +10,9 @@
     width: 100px;
     height: 100px;
 }
+
+.unstyled-link, .unstyled-link:link, .unstyled-link:hover {
+    color: inherit;
+    text-decoration: inherit;
+}
+

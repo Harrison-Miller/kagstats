@@ -10,7 +10,7 @@
 <ng-container *ngIf="players; else noPlayers">
 <div class="row">
     <div class="col-3 buffer" *ngFor="let player of players">
-      <div class="card h-100" routerLink="/players/{{player.id}}">
+      <div class="card h-100" >
         <div class="card-header">
           <app-player-banner [player]="player"></app-player-banner>
         </div>

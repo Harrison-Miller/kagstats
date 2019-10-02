@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PlayersService } from '../../services/players.service';
 import { Player, BasicStats, Nemesis, Hitter } from '../../models';
@@ -6,13 +6,14 @@ import { NemesisService } from '../../services/nemesis.service';
 import { takeUntil } from 'rxjs/operators';
 import { HITTER_DESCRIPTION } from '../../hitters';
 import { HittersService } from '../../services/hitters.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-player-detail',
   templateUrl: './player-detail.component.html',
   styleUrls: ['./player-detail.component.scss', '../../shared/killfeed/killfeed.component.scss']
 })
-export class PlayerDetailComponent implements OnInit {
+export class PlayerDetailComponent implements OnInit, OnDestroy {
 
   playerId: number;
   player: Player;
@@ -27,7 +28,8 @@ export class PlayerDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private playersService: PlayersService,
     private nemesisService: NemesisService,
-    private hittersService: HittersService) { }
+    private hittersService: HittersService,
+    private titleService: Title) { }
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
@@ -50,11 +52,16 @@ export class PlayerDetailComponent implements OnInit {
     });
   }
 
+  ngOnDestroy() {
+    this.titleService.setTitle("KAG Stats");
+  }
+
   getPlayer(): void {
     this.playersService.getPlayer(this.playerId)
       .subscribe( b => {
         this.basicStats = b;
         this.player = this.basicStats.player;
+        this.titleService.setTitle("KAG Stats - " + this.player.characterName);
       });
   }
 
