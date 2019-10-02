@@ -14,6 +14,12 @@ export interface BasicStats {
   totalDeaths: number;
 }
 
+export interface Status {
+  players: number;
+  kills: number;
+  servers: number;
+}
+
 export interface Nemesis {
   nemesis: Player;
   deaths: number;

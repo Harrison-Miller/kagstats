@@ -29,6 +29,7 @@ import { HitterIconPipe } from './pipes/hitter-icon.pipe';
 import { KillsComponent } from './pages/kills/kills.component';
 import { KillfeedComponent } from './shared/killfeed/killfeed.component';
 import { AboutComponent } from './pages/about/about.component';
+import { StatusService } from './services/status.service';
 
 @NgModule({
   declarations: [
@@ -60,7 +61,7 @@ import { AboutComponent } from './pages/about/about.component';
     ReactiveFormsModule,
     NgbModule
   ],
-  providers: [LeaderboardService, PlayersService, ServersService, KillsService],
+  providers: [LeaderboardService, PlayersService, ServersService, KillsService, StatusService],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

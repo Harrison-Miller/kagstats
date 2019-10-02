@@ -32,6 +32,7 @@ func BasicStatsRoutes(r *mux.Router) {
 	r.HandleFunc("/leaderboard/archer", getArcherLeaderBoard).Methods("GET")
 	r.HandleFunc("/leaderboard/builder", getBuilderLeaderBoard).Methods("GET")
 	r.HandleFunc("/leaderboard/knight", getKnightLeaderBoard).Methods("GET")
+	r.HandleFunc("/status", getStatus).Methods("GET")
 }
 
 func getBasicStats(w http.ResponseWriter, r *http.Request) {
@@ -150,4 +151,16 @@ func getKnightLeaderBoard(w http.ResponseWriter, r *http.Request) {
 		Size:        len(stats),
 		LeaderBoard: stats,
 	})
+}
+
+func getStatus(w http.ResponseWriter, r *http.Request) {
+	var status Status
+
+	err := db.Get(&status, `SELECT (SELECT COUNT(id) FROM players) as players, (SELECT COUNT(id) FROM kills) as kills, (SELECT COUNT(id) FROM servers) as servers`)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error fetching status: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	JSONResponse(w, &status)
 }
