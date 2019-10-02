@@ -17,6 +17,8 @@ RUN cp api /
 
 FROM scratch
 
+ADD LICENSE .
+
 COPY --from=build /api /
 
 ENV API_HOST=":8080"

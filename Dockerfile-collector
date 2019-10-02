@@ -17,6 +17,8 @@ RUN cp collector / && cp -r templates / && cp -r scripts /
 
 FROM alpine
 
+ADD LICENSE .
+
 COPY --from=build /collector /
 
 RUN mkdir -p /templates /scripts

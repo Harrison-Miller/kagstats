@@ -10,6 +10,8 @@ RUN npm run build -- --prod
 
 FROM nginx:latest
 
+ADD LICENSE .
+
 RUN rm /etc/nginx/conf.d/default.conf
 
 COPY ui/kagstats.conf /etc/nginx/conf.d

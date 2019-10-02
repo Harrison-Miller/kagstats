@@ -19,6 +19,8 @@ RUN cp indexer /
 
 FROM scratch
 
+ADD LICENSE .
+
 COPY --from=build /indexer /
 
 ENV INDEXER_DB="root:password@tcp(mysql:3306)/kagstats"
