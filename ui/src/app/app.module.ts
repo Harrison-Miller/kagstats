@@ -28,6 +28,7 @@ import { TimeAgoPipe } from 'time-ago-pipe';
 import { HitterIconPipe } from './pipes/hitter-icon.pipe';
 import { KillsComponent } from './pages/kills/kills.component';
 import { KillfeedComponent } from './shared/killfeed/killfeed.component';
+import { AboutComponent } from './pages/about/about.component';
 
 @NgModule({
   declarations: [
@@ -49,7 +50,8 @@ import { KillfeedComponent } from './shared/killfeed/killfeed.component';
     KagClassImgPipe,
     TimeAgoPipe,
     HitterIconPipe,
-    KillsComponent
+    KillsComponent,
+    AboutComponent
   ],
   imports: [
     BrowserModule,
