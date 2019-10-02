@@ -34,6 +34,11 @@ services:
     image: gcr.io/kagstats/api:${TAG:-latest}
     ports:
       - "8080:8080"
+    environment:
+      - KD_GATE=100
+      - ARCHER_GATE=50
+      - BUILDER_GATE=15
+      - KNIGHT_GATE=100
     links:
       - mysql
     hostname: api

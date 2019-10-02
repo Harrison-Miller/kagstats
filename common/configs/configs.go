@@ -52,7 +52,11 @@ type IndexerConfig struct {
 }
 
 type APIConfig struct {
-	Host string `json:"host"`
+	Host        string `json:"host"`
+	KDGate      int    `json:"kdGate"`
+	ArcherGate  int    `json:"archerGate"`
+	BuilderGate int    `json:"builderGate"`
+	KnightGate  int    `json:"knightGate"`
 }
 
 func NewConfig() Config {
@@ -89,7 +93,11 @@ func NewIndexerConfig() IndexerConfig {
 
 func NewAPIConfig() APIConfig {
 	c := APIConfig{
-		Host: ":80",
+		Host:        ":80",
+		KDGate:      100,
+		ArcherGate:  50,
+		BuilderGate: 15,
+		KnightGate:  100,
 	}
 	return c
 }

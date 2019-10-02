@@ -4,9 +4,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/felixge/httpsnoop"
+	"github.com/pkg/errors"
 
 	"github.com/Harrison-Miller/kagstats/common/configs"
 	"github.com/Harrison-Miller/kagstats/common/utils"
@@ -16,6 +18,7 @@ import (
 )
 
 var db *sqlx.DB
+var config configs.Config
 
 func LogHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +29,7 @@ func LogHandler(next http.Handler) http.Handler {
 }
 
 func main() {
-	config, _ := configs.Get()
+	config, _ = configs.Get()
 	if value, ok := os.LookupEnv("API_HOST"); ok {
 		config.API.Host = value
 	}
@@ -36,6 +39,34 @@ func main() {
 	}
 
 	var err error
+	if value, ok := os.LookupEnv("KD_GATE"); ok {
+		config.API.KDGate, err = strconv.Atoi(value)
+		if err != nil {
+			log.Fatal(errors.Wrap(err, "could convert KD_GATE to int"))
+		}
+	}
+
+	if value, ok := os.LookupEnv("ARCHER_GATE"); ok {
+		config.API.ArcherGate, err = strconv.Atoi(value)
+		if err != nil {
+			log.Fatal(errors.Wrap(err, "could convert ARCHER_GATE to int"))
+		}
+	}
+
+	if value, ok := os.LookupEnv("BUILDER_GATE"); ok {
+		config.API.BuilderGate, err = strconv.Atoi(value)
+		if err != nil {
+			log.Fatal(errors.Wrap(err, "could convert BUILDER_GATE to int"))
+		}
+	}
+
+	if value, ok := os.LookupEnv("KNIGHT_GATE"); ok {
+		config.API.KnightGate, err = strconv.Atoi(value)
+		if err != nil {
+			log.Fatal(errors.Wrap(err, "could convert KNIGHT_GATE to int"))
+		}
+	}
+
 	db, err = utils.ConnectToDatabase(config.DatabaseConnection, 10)
 	if err != nil {
 		log.Fatal(err)
