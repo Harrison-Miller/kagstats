@@ -1,0 +1,43 @@
+steps:
+- name: "docker/compose:1.24.0"
+  args:
+    - "pull"
+
+- name: "docker/compose:1.24.0"
+  args:
+    - "build"
+    - "--parallel"
+  env:
+    - 'TAG=$TAG_NAME'
+
+- name: "docker/compose:1.24.0"
+  args:
+    - "push"
+  env:
+    - 'TAG=$TAG_NAME'
+
+# TODO: do database backup
+
+- name: "gcr.io/cloud-builders/gcloud"
+  entrypoint: "bash"
+  args:
+    - "-c"
+    - |
+      echo "Starting deployment"
+      gcloud compute ssh cloudbuild@staging --zone=us-central1-a --strict-host-key-checking=no -- -T << EOF
+      y
+
+
+      EOF
+      gcloud compute ssh cloudbuild@staging --zone=us-central1-a --strict-host-key-checking=no -- -T << EOF
+      sudo rm -rf /release
+      sudo mkdir -p /release
+      sudo chown cloudbuild /release
+      cd /release
+      curl https://raw.githubusercontent.com/Harrison-Miller/kagstats/$TAG_NAME/docker-compose.yaml --output docker-compose.yaml
+      curl https://raw.githubusercontent.com/Harrison-Miller/kagstats/$TAG_NAME/builds/release-compose.yaml --output release-compose.yaml
+      sudo docker-compose -p release down --remove-orphans
+      sudo docker-compose -f docker-compose.yaml -f release-compose.yaml pull
+      sudo SETTINGS=/release-settings.json docker-compose -f docker-compose.yaml -f release-compose.yaml -p release up -d
+      EOF
+      echo "Deployment finsihed"

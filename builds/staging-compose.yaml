@@ -2,3 +2,6 @@ version: "3.7"
 services:
   mysql:
     image: mysql:5.7
+  ui:
+    ports:
+      - "8888:80"

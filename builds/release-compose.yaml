@@ -1,0 +1,10 @@
+version: "3.7"
+services:
+  mysql:
+    image: mysql:5.7
+  api:
+    environment:
+      - KD_GATE=100
+      - ARCHER_GATE=50
+      - BUILDER_GATE=20
+      - KNIGHT_GATE=100

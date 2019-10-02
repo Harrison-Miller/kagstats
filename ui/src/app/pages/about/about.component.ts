@@ -9,8 +9,8 @@ export const FAQ: {question: string, answer: string}[] = [
     answer: 'Go to the <a href="https://github.com/Harrison-Miller/kagstats">github</a> repository and submit an issue or feature request. You can also reach out and discuss KAG stats on the community <a href="https://discordapp.com/invite/kag">discord</a>.'
   },
   {
-    question: 'How can I host my own KAG stats website?',
-    answer: ' If you want to host your own KAG stats website great! Visit the documentation in the github repo (docs yet to be written, link TBD) for general hosting instructions. TL;DR you will need host that supports docker, docker-compose.'
+    question: 'How can I host my own KAG Stats website?',
+    answer: ' If you want to host your own KAG Stats website great! Visit the documentation in the github repo (docs yet to be written, link TBD) for general hosting instructions. TL;DR you will need host that supports docker, docker-compose.'
   },
   {
     question: 'How often are the stats updated?',
