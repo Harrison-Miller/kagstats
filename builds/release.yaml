@@ -36,6 +36,7 @@ steps:
       cd /release
       curl https://raw.githubusercontent.com/Harrison-Miller/kagstats/$TAG_NAME/docker-compose.yaml --output docker-compose.yaml
       curl https://raw.githubusercontent.com/Harrison-Miller/kagstats/$TAG_NAME/builds/release-compose.yaml --output release-compose.yaml
+      sed -i "s/latest/$TAG_NAME/g" docker-compose.yaml
       sudo docker-compose -p release down --remove-orphans
       sudo docker-compose -f docker-compose.yaml -f release-compose.yaml pull
       sudo SETTINGS=/release-settings.json docker-compose -f docker-compose.yaml -f release-compose.yaml -p release up -d
