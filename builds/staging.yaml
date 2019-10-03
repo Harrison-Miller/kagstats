@@ -40,7 +40,7 @@ steps:
       curl https://raw.githubusercontent.com/Harrison-Miller/kagstats/master/builds/staging-compose.yaml --output staging-compose.yaml
       sudo docker-compose -p staging down --remove-orphans
       . /staging-env.sh
-      sudo docker-compose -f docker-compose.yaml -f staging-compose.yaml pull
-      sudo docker-compose -f docker-compose.yaml -f staging-compose.yaml -p staging up -d
+      sudo -E docker-compose -f docker-compose.yaml -f staging-compose.yaml pull
+      sudo -E docker-compose -f docker-compose.yaml -f staging-compose.yaml -p staging up -d
       EOF
       echo "Deployment finsihed"
