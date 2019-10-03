@@ -55,6 +55,7 @@ func (c *Collector) OnPlayerJoined(m rcon.Message, r *rcon.Client) error {
 
 	if (player != models.Player{}) {
 		err = UpdatePlayer(&player)
+		player.ServerID = c.server.ID
 		if err != nil {
 			return err
 		}
@@ -137,6 +138,7 @@ func (c *Collector) PlayerList(m rcon.Message, r *rcon.Client) error {
 	if len(players) > 0 {
 		for _, p := range players {
 			err = UpdatePlayer(&p)
+			p.ServerID = c.server.ID
 			if err != nil {
 				return err
 			}
@@ -243,6 +245,17 @@ func Collect(sconfig configs.ServerConfig) {
 		stopMOTD <- true
 		if err != nil {
 			logger.Println(err)
+		}
+
+		// Add a disconnect event if the server disconects from the collector
+		for _, player := range players {
+			if player.ServerID == collector.server.ID {
+				err = UpdateLeaveTime(player.ID, player.ServerID)
+				if err != nil {
+					logger.Println(err)
+				}
+				logger.Printf("%s (%d) left the game", player.Username, player.ID)
+			}
 		}
 
 		logger.Println("Waiting 1 minute before attempting to connect again")

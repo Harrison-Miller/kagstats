@@ -9,6 +9,7 @@ type Player struct {
 	Username      string `json:"username"`
 	Charactername string `json:"characterName"`
 	Clantag       string `json:"clanTag"`
+	ServerID      int64
 
 	//Information cached from api.kag2d.com
 	OldGold    bool   `json:"oldGold"`
