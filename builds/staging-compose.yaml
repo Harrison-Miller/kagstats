@@ -1,7 +1,6 @@
+# mysql port 3307
+# web port 88
 version: "3.7"
 services:
   mysql:
     image: mysql:5.7
-  ui:
-    ports:
-      - "8888:80"
