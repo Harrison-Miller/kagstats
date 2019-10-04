@@ -97,7 +97,7 @@ func getArcherLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	var stats []BasicStats
 
 	err := db.Select(&stats, `SELECT * FROM basic_stats INNER JOIN players ON basic_stats.playerID=players.ID 
-		WHERE basic_stats.archer_kills >= ? AND basic_stats.archer_kills >= ? 
+		WHERE basic_stats.archer_kills >= ? AND basic_stats.archer_deaths >= ? 
 		ORDER BY (basic_stats.archer_kills / basic_stats.archer_deaths) DESC LIMIT 20`, config.API.ArcherGate, config.API.ArcherGate)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error fetching leader board: %v", err), http.StatusInternalServerError)
