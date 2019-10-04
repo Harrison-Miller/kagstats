@@ -22,7 +22,7 @@ ADD LICENSE .
 COPY --from=build /api /
 
 ENV API_HOST=":8080"
-ENV API_DB="root:password@tcp(mysql:3306)/kagstats"
+ENV API_DB="root:password@tcp(mysql:3306)/kagstats?charset=utf8mb4"
 
 EXPOSE 8080
 

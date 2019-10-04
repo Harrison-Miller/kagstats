@@ -23,7 +23,7 @@ ADD LICENSE .
 
 COPY --from=build /indexer /
 
-ENV INDEXER_DB="root:password@tcp(mysql:3306)/kagstats"
+ENV INDEXER_DB="root:password@tcp(mysql:3306)/kagstats?charset=utf8mb4"
 ENV INDEXER_BATCHSIZE="100"
 ENV INDEXER_INTERVAL="30s"
 
