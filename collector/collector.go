@@ -96,7 +96,7 @@ func (c *Collector) OnPlayerLeave(m rcon.Message, r *rcon.Client) error {
 }
 
 func (c *Collector) OnPlayerDie(m rcon.Message, r *rcon.Client) error {
-	if c.playerCount < 2 {
+	if c.playerCount <= 2 {
 		c.logger.Println("not enough players, not adding kill to db")
 		return nil
 	}
