@@ -5,3 +5,9 @@ type Hitters struct {
 	Hitter   int64 `json:"hitter"`
 	Kills    int64 `json:"kills"`
 }
+
+type Status struct {
+	Players int64 `json:"players"`
+	Kills   int64 `json:"kills"`
+	Servers int64 `json:"servers"`
+}

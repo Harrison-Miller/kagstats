@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Status } from '../../models';
+import { StatusService } from '../../services/status.service';
 
 
 export const FAQ: {question: string, answer: string}[] = [
@@ -15,7 +17,7 @@ export const FAQ: {question: string, answer: string}[] = [
     answer: "It'll take about 2 minutes before you see the most recent information in the system. The collector (connected to the game server) adds entries to the database about every minute."
   },
   {
-    question: "My K/D is high, why can't I see my self on the leaderboard?",
+    question: "My K/D is high, why can't I see myself on the leaderboard?",
     answer: 'There are measures in place to prevent unfair placements on the leaderboards. You must have enough entries in the database and time played before you can potentially appear on the leaderboard. These measures may be adjusted or added to as the system improves.',
   }
 ];
@@ -29,10 +31,21 @@ export const FAQ: {question: string, answer: string}[] = [
 export class AboutComponent implements OnInit {
 
   public faq = FAQ;
+  status: Status;
 
-  constructor() { }
+  constructor(private statusService: StatusService) {
+    this.status = {players: 0, kills: 0, servers: 0};
+    this.getStatus();
+  }
 
   ngOnInit() {
+  }
+
+  getStatus(): void {
+    this.statusService.getStatus()
+      .subscribe(status => {
+        this.status = status;
+      });
   }
 
 }
