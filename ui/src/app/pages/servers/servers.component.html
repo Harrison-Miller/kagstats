@@ -11,14 +11,14 @@
             <span class="dot float-right bg-secondary"></span>
         </ng-template>
       </div>
-      <div class="card-body">
+      <div class="card-body card-overflow">
         <div class="card-text">{{server.description}}</div>
         <div>Players:
           <ng-container *ngIf="server.status; else playersBlock">{{server.status.currentPlayers}}/{{server.status.maxPlayers}}</ng-container>
           <ng-template #playersBlock>0/0</ng-template>
         </div>
         <div>
-          <img src="https://api.kag2d.com/server/ip/{{server.address}}/port/{{server.port}}/minimap" onError="this.src='/assets/unkownmap.png'">
+          <img class="minimap" src="https://api.kag2d.com/server/ip/{{server.address}}/port/{{server.port}}/minimap" onError="this.src='/assets/unkownmap.png'">
         </div>
       </div>
       <div class="card-footer">
