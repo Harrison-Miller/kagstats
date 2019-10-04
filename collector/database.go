@@ -215,6 +215,12 @@ func RunMigrations(db *sqlx.DB) error {
 	if err != nil {
 		return err
 	}
+
+	err = RunMigration(3, BumpNameLimit, db)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -300,4 +306,23 @@ func APICacheChanges(db *sqlx.DB) error {
 func TeamKillChanges(db *sqlx.DB) error {
 	_, err := db.Exec("UPDATE kills SET teamKill=0 WHERE killerID=victimID")
 	return err
+}
+
+func BumpNameLimit(db *sqlx.DB) error {
+	_, err := db.Exec("ALTER TABLE players MODIFY username varchar(255) NOT NULL UNIQUE")
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec("ALTER TABLE players MODIFY charactername varchar(255) NOT NULL")
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec("ALTER TABLE players MODIFY clantag varchar(255) NOT NULL")
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
