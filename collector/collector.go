@@ -17,9 +17,10 @@ import (
 )
 
 type Collector struct {
-	config configs.ServerConfig
-	logger *log.Logger
-	server models.Server
+	config      configs.ServerConfig
+	logger      *log.Logger
+	server      models.Server
+	playerCount int
 }
 
 func UpdatePlayer(p *models.Player) error {
@@ -64,6 +65,7 @@ func (c *Collector) OnPlayerJoined(m rcon.Message, r *rcon.Client) error {
 			return err
 		}
 		c.logger.Printf("%s (%d) joined the game", player.Username, player.ID)
+		c.playerCount++
 	}
 	return nil
 }
@@ -86,11 +88,19 @@ func (c *Collector) OnPlayerLeave(m rcon.Message, r *rcon.Client) error {
 			return err
 		}
 		c.logger.Printf("%s (%d) left the game", player.Username, player.ID)
+		if c.playerCount > 0 {
+			c.playerCount--
+		}
 	}
 	return nil
 }
 
 func (c *Collector) OnPlayerDie(m rcon.Message, r *rcon.Client) error {
+	if c.playerCount < 2 {
+		c.logger.Println("not enough players, not adding kill to db")
+		return nil
+	}
+
 	var kill models.Kill
 	err := json.Unmarshal([]byte(m.Args["object"]), &kill)
 	if err != nil {
@@ -148,6 +158,7 @@ func (c *Collector) PlayerList(m rcon.Message, r *rcon.Client) error {
 			}
 			c.logger.Printf("%s (%d) was in the game", p.Username, p.ID)
 		}
+		c.playerCount += len(players)
 	}
 
 	r.RemoveHandler("^PlayerList (?P<object>.*)")
