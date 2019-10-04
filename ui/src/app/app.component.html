@@ -1,14 +1,11 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-  <a class="navbar-brand" routerLink="" (click)="isNavbarCollapsed=true">Kagstats</a>
+  <a class="navbar-brand" routerLink="" (click)="isNavbarCollapsed=true">KAG Stats</a>
   <button class="navbar-toggler" type="button" (click)="isNavbarCollapsed = !isNavbarCollapsed" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
 
   <div [ngbCollapse]="isNavbarCollapsed" class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
-      <!-- <li class="nav-item">
-        <a class="nav-link" routerLink="/leaderboards">Leaderboards</a>
-      </li> -->
       <li>
         <a class="nav-link" routerLink="/players" (click)="isNavbarCollapsed=true">Players</a>
       </li>

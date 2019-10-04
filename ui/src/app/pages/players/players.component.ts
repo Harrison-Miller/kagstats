@@ -21,7 +21,6 @@ export class PlayersComponent implements OnInit {
     this.search.valueChanges
       .subscribe(value => {
         this.playersService.searchText = value;
-        console.log("got value: " + value)
         if(value == '') {
           this.getPlayers();
         }
