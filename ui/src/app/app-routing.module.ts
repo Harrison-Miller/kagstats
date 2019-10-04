@@ -8,6 +8,7 @@ import { ClassLeaderboardComponent } from './pages/leaderboard/class-leaderboard
 import { PlayersComponent } from './pages/players/players.component';
 import { PlayerDetailComponent } from './pages/player-detail/player-detail.component';
 import { KillsComponent } from './pages/kills/kills.component';
+import { AboutComponent } from './pages/about/about.component';
 
 const routes: Routes = [{
   path: '',
@@ -35,6 +36,9 @@ const routes: Routes = [{
 },{
   path: 'kills',
   component: KillsComponent
+},{
+  path: 'about',
+  component: AboutComponent
 }];
 
 @NgModule({
