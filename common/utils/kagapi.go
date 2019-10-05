@@ -37,6 +37,19 @@ func GetPlayerAvatar(player *models.Player) error {
 		return errors.Wrap(err, "error parsing player avatar response")
 	}
 
+	// set it to blank so old ones get unset
+	player.Avatar = ""
+
+	// check that the link is valid
+	resp, err = client.Get(avatarResp.Large)
+	if err != nil {
+		return errors.Wrap(err, "error checking player avatar")
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return fmt.Errorf("player avatar link returned error code: %d", resp.StatusCode)
+	}
+
 	player.Avatar = avatarResp.Large
 
 	return nil
