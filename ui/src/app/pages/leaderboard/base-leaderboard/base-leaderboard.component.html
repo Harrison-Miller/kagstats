@@ -3,6 +3,7 @@
 <table class="table">
   <thead>
     <tr>
+      <th>Rank</th>
       <th>Player</th>
       <th>Kills</th>
       <th>Deaths</th>
@@ -10,7 +11,8 @@
     </tr>
   </thead>
   <tbody *ngIf="leaderboard$ | async as leaderboard">
-    <tr *ngFor="let leader of leaderboard">
+    <tr *ngFor="let leader of leaderboard; let i = index" [attr.data-index]="i">
+      <td><b>#{{i + 1}}</b></td>
       <td>
         <div style="width: 300px">
           <app-player-banner [player]="leader.player"></app-player-banner>

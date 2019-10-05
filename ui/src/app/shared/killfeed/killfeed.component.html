@@ -1,17 +1,3 @@
-<!--
-<div class="row" *ngFor="let kill of kills">
-    <div class="col text-center">
-        <app-player-banner [player]=kill.killer></app-player-banner>
-    </div>
-    <div class="col text-center">
-        killed
-    </div>
-    <div class="col text-center">
-            <app-player-banner [player]=kill.victim></app-player-banner>
-    </div>
-</div>
--->
-
 <div class="row">
   <table class="table" *ngIf="kills$ | async as kills">
     <tbody *ngFor="let kill of kills">
