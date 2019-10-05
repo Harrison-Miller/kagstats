@@ -126,8 +126,8 @@ func (c *Collector) OnPlayerDie(m rcon.Message, r *rcon.Client) error {
 		// players can't team kill themselves
 		if kill.KillerID == kill.VictimID {
 			kill.TeamKill = false
-		} else if kill.Hitter == 29 {
-			// only builders can get spike kills
+		} else if kill.Hitter == 29 || kill.Hitter == 30 {
+			// only builders can get spike/saw kills
 			kill.KillerClass = "builder"
 		}
 

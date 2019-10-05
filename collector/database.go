@@ -221,6 +221,11 @@ func RunMigrations(db *sqlx.DB) error {
 		return err
 	}
 
+	err = RunMigration(4, SawKillBuilderOnly, db)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -325,4 +330,9 @@ func BumpNameLimit(db *sqlx.DB) error {
 	}
 
 	return nil
+}
+
+func SawKillBuilderOnly(db *sqlx.DB) error {
+	_, err := db.Exec("UPDATE kills SET killerClass='builder' WHERE hitter=30")
+	return err
 }

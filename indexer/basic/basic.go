@@ -15,7 +15,7 @@ func (i *BasicIndexer) Name() string {
 }
 
 func (i *BasicIndexer) Version() int {
-	return 4
+	return 5
 }
 
 func (i *BasicIndexer) Keys() []IndexKey {
