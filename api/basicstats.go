@@ -27,6 +27,7 @@ type BasicStats struct {
 
 func BasicStatsRoutes(r *mux.Router) {
 	r.HandleFunc("/players/{id:[0-9]+}/basic", getBasicStats).Methods("GET")
+	r.HandleFunc("/players/lookup/{name:.+}", getBasicStatsByName).Methods("GET")
 	r.HandleFunc("/leaderboard", getBasicLeaderBoard).Methods("GET")
 	r.HandleFunc("/leaderboard/kills", getKillsLeaderBoard).Methods("GET")
 	r.HandleFunc("/leaderboard/archer", getArcherLeaderBoard).Methods("GET")
@@ -45,6 +46,21 @@ func getBasicStats(w http.ResponseWriter, r *http.Request) {
 	var stats BasicStats
 
 	err = db.Get(&stats, "SELECT * FROM basic_stats INNER JOIN players ON basic_stats.playerID=players.ID WHERE basic_stats.playerID=?", int64(playerID))
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Player not found: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	JSONResponse(w, &stats)
+}
+
+func getBasicStatsByName(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	playerName := vars["name"]
+
+	var stats BasicStats
+
+	err := db.Get(&stats, "SELECT * FROM basic_stats INNER JOIN players ON basic_stats.playerID=players.ID WHERE players.username=?", playerName)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Player not found: %v", err), http.StatusInternalServerError)
 		return
