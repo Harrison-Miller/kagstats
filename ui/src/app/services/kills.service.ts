@@ -9,14 +9,16 @@ import { BehaviorSubject, Observable, timer } from 'rxjs';
 export class KillsService {
   kills$ = new BehaviorSubject<Kill[]>([]);
 
-  url$ = new BehaviorSubject<string>('/api/kills');
+  url$ = new BehaviorSubject<string>(null);
   url: string;
 
   constructor(private http: HttpClient) {
     this.url$.subscribe(newUrl => {
-      this.url = newUrl;
-      this.getKills();
-    })
+      if (!!newUrl) {
+        this.url = newUrl;
+        this.getKills();
+      }
+    });
 
     // timer(0, 5000).subscribe(() => {
     //   this.getKills();
@@ -40,6 +42,6 @@ export class KillsService {
 
     this.http.get<PagedResult<Kill>>(this.url, options).subscribe(result => {
       this.kills$.next(result.values);
-    })
+    });
   }
 }
