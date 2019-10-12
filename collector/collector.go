@@ -211,6 +211,10 @@ func AddHandlers(client *rcon.Client, collector *Collector) {
 }
 
 func Collect(sconfig configs.ServerConfig) {
+	if addrs, err := net.LookupHost(sconfig.Address); err == nil {
+		sconfig.Address = addrs[0]
+	}
+
 	address := net.JoinHostPort(sconfig.Address, sconfig.Port)
 	logger := log.New(os.Stdout, fmt.Sprintf("[%s] ", address), log.LstdFlags)
 
