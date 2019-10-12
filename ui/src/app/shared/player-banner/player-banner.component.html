@@ -32,6 +32,7 @@
         <div *ngIf="player.tier == 2" class="float-left tier2Badge" placement="top" ngbTooltip="tier 2 patreon supporter"></div>
         <div *ngIf="player.tier == 3" class="float-left tier3Badge" placement="top" ngbTooltip="tier 3 patreon supporter"></div>
         <div *ngIf="player.tier == 4" class="float-left tier4Badge" placement="top" ngbTooltip="tier 4 patreon supporter"></div>
+        <div class="float-left {{ player.registered | registeredAccolade }}" placement="top" ngbTooltip="{{ registered_tooltip[player.registered | registeredAccolade] }}"></div>
     </div>
   </div>
   </ng-container>

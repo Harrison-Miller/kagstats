@@ -30,6 +30,7 @@ import { KillsComponent } from './pages/kills/kills.component';
 import { KillfeedComponent } from './shared/killfeed/killfeed.component';
 import { AboutComponent } from './pages/about/about.component';
 import { StatusService } from './services/status.service';
+import { RegisteredAccoladePipe } from './pipes/registered-accolade.pipe';
 
 @NgModule({
   declarations: [
@@ -52,7 +53,8 @@ import { StatusService } from './services/status.service';
     TimeAgoPipe,
     HitterIconPipe,
     KillsComponent,
-    AboutComponent
+    AboutComponent,
+    RegisteredAccoladePipe
   ],
   imports: [
     BrowserModule,
