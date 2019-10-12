@@ -7,7 +7,8 @@ type Hitters struct {
 }
 
 type Status struct {
-	Players int64 `json:"players"`
-	Kills   int64 `json:"kills"`
-	Servers int64 `json:"servers"`
+	Players int64  `json:"players"`
+	Kills   int64  `json:"kills"`
+	Servers int64  `json:"servers"`
+	Version string `json:"version"`
 }

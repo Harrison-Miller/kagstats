@@ -18,6 +18,7 @@ export interface Status {
   players: number;
   kills: number;
   servers: number;
+  version: string;
 }
 
 export interface Nemesis {

@@ -178,5 +178,7 @@ func getStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	status.Version = version
+
 	JSONResponse(w, &status)
 }

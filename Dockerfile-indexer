@@ -19,6 +19,9 @@ RUN cp indexer /
 
 FROM scratch
 
+ARG VERSION
+ENV VERSION=$VERSION
+
 ADD LICENSE .
 
 COPY --from=build /indexer /

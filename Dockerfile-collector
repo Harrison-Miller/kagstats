@@ -17,6 +17,9 @@ RUN cp collector / && cp -r templates / && cp -r scripts /
 
 FROM alpine
 
+ARG VERSION
+ENV VERSION=$VERSION
+
 ADD LICENSE .
 
 COPY --from=build /collector /

@@ -41,6 +41,9 @@ func main() {
 		config.Monitoring.Host = value
 	}
 
+	version, _ := os.LookupEnv("VERSION")
+	log.Printf("KAG Stats  %s\n", version)
+
 	db, err = utils.ConnectToDatabase(config.DatabaseConnection, 10)
 	if err != nil {
 		log.Fatal(err)

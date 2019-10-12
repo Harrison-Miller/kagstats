@@ -42,6 +42,9 @@ func ReadConfig() (configs.Config, error) {
 }
 
 func Run(indexer Indexer) error {
+	version, _ := os.LookupEnv("VERSION")
+	log.Printf("KAG Stats  %s\n", version)
+
 	fmt.Printf("Starting Indexer: %s Version %d\n", indexer.Name(), indexer.Version())
 
 	config, err := ReadConfig()

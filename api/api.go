@@ -19,6 +19,7 @@ import (
 
 var db *sqlx.DB
 var config configs.Config
+var version string
 
 func LogHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -66,6 +67,9 @@ func main() {
 			log.Fatal(errors.Wrap(err, "could convert KNIGHT_GATE to int"))
 		}
 	}
+
+	version, _ = os.LookupEnv("VERSION")
+	log.Printf("KAG Stats  %s\n", version)
 
 	db, err = utils.ConnectToDatabase(config.DatabaseConnection, 10)
 	if err != nil {
