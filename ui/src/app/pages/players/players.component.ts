@@ -47,4 +47,8 @@ export class PlayersComponent implements OnInit {
       });
   }
 
+  public clearSearch(): void {
+    this.search.patchValue("");
+  }
+
 }

@@ -34,7 +34,7 @@ export class AboutComponent implements OnInit {
   status: Status;
 
   constructor(private statusService: StatusService) {
-    this.status = {players: 0, kills: 0, servers: 0};
+    this.status = {players: 0, kills: 0, servers: 0, version: ''};
     this.getStatus();
   }
 
