@@ -17,5 +17,5 @@ services:
     environment:
       - INDEXER_BATCHSIZE=1000
   hitters-indexer:
-    environemtn:
+    environment:
       - INDEXER_BATCHSIZE=1000
