@@ -30,6 +30,14 @@ export class ServersComponent implements OnInit {
       this.serversService.getAPIServer(server.address, server.port)
         .subscribe(status => {
           server.status = status;
+          this.servers.sort((a,b) => {
+            if (!a.status) {
+              return 1;
+            }else if(!b.status) {
+              return -1;
+            }
+            return b.status.currentPlayers - a.status.currentPlayers;
+          });
         })
     });
   }
