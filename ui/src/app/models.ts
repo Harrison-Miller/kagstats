@@ -48,6 +48,7 @@ export interface Kill {
   teamKill: boolean;
   victim: Player;
   killer: Player;
+  server: Server;
 }
 
 export interface Player {

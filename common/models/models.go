@@ -53,6 +53,7 @@ type Kill struct {
 
 	Player `json:"victim" db:"victim,prefix=victim."`
 	Killer `json:"killer" db:"killer,prefix=killer."`
+	Server `json:"server" db:"server,prefix=server."`
 }
 
 type Event struct {
