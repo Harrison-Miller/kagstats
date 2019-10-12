@@ -23,6 +23,8 @@ type Collector struct {
 	playerCount int
 }
 
+const MINIMUM_PLAYERS = 4
+
 func UpdatePlayer(p *models.Player) error {
 	if cache, ok := players[p.Username]; ok {
 		p.ID = cache.ID
@@ -96,7 +98,7 @@ func (c *Collector) OnPlayerLeave(m rcon.Message, r *rcon.Client) error {
 }
 
 func (c *Collector) OnPlayerDie(m rcon.Message, r *rcon.Client) error {
-	if c.playerCount <= 2 {
+	if c.playerCount >= MINIMUM_PLAYERS {
 		c.logger.Println("not enough players, not adding kill to db")
 		return nil
 	}
@@ -158,7 +160,7 @@ func (c *Collector) PlayerList(m rcon.Message, r *rcon.Client) error {
 			}
 			c.logger.Printf("%s (%d) was in the game", p.Username, p.ID)
 		}
-		c.playerCount += len(players)
+		c.playerCount = len(players)
 	}
 
 	r.RemoveHandler("^PlayerList (?P<object>.*)")
@@ -231,6 +233,8 @@ func Collect(sconfig configs.ServerConfig) {
 
 		defer client.Close()
 		logger.Printf("Connected to %s!\n", address)
+
+		collector.playerCount = 0
 
 		client.RunScript("scripts/ServerInfo.as")
 		client.HandleFunc("^ServerInfo (?P<object>.*)", collector.ServerInfo).RemoveTimestamp()
