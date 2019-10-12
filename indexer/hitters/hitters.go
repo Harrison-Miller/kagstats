@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/Harrison-Miller/kagstats/common/models"
 	. "github.com/Harrison-Miller/kagstats/common/models"
 	. "github.com/Harrison-Miller/kagstats/indexer"
 )
@@ -15,7 +16,7 @@ func (i *HittersIndexer) Name() string {
 }
 
 func (i *HittersIndexer) Version() int {
-	return 2
+	return 3
 }
 
 func (i *HittersIndexer) Keys() []IndexKey {
@@ -37,6 +38,15 @@ func (i *HittersIndexer) Counters() []string {
 func (i *HittersIndexer) Index(kill Kill) []Index {
 	var indices []Index
 	if kill.KillerID != kill.VictimID && !kill.TeamKill {
+		// remove duplicate hitters
+		if kill.Hitter == models.Burn {
+			kill.Hitter = models.Fire
+		} else if kill.Hitter == models.Mine_special {
+			kill.Hitter = models.Mine_special
+		} else if kill.Hitter == models.Cata_boulder {
+			kill.Hitter = models.Cata_stones
+		}
+
 		indices = append(indices, Index{
 			Keys:     []int{int(kill.KillerID), int(kill.Hitter)},
 			Counters: map[string]int{"kills": 1},
