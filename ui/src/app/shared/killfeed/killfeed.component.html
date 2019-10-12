@@ -1,5 +1,5 @@
 <div class="row">
-  <table class="table" *ngIf="kills$ | async as kills">
+  <table class="table" *ngIf="kills$ | async as kills; else noHistory">
     <tbody *ngFor="let kill of kills">
       <td>
         <div style="width: 250px">
@@ -26,3 +26,6 @@
     </tbody>
   </table>
 </div>
+<ng-template #noHistory>
+    <h3 class="text-center">No history to show</h3>
+</ng-template>

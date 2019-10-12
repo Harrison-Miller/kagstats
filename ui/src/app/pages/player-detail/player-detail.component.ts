@@ -17,7 +17,22 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
 
   playerId: number;
   player: Player;
-  basicStats: BasicStats;
+  basicStats: BasicStats = {
+    player: null,
+    suicides: 0,
+    teamKills: 0,
+    archerKills: 0,
+    archerDeaths: 0,
+    builderKills: 0,
+    builderDeaths: 0,
+    knightKills: 0,
+    knightDeaths: 0,
+    otherKills: 0,
+    otherDeaths: 0,
+    totalKills: 0,
+    totalDeaths: 0
+  };
+
   nemesis: Nemesis;
   hitters: Hitter[];
   descriptions: string[] = HITTER_DESCRIPTION;
@@ -43,11 +58,15 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
       this.getPlayer();
       this.nemesisService.getNemesis(this.playerId)
         .subscribe( nemeses => {
-          this.nemesis = nemeses[0];
+          if(nemeses) {
+            this.nemesis = nemeses[0];
+          }
         });
       this.hittersService.getHitters(this.playerId)
         .subscribe( hitters => {
-          this.hitters = hitters.slice(0, 3);
+          if(hitters) {
+            this.hitters = hitters.slice(0, 3);
+          }
         });
     });
   }
@@ -62,6 +81,13 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
         this.basicStats = b;
         this.player = this.basicStats.player;
         this.titleService.setTitle("KAG Stats - " + this.player.characterName);
+      },
+      error => {
+        this.playersService.getPlayerName(this.playerId)
+          .subscribe( a => {
+            this.player = a;
+            this.titleService.setTitle("KAG Stats - " + this.player.characterName);
+          })
       });
   }
 

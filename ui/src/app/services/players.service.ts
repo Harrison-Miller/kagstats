@@ -16,6 +16,10 @@ export class PlayersService {
     return this.http.get<BasicStats>(`/api/players/${playerId}/basic`);
   }
 
+  getPlayerName(playerId): Observable<Player> {
+    return this.http.get<Player>(`/api/players/${playerId}`);
+  }
+
   getPlayers(): Observable<PagedResult<Player>> {
     return this.http.get<PagedResult<Player>>('/api/players');
   }

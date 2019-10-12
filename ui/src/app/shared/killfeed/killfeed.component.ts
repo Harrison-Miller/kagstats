@@ -28,7 +28,9 @@ export class KillfeedComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.kills$ = this.killsService.kills$.pipe(
       map(kills => {
-        return kills.slice(0, this.limit);
+        if(kills) {
+          return kills.slice(0, this.limit);
+        }
       })
     );
   }
