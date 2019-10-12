@@ -17,6 +17,17 @@
           <ng-container *ngIf="server.status; else playersBlock">{{server.status.currentPlayers}}/{{server.status.maxPlayers}}</ng-container>
           <ng-template #playersBlock>0/0</ng-template>
         </div>
+        <div *ngIf="server.status" style="color:red">
+          <div *ngIf="server.gameMode=='TDM' && server.status.currentPlayers<4">
+            Not enough players to collect stats.
+          </div>
+          <div *ngIf="server.gameMode=='CTF' && server.status.currentPlayers<8">
+              Not enough players to collect stats.
+          </div>
+          <div *ngIf="server.gameMode=='TTH' && server.status.currentPlayers<8">
+              Not enough players to collect stats.
+          </div>
+        </div>
         <div>
           <img class="minimap" src="https://api.kag2d.com/server/ip/{{server.address}}/port/{{server.port}}/minimap" onError="this.src='/assets/unkownmap.png'">
         </div>

@@ -23,7 +23,8 @@ type Collector struct {
 	playerCount int
 }
 
-const MINIMUM_PLAYERS = 4
+const TDM_MINIMUM_PLAYERS = 4
+const CTF_MINIMUM_PLAYERS = 8
 
 func UpdatePlayer(p *models.Player) error {
 	if cache, ok := players[p.Username]; ok {
@@ -98,7 +99,12 @@ func (c *Collector) OnPlayerLeave(m rcon.Message, r *rcon.Client) error {
 }
 
 func (c *Collector) OnPlayerDie(m rcon.Message, r *rcon.Client) error {
-	if c.playerCount >= MINIMUM_PLAYERS {
+	if c.server.Gamemode == "TDM" && c.playerCount < TDM_MINIMUM_PLAYERS {
+		c.logger.Println("not enough players, not adding kill to db")
+		return nil
+	}
+
+	if (c.server.Gamemode == "CTF" || c.server.Gamemode == "WAR") && c.playerCount < CTF_MINIMUM_PLAYERS {
 		c.logger.Println("not enough players, not adding kill to db")
 		return nil
 	}
