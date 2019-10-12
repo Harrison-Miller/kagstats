@@ -60,7 +60,7 @@ func getBasicStatsByName(w http.ResponseWriter, r *http.Request) {
 
 	var stats BasicStats
 
-	err := db.Get(&stats, "SELECT * FROM basic_stats INNER JOIN players ON basic_stats.playerID=players.ID WHERE players.username=?", playerName)
+	err := db.Get(&stats, "SELECT * FROM basic_stats INNER JOIN players ON basic_stats.playerID=players.ID WHERE LOWER(players.username)=LOWER(?)", playerName)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Player not found: %v", err), http.StatusInternalServerError)
 		return
