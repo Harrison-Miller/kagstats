@@ -156,16 +156,17 @@
         <div class="row buffer">
             <div class="shadow-sm col text-center">
                 <h3>Nemesis</h3>
-                <ng-container *ngIf="nemesis">
-                <div class="row"></div>
-                <div class="row margin-top">
+                <ng-container *ngIf="nemesis; else noNemesis">
+                <div class="row margin-top text-center">
                     <div class="col offset-4">
                         <app-player-banner [player]="nemesis.nemesis" [status]="false"></app-player-banner>
                     </div>
                 </div>
-                <h5 class="margin-top">Has killed {{player.clanTag}} {{player.characterName}} {{nemesis.deaths}} times!</h5>
-                <div class="row"></div>
+                <div class="margin-top text-center">Has killed {{player.clanTag}} {{player.characterName}} <b>{{nemesis.deaths}}</b> times!</div>
                 </ng-container>
+                <ng-template #noNemesis>
+                    <div class="text-center">{{player.clanTag}} {{player.characterName}} doesn't have a nemesis</div>
+                </ng-template>
             </div>
             <div class="shadow-sm col text-center">
                 <h3>Top Weapons</h3>
@@ -180,15 +181,16 @@
         <div class="row">
             <div class="shadow-sm col text-center">
                 <h3>Bullied</h3>
-                <ng-container *ngIf="bullied">
+                <ng-container *ngIf="bullied; else noBully">
                 <div class="buffer">{{player.clanTag}} {{player.characterName}} has bullied <b>{{bullied.length}}</b> player(s)</div>
+                <small style="color:grey">showing {{bullied.slice(0,5).length}} of those players</small>
                 <table class="table">
                     <thead>
                         <th>Player</th>
                         <th>Deaths</th>
                     </thead>
                     <tbody>
-                    <tr *ngFor="let b of bullied">
+                    <tr *ngFor="let b of bullied.slice(0,5)">
                         <td>
                             <app-player-banner [player]="b.nemesis" [status]="false"></app-player-banner>
                         </td>
@@ -199,6 +201,9 @@
                 </tbody>
                 </table>
                 </ng-container>
+                <ng-template #noBully>
+                    <div class="text-center">{{player.clanTag}} {{player.characterName}} hasn't bullied anyone hard enough</div>
+                </ng-template>
             </div>
             <div class="col">
             </div>
