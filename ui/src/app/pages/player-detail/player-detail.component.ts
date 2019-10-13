@@ -109,6 +109,12 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
       });
   }
 
+  totalKD(): string {
+    let kills = this.basicStats.totalKills;
+    let deaths = this.basicStats.totalDeaths;
+    return (kills / (deaths === 0 ? 1 : deaths)).toFixed(2);
+  }
+
   archerKD(): string {
     let kills = this.basicStats.archerKills;
     let deaths = this.basicStats.archerDeaths;

@@ -76,6 +76,29 @@
     <ng-template ngbTabTitle><h3>Overview</h3></ng-template>
     <ng-template ngbTabContent>
     <div class="top-margin">
+        <div class="row buffer">
+            <div class="col"></div>
+            <div class="shadow-sm col text-center">
+                <h3>Total</h3>
+                <h4>{{totalKD()}}</h4>
+                <div class="row">
+                    <div class="col">
+                        <div>Kills</div>
+                        <h5>{{basicStats.totalKills}}</h5>
+                    </div>
+                    <div class="col">
+                        <div>Deaths</div>
+                        <h5>{{basicStats.totalDeaths}}</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="shadow-sm col text-center">
+                <h3>Suicides</h3>
+                <div class="sprite2x icon suicideIcon"></div>
+                <h4>{{basicStats.suicides}}</h4>
+            </div>
+            <div class="col"></div>
+        </div>
         <div class="row">
             <div class="shadow-sm col text-center">
                 <h3>Archer</h3>
@@ -122,11 +145,6 @@
                     </div>
                 </div>
             </div>
-            <div class="shadow-sm col text-center">
-                <h3>Suicides</h3>
-                <div class="sprite2x icon suicideIcon"></div>
-                <h4>{{basicStats.suicides}}</h4>
-            </div>
         </div>
     </div>
     </ng-template>
@@ -164,7 +182,7 @@
     <ng-template ngbTabTitle><h3>Kill History</h3></ng-template>
     <ng-template ngbTabContent>
         <div class="top-margin">
-            <app-killfeed [url]="'/api/players/' + player.id + '/kills'" [limit]="10"></app-killfeed>
+            <app-killfeed [url]="'/api/players/' + player.id + '/kills'" [limit]="20"></app-killfeed>
         </div>
     </ng-template>
     </ngb-tab>
