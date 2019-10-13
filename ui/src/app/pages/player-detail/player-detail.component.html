@@ -16,15 +16,27 @@
             <img id="avatar" src="{{ player.id | unkownAvatar }}" class="rounded-circle" style="width: 100px; height: 100px;">
         </ng-template>      
     </div>
-    <div class="col top-margin">
+    <div class="col">
     <div class="row buffer">
         <div class="col">
-            <div *ngIf="player.oldGold" class="float-left oldGoldBadge" placement="right" ngbTooltip="gold member who bought the game pre-F2P launch"></div>
-            <div *ngIf="player.tier == 1" class="float-left tier1Badge" placement="right" ngbTooltip="tier 1 patreon supporter"></div>
-            <div *ngIf="player.tier == 2" class="float-left tier2Badge" placement="right" ngbTooltip="tier 2 patreon supporter"></div>
-            <div *ngIf="player.tier == 3" class="float-left tier3Badge" placement="right" ngbTooltip="tier 3 patreon supporter"></div>
-            <div *ngIf="player.tier == 4" class="float-left tier4Badge" placement="right" ngbTooltip="tier 4 patreon supporter"></div>
-            <div class="float-left {{ player.registered | registeredAccolade }}" placement="right" ngbTooltip="{{ registered_tooltip[player.registered | registeredAccolade] }}"></div>
+            <div style="overflow:auto; display:inline-block" placement="top" ngbTooltip="gold member who bought the game pre-F2P launch">
+                <div *ngIf="player.oldGold" class="sprite2x float-left oldGoldBadge"></div>
+            </div>
+            <div style="overflow:auto; display:inline-block" placement="top" ngbTooltip="tier 1 patreon supporter">
+                <div *ngIf="player.tier == 1" class="sprite2x float-left tier1Badge"></div>
+            </div>
+            <div style="overflow:auto; display:inline-block" placement="top" ngbTooltip="tier 2 patreon supporter">
+                <div *ngIf="player.tier == 2" class="sprite2x float-left tier2Badge"></div>
+            </div>
+            <div style="overflow:auto; display:inline-block" placement="top" ngbTooltip="tier 3 patreon supporter">
+                <div *ngIf="player.tier == 3" class="sprite2x float-left tier3Badge"></div>
+            </div>
+            <div style="overflow:auto; display:inline-block" placement="top" ngbTooltip="tier 4 patreon supporter">
+                <div *ngIf="player.tier == 4" class="sprite2x float-left tier4Badge"></div>
+            </div>
+            <div style="overflow:auto; display:inline-block" placement="top" ngbTooltip="{{ registered_tooltip[player.registered | registeredAccolade] }}">
+                <div class="sprite2x float-left {{ player.registered | registeredAccolade }}"></div>
+            </div>
         </div>
     </div>
     
@@ -67,7 +79,7 @@
         <div class="row">
             <div class="shadow-sm col text-center">
                 <h3>Archer</h3>
-                <div class="icon archerIcon"></div>
+                <div class="sprite2x icon archerIcon"></div>
                 <h4>{{archerKD()}}</h4>
                 <div class="row">
                     <div class="col">
@@ -82,7 +94,7 @@
             </div>
             <div class="shadow-sm col text-center">
                 <h3>Builder</h3>
-                <div class="icon builderIcon"></div>
+                <div class="sprite2x icon builderIcon"></div>
                 <h4>{{builderKD()}}</h4>
                 <div class="row">
                     <div class="col">
@@ -97,7 +109,7 @@
             </div>
             <div class="shadow-sm col text-center">
                 <h3>Knight</h3>
-                <div class="icon knightIcon"></div>
+                <div class="sprite2x icon knightIcon"></div>
                 <h4>{{knightKD()}}</h4>
                 <div class="row">
                     <div class="col">
@@ -112,7 +124,7 @@
             </div>
             <div class="shadow-sm col text-center">
                 <h3>Suicides</h3>
-                <div class="icon suicideIcon"></div>
+                <div class="sprite2x icon suicideIcon"></div>
                 <h4>{{basicStats.suicides}}</h4>
             </div>
         </div>
@@ -140,7 +152,7 @@
                 <ng-container *ngIf="hitters">
                 <div *ngFor="let hitter of hitters">
                     <h5>{{hitter.kills}} kills with {{descriptions[hitter.hitter]}}</h5>
-                    <div class="{{ hitter.hitter | hitterIcon }}" style="margin: auto"></div>
+                    <div class="sprite2x {{ hitter.hitter | hitterIcon }}" style="margin: auto"></div>
                 </div>
                 </ng-container>
             </div>

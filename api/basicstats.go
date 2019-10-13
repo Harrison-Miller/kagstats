@@ -58,7 +58,6 @@ func getBasicStats(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("Player not found: %v", err), http.StatusInternalServerError)
 		return
 	}
-	fmt.Println(stats)
 
 	JSONResponse(w, &stats)
 }

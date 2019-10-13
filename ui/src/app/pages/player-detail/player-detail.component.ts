@@ -105,7 +105,6 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
   getServer(id: number): void {
     this.serversService.getServer(id)
       .subscribe( server => {
-        console.log(server);
         this.server =  server;
       });
   }
