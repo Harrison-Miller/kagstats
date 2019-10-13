@@ -40,6 +40,7 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
   server: Server;
 
   nemesis: Nemesis;
+  bullied: Nemesis[];
   hitters: Hitter[];
   descriptions: string[] = HITTER_DESCRIPTION;
 
@@ -66,9 +67,16 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
       
       this.getPlayer();
       this.nemesisService.getNemesis(this.playerId)
-        .subscribe( nemeses => {
-          if(nemeses) {
-            this.nemesis = nemeses[0];
+        .subscribe( nemesis => {
+          if(nemesis) {
+            this.nemesis = nemesis;
+          }
+        });
+      this.nemesisService.getBullied(this.playerId)
+        .subscribe( bullied => {
+          if(bullied) {
+            
+            this.bullied = bullied.sort((a,b) => b.deaths - a.deaths);
           }
         });
       this.hittersService.getHitters(this.playerId)

@@ -1,6 +1,6 @@
 <div class="row">
   <table class="table" *ngIf="kills$ | async as kills; else noHistory">
-    <tbody *ngFor="let kill of kills">
+    <tr *ngFor="let kill of kills">
       <td>
         <div style="width: 250px">
             <app-player-banner [status]="false" [player]="kill.killer"></app-player-banner>
@@ -26,7 +26,7 @@
       </ng-container>
       <td>{{kill.time | timeAgo }}</td>
       <td><p style="color: gray">{{kill.server.name}}</p></td>
-    </tbody>
+    </tr>
   </table>
 </div>
 <ng-template #noHistory>

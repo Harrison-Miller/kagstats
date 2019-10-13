@@ -17,6 +17,7 @@ type Nemesis struct {
 
 func NemesisRoutes(r *mux.Router) {
 	r.HandleFunc("/players/{id:[0-9]+}/nemesis", getNemesis).Methods("GET")
+	r.HandleFunc("/players/{id:[0-9]+}/bullied", getBullied).Methods("GET")
 }
 
 func getNemesis(w http.ResponseWriter, r *http.Request) {
@@ -26,27 +27,36 @@ func getNemesis(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var player models.Player
-	err = db.Get(&player, "SELECT * FROM players WHERE ID=?", playerID)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("could not find player: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	var n []Nemesis
-	err = db.Select(&n, `SELECT * FROM nemesis AS n INNER JOIN players ON n.nemesisID=players.ID WHERE n.playerID=? ORDER BY n.deaths DESC LIMIT 3`, playerID)
+	var n Nemesis
+	err = db.Get(&n, `SELECT * FROM nemesis AS n INNER JOIN players ON n.nemesisID=players.ID WHERE n.playerID=? AND n.deaths > 3 ORDER BY n.deaths DESC LIMIT 1`, playerID)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("could not find nemeses for player: %v", err), http.StatusInternalServerError)
 		return
 	}
 
+	JSONResponse(w, n)
+}
+
+func getBullied(w http.ResponseWriter, r *http.Request) {
+	playerID, err := GetIntURLArg("id", r)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("coud not get id: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	var b []Nemesis
+	err = db.Select(&b, `SELECT players.*, n1.playerID as playerID, n1.nemesisID as nemesisID, n1.deaths as deaths 
+		FROM nemesis as n1 INNER JOIN (SELECT playerID, MAX(deaths) as deaths FROM nemesis GROUP BY playerID) AS n2 
+		ON n1.playerID = n2.playerID AND n1.deaths = n2.deaths AND n1.deaths > 3 AND n1.nemesisID = ? INNER JOIN players ON n1.playerID=players.ID
+	`, playerID)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("could not find bullied players for player: %v", err), http.StatusInternalServerError)
+		return
+	}
+
 	JSONResponse(w, struct {
-		MyPlayer models.Player `json:"player"`
-		Size     int           `json:"size"`
-		Nemeses  []Nemesis     `json:"nemeses"`
+		Bullied []Nemesis `json:"bullied"`
 	}{
-		MyPlayer: player,
-		Size:     len(n),
-		Nemeses:  n,
+		Bullied: b,
 	})
 }

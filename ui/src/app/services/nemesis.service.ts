@@ -11,10 +11,15 @@ export class NemesisService {
 
   constructor(private http: HttpClient) { }
 
-  getNemesis(playerId: number): Observable<Nemesis[]> {
+  getNemesis(playerId: number): Observable<Nemesis> {
     let path = `/api/players/${playerId}/nemesis`;
-    return this.http.get<{nemeses:Nemesis[]}>(path).pipe(
-      map(n => n.nemeses)
+    return this.http.get<Nemesis>(path);
+  }
+
+  getBullied(playerId: number): Observable<Nemesis[]> {
+    let path = `/api/players/${playerId}/bullied`;
+    return this.http.get<{bullied:Nemesis[]}>(path).pipe(
+      map(n => n.bullied)
     );
   }
 }

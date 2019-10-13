@@ -153,16 +153,18 @@
     <ng-template ngbTabTitle><h3>Fact Sheet</h3></ng-template>
     <ng-template ngbTabContent>
         <div class="margin-top">
-        <div class="row">
+        <div class="row buffer">
             <div class="shadow-sm col text-center">
                 <h3>Nemesis</h3>
                 <ng-container *ngIf="nemesis">
+                <div class="row"></div>
                 <div class="row margin-top">
-                    <div class="col offset-4" routerLink="/players/{{nemesis.nemesis.id}}">
-                        <app-player-banner [player]="nemesis.nemesis"></app-player-banner>
+                    <div class="col offset-4">
+                        <app-player-banner [player]="nemesis.nemesis" [status]="false"></app-player-banner>
                     </div>
                 </div>
                 <h5 class="margin-top">Has killed {{player.clanTag}} {{player.characterName}} {{nemesis.deaths}} times!</h5>
+                <div class="row"></div>
                 </ng-container>
             </div>
             <div class="shadow-sm col text-center">
@@ -173,6 +175,32 @@
                     <div class="sprite2x {{ hitter.hitter | hitterIcon }}" style="margin: auto"></div>
                 </div>
                 </ng-container>
+            </div>
+        </div>
+        <div class="row">
+            <div class="shadow-sm col text-center">
+                <h3>Bullied</h3>
+                <ng-container *ngIf="bullied">
+                <div class="buffer">{{player.clanTag}} {{player.characterName}} has bullied <b>{{bullied.length}}</b> player(s)</div>
+                <table class="table">
+                    <thead>
+                        <th>Player</th>
+                        <th>Deaths</th>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let b of bullied">
+                        <td>
+                            <app-player-banner [player]="b.nemesis" [status]="false"></app-player-banner>
+                        </td>
+                        <td>
+                            {{b.deaths}}
+                        </td>
+                    </tr>
+                </tbody>
+                </table>
+                </ng-container>
+            </div>
+            <div class="col">
             </div>
         </div>
         </div>
