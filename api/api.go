@@ -68,6 +68,13 @@ func main() {
 		}
 	}
 
+	if value, ok := os.LookupEnv("NEMESIS_GATE"); ok {
+		config.API.NemesisGate, err = strconv.Atoi(value)
+		if err != nil {
+			log.Fatal(errors.Wrap(err, "could convert NEMESIS_GATE to int"))
+		}
+	}
+
 	version, _ = os.LookupEnv("VERSION")
 	log.Printf("KAG Stats  %s\n", version)
 

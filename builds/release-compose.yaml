@@ -10,6 +10,7 @@ services:
       - ARCHER_GATE=40
       - BUILDER_GATE=20
       - KNIGHT_GATE=75
+      - NEMESIS_GATE=11
   basic-indexer:
     environment:
       - INDEXER_BATCHSIZE=3000

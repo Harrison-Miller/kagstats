@@ -28,7 +28,8 @@ func getNemesis(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var n Nemesis
-	err = db.Get(&n, `SELECT * FROM nemesis AS n INNER JOIN players ON n.nemesisID=players.ID WHERE n.playerID=? AND n.deaths > 3 ORDER BY n.deaths DESC LIMIT 1`, playerID)
+	err = db.Get(&n, `SELECT * FROM nemesis AS n INNER JOIN players 
+		ON n.nemesisID=players.ID WHERE n.playerID=? AND n.deaths >= ? ORDER BY n.deaths DESC LIMIT 1`, playerID, config.API.NemesisGate)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("could not find nemeses for player: %v", err), http.StatusInternalServerError)
 		return
@@ -47,8 +48,8 @@ func getBullied(w http.ResponseWriter, r *http.Request) {
 	var b []Nemesis
 	err = db.Select(&b, `SELECT players.*, n1.playerID as playerID, n1.nemesisID as nemesisID, n1.deaths as deaths 
 		FROM nemesis as n1 INNER JOIN (SELECT playerID, MAX(deaths) as deaths FROM nemesis GROUP BY playerID) AS n2 
-		ON n1.playerID = n2.playerID AND n1.deaths = n2.deaths AND n1.deaths > 3 AND n1.nemesisID = ? INNER JOIN players ON n1.playerID=players.ID
-	`, playerID)
+		ON n1.playerID = n2.playerID AND n1.deaths = n2.deaths AND n1.deaths >= ? AND n1.nemesisID = ? INNER JOIN players ON n1.playerID=players.ID
+	`, config.API.NemesisGate, playerID)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("could not find bullied players for player: %v", err), http.StatusInternalServerError)
 		return

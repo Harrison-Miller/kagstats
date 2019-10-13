@@ -57,6 +57,7 @@ type APIConfig struct {
 	ArcherGate  int    `json:"archerGate"`
 	BuilderGate int    `json:"builderGate"`
 	KnightGate  int    `json:"knightGate"`
+	NemesisGate int    `json:"nemesisGate"`
 }
 
 func NewConfig() Config {
@@ -98,6 +99,7 @@ func NewAPIConfig() APIConfig {
 		ArcherGate:  50,
 		BuilderGate: 15,
 		KnightGate:  100,
+		NemesisGate: 4,
 	}
 	return c
 }
