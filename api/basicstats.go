@@ -8,6 +8,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
+const basicQuery = `SELECT basic_stats.*, p.ID "player.ID", p.username "player.username",
+p.charactername "player.charactername", p.clantag "player.clantag", p.oldgold "player.oldgold",
+p.registered "player.registered", p.role "player.role", p.avatar "player.avatar", p.tier "player.tier",
+e.type "player.lastEvent.type", e.time "player.lastEvent.time", e.serverID "player.lastEvent.serverID" 
+ FROM basic_stats 
+INNER JOIN players as p ON basic_stats.playerID=p.ID 
+INNER JOIN events as e ON p.lastEventID=e.ID `
+
 type BasicStats struct {
 	models.Player `json:"player" db:"player,prefix=player."`
 	PlayerID      int64 `json:"-" db:"playerID"`
@@ -45,14 +53,7 @@ func getBasicStats(w http.ResponseWriter, r *http.Request) {
 
 	var stats BasicStats
 
-	err = db.Get(&stats, `SELECT basic_stats.*, p.ID "player.ID", p.username "player.username",
-		p.charactername "player.charactername", p.clantag "player.clantag", p.oldgold "player.oldgold",
-		p.registered "player.registered", p.role "player.role", p.avatar "player.avatar", p.tier "player.tier",
-		e.type "player.lastEvent.type", e.time "player.lastEvent.time", e.serverID "player.lastEvent.serverID" 
- 		FROM basic_stats 
-		INNER JOIN players as p ON basic_stats.playerID=p.ID 
-		INNER JOIN events as e ON p.lastEventID=e.ID 
-		WHERE basic_stats.playerID=?`, int64(playerID))
+	err = db.Get(&stats, basicQuery+"WHERE basic_stats.playerID=?", int64(playerID))
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Player not found: %v", err), http.StatusInternalServerError)
 		return
@@ -68,7 +69,7 @@ func getBasicStatsByName(w http.ResponseWriter, r *http.Request) {
 
 	var stats BasicStats
 
-	err := db.Get(&stats, "SELECT * FROM basic_stats INNER JOIN players ON basic_stats.playerID=players.ID WHERE LOWER(players.username)=LOWER(?)", playerName)
+	err := db.Get(&stats, basicQuery+"WHERE LOWER(players.username)=LOWER(?)", playerName)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Player not found: %v", err), http.StatusInternalServerError)
 		return
@@ -80,8 +81,7 @@ func getBasicStatsByName(w http.ResponseWriter, r *http.Request) {
 func getBasicLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	var stats []BasicStats
 
-	err := db.Select(&stats, `SELECT * FROM basic_stats INNER JOIN players ON basic_stats.playerID=players.ID 
-		WHERE basic_stats.total_kills >= ? AND basic_stats.total_deaths >= ? 
+	err := db.Select(&stats, basicQuery+`WHERE basic_stats.total_kills >= ? AND basic_stats.total_deaths >= ? 
 		ORDER BY (basic_stats.total_kills / basic_stats.total_deaths) DESC LIMIT 20`, config.API.KDGate, config.API.KDGate)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error fetching leader board: %v", err), http.StatusInternalServerError)
@@ -100,8 +100,7 @@ func getBasicLeaderBoard(w http.ResponseWriter, r *http.Request) {
 func getKillsLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	var stats []BasicStats
 
-	err := db.Select(&stats, `SELECT * FROM basic_stats INNER JOIN players ON basic_stats.playerID=players.ID 
-		WHERE basic_stats.total_kills >= ? AND basic_stats.total_deaths >= ? 
+	err := db.Select(&stats, basicQuery+`WHERE basic_stats.total_kills >= ? AND basic_stats.total_deaths >= ? 
 		ORDER BY basic_stats.total_kills DESC LIMIT 20`, config.API.KDGate, config.API.KDGate)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error fetching leader board: %v", err), http.StatusInternalServerError)
@@ -120,8 +119,7 @@ func getKillsLeaderBoard(w http.ResponseWriter, r *http.Request) {
 func getArcherLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	var stats []BasicStats
 
-	err := db.Select(&stats, `SELECT * FROM basic_stats INNER JOIN players ON basic_stats.playerID=players.ID 
-		WHERE basic_stats.archer_kills >= ? AND basic_stats.archer_deaths >= ? 
+	err := db.Select(&stats, basicQuery+`WHERE basic_stats.archer_kills >= ? AND basic_stats.archer_deaths >= ? 
 		ORDER BY (basic_stats.archer_kills / basic_stats.archer_deaths) DESC LIMIT 20`, config.API.ArcherGate, config.API.ArcherGate)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error fetching leader board: %v", err), http.StatusInternalServerError)
@@ -140,8 +138,7 @@ func getArcherLeaderBoard(w http.ResponseWriter, r *http.Request) {
 func getBuilderLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	var stats []BasicStats
 
-	err := db.Select(&stats, `SELECT * FROM basic_stats INNER JOIN players ON basic_stats.playerID=players.ID 
-		WHERE basic_stats.builder_kills >= ? AND basic_stats.builder_deaths >= ? 
+	err := db.Select(&stats, basicQuery+`WHERE basic_stats.builder_kills >= ? AND basic_stats.builder_deaths >= ? 
 		ORDER BY (basic_stats.builder_kills / basic_stats.builder_deaths) DESC LIMIT 20`, config.API.BuilderGate, config.API.BuilderGate)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error fetching leader board: %v", err), http.StatusInternalServerError)
@@ -160,8 +157,7 @@ func getBuilderLeaderBoard(w http.ResponseWriter, r *http.Request) {
 func getKnightLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	var stats []BasicStats
 
-	err := db.Select(&stats, `SELECT * FROM basic_stats INNER JOIN players ON basic_stats.playerID=players.ID 
-		WHERE basic_stats.knight_kills >= ? AND basic_stats.knight_deaths >= ? 
+	err := db.Select(&stats, basicQuery+`WHERE basic_stats.knight_kills >= ? AND basic_stats.knight_deaths >= ? 
 		ORDER BY (basic_stats.knight_kills / basic_stats.knight_deaths) DESC LIMIT 20`, config.API.KnightGate, config.API.KnightGate)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error fetching leader board: %v", err), http.StatusInternalServerError)
