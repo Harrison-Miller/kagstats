@@ -11,8 +11,14 @@ export class RegisteredAccoladePipe implements PipeTransform {
     return null;
   }
 
+  parseDate(date: string): number {
+    //2011-11-09 05:20:22
+    var b = date.split(/\D/);
+    return Date.UTC(+b[0], +b[1]-1, +b[2], +b[3], +b[4], +b[5])
+  }
+
   getRegisteredAccolade(registered: string): string {
-    let l = Date.parse(registered + " UTC")
+    let l = this.parseDate(registered)
     let n = Date.now();
 
     let diff = n - l;
