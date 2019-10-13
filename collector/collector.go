@@ -29,9 +29,12 @@ const CTF_MINIMUM_PLAYERS = 8
 func UpdatePlayer(p *models.Player) error {
 	if cache, ok := players[p.Username]; ok {
 		p.ID = cache.ID
+		cache.ServerID = p.ServerID
+
 		if p.Charactername != cache.Charactername || p.Clantag != cache.Clantag {
 			cache.Charactername = p.Charactername
 			cache.Clantag = p.Clantag
+
 			err := UpdatePlayerInfo(p)
 			if err != nil {
 				return errors.Wrap(err, "error updating player info")
@@ -58,8 +61,8 @@ func (c *Collector) OnPlayerJoined(m rcon.Message, r *rcon.Client) error {
 	}
 
 	if (player != models.Player{}) {
-		err = UpdatePlayer(&player)
 		player.ServerID = c.server.ID
+		err = UpdatePlayer(&player)
 		if err != nil {
 			return err
 		}
@@ -155,8 +158,8 @@ func (c *Collector) PlayerList(m rcon.Message, r *rcon.Client) error {
 
 	if len(players) > 0 {
 		for _, p := range players {
-			err = UpdatePlayer(&p)
 			p.ServerID = c.server.ID
+			err = UpdatePlayer(&p)
 			if err != nil {
 				return err
 			}
