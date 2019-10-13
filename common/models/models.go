@@ -9,7 +9,7 @@ type Player struct {
 	Username      string `json:"username"`
 	Charactername string `json:"characterName"`
 	Clantag       string `json:"clanTag"`
-	ServerID      int64
+	ServerID      int64  // used for tracking in the collector
 
 	//Information cached from api.kag2d.com
 	OldGold    bool   `json:"oldGold"`
@@ -18,8 +18,8 @@ type Player struct {
 	Avatar     string `json:"avatar"`
 	Tier       int64  `json:"tier"`
 
-	LastEvent     string `json:"lastEvent" db:"lastEvent"`
-	LastEventTime int64  `json:"lastEventTime" db:"lastEventTime"`
+	LastEventID int64 `json:"-" db:"lastEventID"`
+	Event       `json:"lastEvent" db:"lastEvent,prefix=lastEvent."`
 }
 
 func GetPlayer(playerID int, db *sqlx.DB) (Player, error) {
@@ -58,10 +58,8 @@ type Kill struct {
 
 type Event struct {
 	ID       int64  `json:"id" db:"ID"`
-	PlayerID int64  `json:"-" db:"playerID"`
+	PlayerID int64  `json:"playerId" db:"playerID"`
 	Type     string `json:"type"`
 	Time     int64  `json:"time"`
 	ServerID int64  `json:"serverId" db:"serverID"`
-
-	Player `json:"player" db:"player,prefix=player."`
 }

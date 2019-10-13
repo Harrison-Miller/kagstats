@@ -1,18 +1,62 @@
 
 <ng-container *ngIf="player">
-<h2 class="{{ player.role | kagRoleColor }}">
+<h2 class="{{ player.role | kagRoleColor }} buffer">
     {{player.clanTag}} {{player.characterName}}
     <ng-container *ngIf="player.characterName != player.username">
         ({{player.username}})
     </ng-container>
 </h2>
+<div class="container">
+<div class="row buffer top-margin">
+    <div class="float-left col-2">
+        <ng-container *ngIf="player.avatar != ''; else avatarElse">
+            <img id="avatar" src="{{player.avatar}}" default="/assets/portrait1.png" class="rounded-circle" style="width: 100px; height: 100px;">
+        </ng-container>
+        <ng-template #avatarElse>
+            <img id="avatar" src="{{ player.id | unkownAvatar }}" class="rounded-circle" style="width: 100px; height: 100px;">
+        </ng-template>      
+    </div>
+    <div class="col top-margin">
+    <div class="row buffer">
+        <div class="col">
+            <div *ngIf="player.oldGold" class="float-left oldGoldBadge" placement="right" ngbTooltip="gold member who bought the game pre-F2P launch"></div>
+            <div *ngIf="player.tier == 1" class="float-left tier1Badge" placement="right" ngbTooltip="tier 1 patreon supporter"></div>
+            <div *ngIf="player.tier == 2" class="float-left tier2Badge" placement="right" ngbTooltip="tier 2 patreon supporter"></div>
+            <div *ngIf="player.tier == 3" class="float-left tier3Badge" placement="right" ngbTooltip="tier 3 patreon supporter"></div>
+            <div *ngIf="player.tier == 4" class="float-left tier4Badge" placement="right" ngbTooltip="tier 4 patreon supporter"></div>
+            <div class="float-left {{ player.registered | registeredAccolade }}" placement="right" ngbTooltip="{{ registered_tooltip[player.registered | registeredAccolade] }}"></div>
+        </div>
+    </div>
+    
+    <div class="row buffer">
+        <div class="col">
+            <ng-container *ngIf="player.lastEvent.type == 'joined'; else statusElse">
+                <span class="float-left badge badge-success">Online</span>
+            </ng-container>
+            <ng-template #statusElse>
+                <ng-container *ngIf="today - player.lastEvent.time < 150000; else idleStatus">
+                    <span class="float-left badge badge-warning">Offline</span>
+                </ng-container>
+                <ng-template #idleStatus>
+                    <span class="float-left badge badge-secondary">Offline</span>
+                </ng-template>
+            </ng-template>
+        </div>
+    </div>
 
-<ng-container *ngIf="player.avatar != ''; else avatarElse">
-    <img id="avatar" src="{{player.avatar}}" default="/assets/portrait1.png" class="rounded-circle" style="width: 100px; height: 100px;">
-</ng-container>
-<ng-template #avatarElse>
-    <img id="avatar" src="{{ player.id | unkownAvatar }}" class="rounded-circle" style="width: 100px; height: 100px;">
-</ng-template>
+    <div *ngIf="server" class="row">
+        <div class="col">
+            <ng-container *ngIf="player.lastEvent.type == 'joined'; else offline">
+                <span class="float-left">Currently playing on: <b>{{ server.name }}</b></span>
+            </ng-container>
+            <ng-template #offline>
+                <span class="float-left">Last seen on: <b>{{ server.name }}</b> {{ player.lastEvent.time | timeAgo }}</span>
+            </ng-template>
+        </div>
+    </div>
+    </div>
+</div>
+</div>
 
 <div class="top-margin">
 <ngb-tabset [justify]="center" #t="ngbTabset">

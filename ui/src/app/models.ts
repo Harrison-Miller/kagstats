@@ -36,7 +36,7 @@ export interface Event {
   type: string;
   time: number;
   serverId: number;
-  player: Player;
+  playerId: number;
 }
 
 export interface Kill {
@@ -62,8 +62,7 @@ export interface Player {
   registered: string;
   role: number;
   tier: number;
-  lastEvent: string;
-  lastEventTime: number;
+  lastEvent: Event;
 }
 
 export interface APIServer {

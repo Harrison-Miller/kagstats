@@ -14,6 +14,10 @@ export class ServersService {
     return this.http.get<Server[]>('/api/servers');
   }
 
+  getServer(id: number): Observable<Server> {
+    return this.http.get<Server>(`/api/servers/${id}`);
+  }
+
   getAPIServer(address: string, port: string): Observable<APIServer> {
     let path = `https://api.kag2d.com/server/ip/${address}/port/${port}/status`
     return this.http.get<{serverStatus:APIServer}>(path).pipe(

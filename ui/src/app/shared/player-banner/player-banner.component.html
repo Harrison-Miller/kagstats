@@ -9,18 +9,17 @@
       </ng-template>
 
       <ng-container *ngIf="status">
-        <ng-container *ngIf="player.lastEvent == 'joined'; else statusElse">
-                <span class="dot bg-success"></span>
+        <ng-container *ngIf="player.lastEvent.type == 'joined'; else statusElse">
+            <span class="dot bg-success"></span>
+        </ng-container>
+        <ng-template #statusElse>
+            <ng-container *ngIf="today - player.lastEvent.time < 150000; else idleStatus">
+                <span class="dot bg-warning"></span>
             </ng-container>
-            <ng-template #statusElse>
-                <ng-container *ngIf="today - player.lastEventTime < 150000; else idleStatus">
-                    <span class="dot bg-warning"></span>
-                </ng-container>
-                <ng-template #idleStatus>
-                    <span class="dot bg-secondary"></span>
-                </ng-template>
-        
+            <ng-template #idleStatus>
+                <span class="dot bg-secondary"></span>
             </ng-template>
+        </ng-template>
       </ng-container>
   </div>
 

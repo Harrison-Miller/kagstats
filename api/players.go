@@ -12,8 +12,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const playersQuery = `SELECT players.*, event.type "lastEvent", event.time "lastEventTime" FROM players
-	INNER JOIN events as event ON event.ID = (SELECT e.ID FROM events as e WHERE e.playerID=players.ID ORDER BY e.ID DESC LIMIT 1) `
+const playersQuery = `SELECT players.*, event.type "lastEvent.type", event.time "lastEvent.time", event.serverID "lastEvent.serverID" FROM players
+	INNER JOIN events as event ON event.ID = players.lastEventID `
 
 func getPlayers(w http.ResponseWriter, r *http.Request) {
 	var players []models.Player
@@ -41,7 +41,7 @@ func getPlayers(w http.ResponseWriter, r *http.Request) {
 		limit = Min(int64(l), limit)
 	}
 
-	err := db.Select(&players, playersQuery+"ORDER BY lastEvent='joined' DESC, lastEventTime DESC LIMIT ?,?", start, limit)
+	err := db.Select(&players, playersQuery+"ORDER BY event.type='joined' DESC, event.time DESC LIMIT ?,?", start, limit)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return

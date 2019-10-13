@@ -9,7 +9,7 @@ import (
 )
 
 type BasicStats struct {
-	models.Player `json:"player"`
+	models.Player `json:"player" db:"player,prefix=player."`
 	PlayerID      int64 `json:"-" db:"playerID"`
 	Suicides      int64 `json:"suicides"`
 	TeamKills     int64 `json:"teamKills"`
@@ -45,11 +45,19 @@ func getBasicStats(w http.ResponseWriter, r *http.Request) {
 
 	var stats BasicStats
 
-	err = db.Get(&stats, "SELECT * FROM basic_stats INNER JOIN players ON basic_stats.playerID=players.ID WHERE basic_stats.playerID=?", int64(playerID))
+	err = db.Get(&stats, `SELECT basic_stats.*, p.ID "player.ID", p.username "player.username",
+		p.charactername "player.charactername", p.clantag "player.clantag", p.oldgold "player.oldgold",
+		p.registered "player.registered", p.role "player.role", p.avatar "player.avatar", p.tier "player.tier",
+		e.type "player.lastEvent.type", e.time "player.lastEvent.time", e.serverID "player.lastEvent.serverID" 
+ 		FROM basic_stats 
+		INNER JOIN players as p ON basic_stats.playerID=p.ID 
+		INNER JOIN events as e ON p.lastEventID=e.ID 
+		WHERE basic_stats.playerID=?`, int64(playerID))
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Player not found: %v", err), http.StatusInternalServerError)
 		return
 	}
+	fmt.Println(stats)
 
 	JSONResponse(w, &stats)
 }

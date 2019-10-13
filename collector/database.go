@@ -191,11 +191,21 @@ func AddEvent(playerID int64, eventType string, serverID int64) error {
 	}
 	defer tx.Rollback()
 
-	_, err = tx.Exec("INSERT INTO events (playerID,Type,Time,ServerID) VALUES(?,?,?,?)",
+	res, err := tx.Exec("INSERT INTO events (playerID,Type,Time,ServerID) VALUES(?,?,?,?)",
 		playerID, eventType, utils.NowAsUnixMilliseconds(), serverID)
 
 	if err != nil {
 		return errors.Wrap(err, "error inserting event")
+	}
+
+	id, err := res.LastInsertId()
+	if err != nil {
+		return errors.Wrap(err, "error getting last inserted id")
+	}
+
+	_, err = tx.Exec("UPDATE players SET lastEventID=? WHERE ID=?", id, playerID)
+	if err != nil {
+		return errors.Wrap(err, "error updating player lastEventID")
 	}
 
 	if err := tx.Commit(); err != nil {
@@ -204,7 +214,7 @@ func AddEvent(playerID int64, eventType string, serverID int64) error {
 	return nil
 }
 
-// add datanase migrations here
+// add database migrations here
 func RunMigrations(db *sqlx.DB) error {
 	err := RunMigration(1, APICacheChanges, db)
 	if err != nil {
@@ -222,6 +232,11 @@ func RunMigrations(db *sqlx.DB) error {
 	}
 
 	err = RunMigration(4, SawKillBuilderOnly, db)
+	if err != nil {
+		return err
+	}
+
+	err = RunMigration(5, AddLastEventToPlayers, db)
 	if err != nil {
 		return err
 	}
@@ -335,4 +350,25 @@ func BumpNameLimit(db *sqlx.DB) error {
 func SawKillBuilderOnly(db *sqlx.DB) error {
 	_, err := db.Exec("UPDATE kills SET killerClass='builder' WHERE hitter=30")
 	return err
+}
+
+func AddLastEventToPlayers(db *sqlx.DB) error {
+	err := AddColumn("players", "lastEventID", "INT", "NULL", db)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec("ALTER TABLE players ADD FOREIGN KEY(lastEventID) REFERENCES events(ID)")
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(`UPDATE players
+		INNER JOIN events as event ON event.ID = (SELECT e.ID FROM events as e WHERE e.playerID=players.ID ORDER BY e.ID DESC LIMIT 1) 
+		SET lastEventID=event.ID`)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

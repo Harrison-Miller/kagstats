@@ -1,19 +1,23 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PlayersService } from '../../services/players.service';
-import { Player, BasicStats, Nemesis, Hitter } from '../../models';
+import { Player, BasicStats, Nemesis, Hitter, Server } from '../../models';
 import { NemesisService } from '../../services/nemesis.service';
 import { takeUntil } from 'rxjs/operators';
 import { HITTER_DESCRIPTION } from '../../hitters';
+import { REGISTERED_TOOLTIP } from '../../shared/player-banner/player-banner.component';
 import { HittersService } from '../../services/hitters.service';
+import { ServersService } from '../../services/servers.service';
 import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-player-detail',
   templateUrl: './player-detail.component.html',
-  styleUrls: ['./player-detail.component.scss', '../../shared/killfeed/killfeed.component.scss']
+  styleUrls: ['./player-detail.component.scss', '../../shared/killfeed/killfeed.component.scss', '../../shared/player-banner/player-banner.component.scss']
 })
 export class PlayerDetailComponent implements OnInit, OnDestroy {
+
+  public registered_tooltip = REGISTERED_TOOLTIP;
 
   playerId: number;
   player: Player;
@@ -33,9 +37,13 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
     totalDeaths: 0
   };
 
+  server: Server;
+
   nemesis: Nemesis;
   hitters: Hitter[];
   descriptions: string[] = HITTER_DESCRIPTION;
+
+  today: number = Date.now();
 
   @ViewChild('t') t;
 
@@ -44,6 +52,7 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
     private playersService: PlayersService,
     private nemesisService: NemesisService,
     private hittersService: HittersService,
+    private serversService: ServersService,
     private titleService: Title) { }
 
   ngOnInit() {
@@ -80,14 +89,24 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
       .subscribe( b => {
         this.basicStats = b;
         this.player = this.basicStats.player;
+        this.getServer(this.player.lastEvent.serverId);
         this.titleService.setTitle("KAG Stats - " + this.player.characterName);
       },
       error => {
         this.playersService.getPlayerName(this.playerId)
           .subscribe( a => {
             this.player = a;
+            this.getServer(this.player.lastEvent.serverId);
             this.titleService.setTitle("KAG Stats - " + this.player.characterName);
           })
+      });
+  }
+
+  getServer(id: number): void {
+    this.serversService.getServer(id)
+      .subscribe( server => {
+        console.log(server);
+        this.server =  server;
       });
   }
 
