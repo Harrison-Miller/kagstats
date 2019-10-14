@@ -68,7 +68,7 @@ func getBasicStatsByName(w http.ResponseWriter, r *http.Request) {
 
 	var stats BasicStats
 
-	err := db.Get(&stats, basicQuery+"WHERE LOWER(player.username)=LOWER(?)", playerName)
+	err := db.Get(&stats, basicQuery+"WHERE LOWER(p.username)=LOWER(?)", playerName)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Player not found: %v", err), http.StatusInternalServerError)
 		return
