@@ -23,8 +23,9 @@ export class PlayersComponent implements OnInit {
         this.playersService.searchText = value;
         if(value == '') {
           this.getPlayers();
+        } else {
+          this.searchPlayers(value);
         }
-        this.searchPlayers(value);
       });
     this.search.patchValue(this.playersService.searchText);
   }
