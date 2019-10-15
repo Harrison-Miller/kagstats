@@ -61,6 +61,11 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
       this.playerId = +params.get('id');
       window.scrollTo(0, 0);
 
+      this.nemesis = null;
+      this.bullied = null;
+      this.hitters = null;
+
+
       if(this.t) {
         this.t.select('overview');
       }
