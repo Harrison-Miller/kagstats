@@ -241,6 +241,11 @@ func RunMigrations(db *sqlx.DB) error {
 		return err
 	}
 
+	err = RunMigration(6, AddAccolades, db)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -366,6 +371,50 @@ func AddLastEventToPlayers(db *sqlx.DB) error {
 	_, err = db.Exec(`UPDATE players
 		INNER JOIN events as event ON event.ID = (SELECT e.ID FROM events as e WHERE e.playerID=players.ID ORDER BY e.ID DESC LIMIT 1) 
 		SET lastEventID=event.ID`)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func AddAccolades(db *sqlx.DB) error {
+	err := AddColumn("players", "gold", "INT NOT NULL", "0", db)
+	if err != nil {
+		return err
+	}
+
+	err = AddColumn("players", "silver", "INT NOT NULL", "0", db)
+	if err != nil {
+		return err
+	}
+
+	err = AddColumn("players", "bronze", "INT NOT NULL", "0", db)
+	if err != nil {
+		return err
+	}
+
+	err = AddColumn("players", "participation", "INT NOT NULL", "0", db)
+	if err != nil {
+		return err
+	}
+
+	err = AddColumn("players", "github", "BOOLEAN NOT NULL", "FALSE", db)
+	if err != nil {
+		return err
+	}
+
+	err = AddColumn("players", "community", "BOOLEAN NOT NULL", "FALSE", db)
+	if err != nil {
+		return err
+	}
+
+	err = AddColumn("players", "mapmaker", "BOOLEAN NOT NULL", "FALSE", db)
+	if err != nil {
+		return err
+	}
+
+	err = AddColumn("players", "moderation", "BOOLEAN NOT NULL", "FALSE", db)
 	if err != nil {
 		return err
 	}

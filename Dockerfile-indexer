@@ -17,10 +17,16 @@ RUN GO111MODULE=on GOARCH=386 CGO_ENABLED=0 GOOS=linux go build -o indexer -mod=
 
 RUN cp indexer /
 
+FROM alpine AS certs
+
+RUN apk update && apk add --no-cache ca-certificates && update-ca-certificates
+
 FROM scratch
 
 ARG VERSION
 ENV VERSION=$VERSION
+
+COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 ADD LICENSE .
 

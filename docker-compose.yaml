@@ -90,6 +90,17 @@ services:
     links:
       - mysql
     restart: always
+  accolades:
+    build:
+      context: .
+      dockerfile: Dockerfile-indexer
+      args:
+        indexer: accolades
+        VERSION: ${TAG:-latest}
+    image: gcr.io/kagstats/accolades:${TAG:-latest}
+    links:
+      - mysql
+    restart: always
   ui:
     build:
       context: .

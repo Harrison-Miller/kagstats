@@ -19,23 +19,49 @@
     <div class="col">
     <div class="row buffer">
         <div class="col">
-            <div style="overflow:auto; display:inline-block" placement="top" ngbTooltip="gold member who bought the game pre-F2P launch">
-                <div *ngIf="player.oldGold" class="sprite2x float-left oldGoldBadge"></div>
+            <div *ngIf="player.oldGold" style="overflow:auto; display:inline-block" placement="top" ngbTooltip="gold member who bought the game pre-F2P launch">
+                <div class="sprite2x float-left oldGoldBadge"></div>
             </div>
-            <div style="overflow:auto; display:inline-block" placement="top" ngbTooltip="tier 1 patreon supporter">
-                <div *ngIf="player.tier == 1" class="sprite2x float-left tier1Badge"></div>
+            <div *ngIf="player.tier == 1" style="overflow:auto; display:inline-block" placement="top" ngbTooltip="tier 1 patreon supporter">
+                <div class="sprite2x float-left tier1Badge"></div>
             </div>
-            <div style="overflow:auto; display:inline-block" placement="top" ngbTooltip="tier 2 patreon supporter">
-                <div *ngIf="player.tier == 2" class="sprite2x float-left tier2Badge"></div>
+            <div *ngIf="player.tier == 2" style="overflow:auto; display:inline-block" placement="top" ngbTooltip="tier 2 patreon supporter">
+                <div class="sprite2x float-left tier2Badge"></div>
             </div>
-            <div style="overflow:auto; display:inline-block" placement="top" ngbTooltip="tier 3 patreon supporter">
-                <div *ngIf="player.tier == 3" class="sprite2x float-left tier3Badge"></div>
+            <div *ngIf="player.tier == 3" style="overflow:auto; display:inline-block" placement="top" ngbTooltip="tier 3 patreon supporter">
+                <div class="sprite2x float-left tier3Badge"></div>
             </div>
-            <div style="overflow:auto; display:inline-block" placement="top" ngbTooltip="tier 4 patreon supporter">
-                <div *ngIf="player.tier == 4" class="sprite2x float-left tier4Badge"></div>
+            <div *ngIf="player.tier == 4" style="overflow:auto; display:inline-block" placement="top" ngbTooltip="tier 4 patreon supporter">
+                <div class="sprite2x float-left tier4Badge"></div>
             </div>
             <div style="overflow:auto; display:inline-block" placement="top" ngbTooltip="{{ registered_tooltip[player.registered | registeredAccolade] }}">
                 <div class="sprite2x float-left {{ player.registered | registeredAccolade }}"></div>
+            </div>
+
+            <!-- accolade_data.cfg accolades -->
+            <div *ngIf="player.gold > 0" style="overflow:auto; display:inline-block" placement="top" ngbTooltip="{{ player.gold }} Gold Medals">
+                <div class="sprite2x float-left goldBadge"></div>
+            </div>
+            <div *ngIf="player.silver > 0" style="overflow:auto; display:inline-block" placement="top" ngbTooltip="{{ player.silver }} Silver Medals">
+                <div class="sprite2x float-left silverBadge"></div>
+            </div>
+            <div *ngIf="player.bronze > 0"style="overflow:auto; display:inline-block" placement="top" ngbTooltip="{{ player.bronze }} Bronze Medals">
+                <div class="sprite2x float-left bronzeBadge"></div>
+            </div>
+            <div *ngIf="player.participation > 0" style="overflow:auto; display:inline-block" placement="top" ngbTooltip="{{ player.participation }} Participation Ribbons">
+                <div class="sprite2x float-left participationBadge"></div>
+            </div>
+            <div *ngIf="player.github" style="overflow:auto; display:inline-block" placement="top" ngbTooltip="for significantly contributing to an issue or pul request on the KAG GitHub">
+                <div class="sprite2x float-left githubBadge"></div>
+            </div>
+            <div *ngIf="player.community" style="overflow:auto; display:inline-block" placement="top" ngbTooltip="for significantly contributing to the KAG community in some way">
+                <div class="sprite2x float-left communityBadge"></div>
+            </div>
+            <div *ngIf="player.mapmaker" style="overflow:auto; display:inline-block" placement="top" ngbTooltip="for contributing to the official map cycle">
+                <div class="sprite2x float-left mapmakerBadge"></div>
+            </div>
+            <div *ngIf="player.moderation" style="overflow:auto; display:inline-block" placement="top" ngbTooltip="for contributing to moderating the game, forums or discord">
+                <div class="sprite2x float-left moderationBadge"></div>
             </div>
         </div>
     </div>

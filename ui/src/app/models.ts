@@ -57,12 +57,27 @@ export interface Player {
   username: string;
   characterName: string;
   clanTag: string;
+
+  //kag2d.com api
   avatar: string;
   oldGold: boolean;
   registered: string;
   role: number;
   tier: number;
+
+  //accolades
+  gold: number;
+  silver: number;
+  bronze: number;
+  participation: number;
+  github: boolean;
+  community: boolean;
+  mapmaker: boolean;
+  moderation: boolean;
+
   lastEvent: Event;
+
+
 }
 
 export interface APIServer {

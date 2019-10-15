@@ -18,6 +18,16 @@ type Player struct {
 	Avatar     string `json:"avatar"`
 	Tier       int64  `json:"tier"`
 
+	//Accolades
+	Gold          int  `json:"gold"`
+	Silver        int  `json:"silver"`
+	Bronze        int  `json:"bronze"`
+	Participation int  `json:"participation"`
+	Github        bool `json:"github"`
+	Community     bool `json:"community"`
+	MapMaker      bool `json:"mapmaker"`
+	Moderation    bool `json:"moderation"`
+
 	LastEventID int64 `json:"-" db:"lastEventID"`
 	Event       `json:"lastEvent" db:"lastEvent,prefix=lastEvent."`
 }
