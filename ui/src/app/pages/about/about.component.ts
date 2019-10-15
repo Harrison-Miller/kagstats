@@ -10,7 +10,7 @@ export const FAQ: {question: string, answer: string}[] = [
   },
   {
     question: 'How can I host my own KAG Stats website?',
-    answer: ' If you want to host your own KAG Stats website great! Visit the documentation in the github repo (docs yet to be written, link TBD) for general hosting instructions. TL;DR you will need host that supports docker, docker-compose.'
+    answer: 'If you want to host your own KAG Stats website great! Visit the <a href="https://github.com/Harrison-Miller/kagstats/blob/master/docs/Hosting.md">documentation</a> in the github repo for general hosting instructions. TL;DR you will need host that supports docker, docker-compose.'
   },
   {
     question: 'How often are the stats updated?',

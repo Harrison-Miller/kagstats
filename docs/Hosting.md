@@ -11,9 +11,9 @@ The rest of this document will assume the host is running Centos7 however you ca
 ## Hardware Requirements
 
 Recommened:
-1 CPU
-2GB Memory
-10GB Disk
+* 1 CPU
+* 2GB Memory
+* 10GB Disk
 
 ## Docker and docker-compose
 
