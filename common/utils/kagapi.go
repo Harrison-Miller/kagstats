@@ -40,6 +40,10 @@ func GetPlayerAvatar(player *models.Player) error {
 	// set it to blank so old ones get unset
 	player.Avatar = ""
 
+	if avatarResp.Large == "" {
+		return nil
+	}
+
 	// check that the link is valid
 	resp, err = client.Get(avatarResp.Large)
 	if err != nil {
@@ -47,7 +51,7 @@ func GetPlayerAvatar(player *models.Player) error {
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return fmt.Errorf("player avatar link returned error code: %d", resp.StatusCode)
+		return fmt.Errorf("player avatar link for %s returned error code: %d", player.Username, resp.StatusCode)
 	}
 
 	player.Avatar = avatarResp.Large
@@ -71,7 +75,11 @@ func GetPlayerTier(player *models.Player) error {
 	}
 	resp, err := client.Get(path)
 	if err != nil {
-		return errors.Wrap(err, "eror getting player tier")
+		return errors.Wrap(err, "error getting player tier")
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return fmt.Errorf("player tier for %s returned error code: %d", player.Username, resp.StatusCode)
 	}
 
 	tierResp := PlayerTierResponse{}

@@ -1,6 +1,8 @@
 package models
 
 import (
+	"database/sql"
+
 	"github.com/jmoiron/sqlx"
 )
 
@@ -28,7 +30,7 @@ type Player struct {
 	MapMaker      bool `json:"mapmaker"`
 	Moderation    bool `json:"moderation"`
 
-	LastEventID int64 `json:"-" db:"lastEventID"`
+	LastEventID sql.NullInt64 `json:"-" db:"lastEventID"`
 	Event       `json:"lastEvent" db:"lastEvent,prefix=lastEvent."`
 }
 
