@@ -47,6 +47,7 @@ steps:
       curl https://raw.githubusercontent.com/Harrison-Miller/kagstats/$TAG_NAME/docker-compose.yaml --output docker-compose.yaml
       curl https://raw.githubusercontent.com/Harrison-Miller/kagstats/$TAG_NAME/builds/gather-compose.yaml --output gather-compose.yaml
       sed -i "s/latest/$TAG_NAME/g" docker-compose.yaml
+      . /gather-env.sh
       sudo -E docker-compose -f docker-compose.yaml -f gather-compose.yaml pull
       sudo -E docker-compose -f docker-compose.yaml -f gather-compose.yaml -p gather up -d
       EOF
