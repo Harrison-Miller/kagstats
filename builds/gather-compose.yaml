@@ -1,0 +1,22 @@
+# mysql port 3308
+# web port 89
+version: "3.7"
+services:
+  mysql:
+    image: mysql:5.7
+  api:
+    environment:
+      - KD_GATE=30
+      - ARCHER_GATE=15
+      - BUILDER_GATE=10
+      - KNIGHT_GATE=30
+      - NEMESIS_GATE=7
+  basic-indexer:
+    environment:
+      - INDEXER_BATCHSIZE=1000
+  nemesis-indexer:
+    environment:
+      - INDEXER_BATCHSIZE=1000
+  hitters-indexer:
+    environment:
+      - INDEXER_BATCHSIZE=1000
