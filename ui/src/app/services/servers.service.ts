@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Server, APIServer } from '../models';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -11,11 +12,11 @@ export class ServersService {
   constructor(private http: HttpClient) {}
 
   getServers(): Observable<Server[]> {
-    return this.http.get<Server[]>('/api/servers');
+    return this.http.get<Server[]>(`${environment.apiUrl}/servers`);
   }
 
   getServer(id: number): Observable<Server> {
-    return this.http.get<Server>(`/api/servers/${id}`);
+    return this.http.get<Server>(`${environment.apiUrl}/servers/${id}`);
   }
 
   getAPIServer(address: string, port: string): Observable<APIServer> {

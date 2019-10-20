@@ -19,7 +19,7 @@ import { HITTER_DESCRIPTION } from '../../hitters';
 })
 export class KillfeedComponent implements OnInit, OnChanges {
   @Input() limit: number = 100;
-  @Input() url: string = '/api/kills';
+  @Input() url: string = '/kills';
   kills$: Observable<Kill[]>;
   descriptions: string[] = HITTER_DESCRIPTION;
 

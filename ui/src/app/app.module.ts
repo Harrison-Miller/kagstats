@@ -24,13 +24,13 @@ import { DefaultImageDirective } from './default-image.directive';
 import { PlayerDetailComponent } from './pages/player-detail/player-detail.component';
 import { KillsService } from './services/kills.service';
 import { KagClassImgPipe } from './pipes/kag-class-img.pipe';
-import { TimeAgoPipe } from 'time-ago-pipe';
 import { HitterIconPipe } from './pipes/hitter-icon.pipe';
 import { KillsComponent } from './pages/kills/kills.component';
 import { KillfeedComponent } from './shared/killfeed/killfeed.component';
 import { AboutComponent } from './pages/about/about.component';
 import { StatusService } from './services/status.service';
 import { RegisteredAccoladePipe } from './pipes/registered-accolade.pipe';
+import { TimeAgoPipe } from './pipes/time-ago.pipe';
 
 @NgModule({
   declarations: [
@@ -49,8 +49,8 @@ import { RegisteredAccoladePipe } from './pipes/registered-accolade.pipe';
     DefaultImageDirective,
     PlayerDetailComponent,
     KillfeedComponent,
-    KagClassImgPipe,
     TimeAgoPipe,
+    KagClassImgPipe,
     HitterIconPipe,
     KillsComponent,
     AboutComponent,
@@ -61,7 +61,7 @@ import { RegisteredAccoladePipe } from './pipes/registered-accolade.pipe';
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
-    NgbModule
+    NgbModule,
   ],
   providers: [LeaderboardService, PlayersService, ServersService, KillsService, StatusService],
   bootstrap: [AppComponent]

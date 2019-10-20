@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { PagedResult, Kill } from '../models';
 import { BehaviorSubject, Observable, timer } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -40,7 +41,7 @@ export class KillsService {
       ? { params: new HttpParams().set('start', start.toString()) }
       : {};
 
-    this.http.get<PagedResult<Kill>>(this.url, options).subscribe(result => {
+    this.http.get<PagedResult<Kill>>(environment.apiUrl + this.url, options).subscribe(result => {
       this.kills$.next(result.values);
     });
   }
