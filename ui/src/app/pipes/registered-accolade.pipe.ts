@@ -44,15 +44,15 @@ export class RegisteredAccoladePipe implements PipeTransform {
       return "r2yBadge";
     } else if(diff > 1*365) {
       return "r1yBadge";
-    } else if(diff > 9*31) {
+    } else if(diff > 9*30) {
       return "r9mBadge";
-    } else if(diff > 6*31) {
+    } else if(diff > 6*30) {
       return "r6mBadge";
-    } else if(diff > 3*31) {
+    } else if(diff > 3*30) {
       return "r3mBadge";
-    } else if(diff > 2*31) {
+    } else if(diff > 2*30) {
       return "r2mBadge";
-    } else if(diff > 1*31) {
+    } else if(diff > 1*30) {
       return "r1mBadge";
     } else if(diff > 3*7) {
       return "r3wBadge";
