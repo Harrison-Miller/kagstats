@@ -35,7 +35,7 @@ Open a terminal to the ui directory of the kagstats repo.
 Run: `ng serve --watch --poll 250 -c=dev`. Then open your browser to
 http://localhost:4200.
 
-**NOTE:** Defining poll and watch together because often watch doesn't work when an editor has a lock on the file first.
+**NOTE:** we define poll and watch together because often watch doesn't work when an editor has a lock on the file first.
 
 ## Dockerized Development
 
