@@ -95,7 +95,8 @@ export interface Server {
   address: string;
   port: string;
   tags: string;
-  status: APIServer;
+  status: boolean;
+  APIStatus: APIServer;
 }
 
 export interface LeaderboardResult {

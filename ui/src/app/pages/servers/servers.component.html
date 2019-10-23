@@ -2,29 +2,32 @@
 <div class="row h-100">
   <div class="col-4 buffer" style="min-height: 33vh" *ngFor="let server of servers">
     <div class="card h-100">
+      <div *ngIf="!server.status" style="position:absolute;width:100%;height:100%;display:block;background-color: rgba(0,0,0,0.5);z-index: 2;color:white" class="text-center">
+        <h3>Not Collecting</h3>
+      </div>
       <div class="card-header">
         {{server.name}} 
-        <ng-container *ngIf="server.status; else statusElse">
-            <span class="dot float-right {{ server.statuslastUpdate | statusClass }}"></span>
+        <ng-container *ngIf="server.APIStatus; else statusElse">
+            <span class="dot float-right {{ server.APIStatus.lastUpdate | statusClass }}"></span>
         </ng-container>
         <ng-template #statusElse>
-            <span class="dot float-right bg-secondary"></span>
+            <span class="dot float-right bg-warning"></span>
         </ng-template>
       </div>
       <div class="card-body card-overflow">
         <div class="card-text">{{server.description}}</div>
         <div>Players:
-          <ng-container *ngIf="server.status; else playersBlock">{{server.status.currentPlayers}}/{{server.status.maxPlayers}}</ng-container>
+          <ng-container *ngIf="server.APIStatus; else playersBlock">{{server.APIStatus.currentPlayers}}/{{server.APIStatus.maxPlayers}}</ng-container>
           <ng-template #playersBlock>0/0</ng-template>
         </div>
-        <div *ngIf="server.status" style="color:red">
-          <div *ngIf="server.gameMode=='TDM' && server.status.currentPlayers<4">
+        <div *ngIf="server.APIStatus" style="color:red">
+          <div *ngIf="server.gameMode=='TDM' && server.APIStatus.currentPlayers<4">
             Not enough players to collect stats.
           </div>
-          <div *ngIf="server.gameMode=='CTF' && server.status.currentPlayers<8">
+          <div *ngIf="server.gameMode=='CTF' && server.APIStatus.currentPlayers<8">
               Not enough players to collect stats.
           </div>
-          <div *ngIf="server.gameMode=='WAR' && server.status.currentPlayers<8">
+          <div *ngIf="server.gameMode=='WAR' && server.APIStatus.currentPlayers<8">
               Not enough players to collect stats.
           </div>
         </div>
@@ -34,7 +37,7 @@
       </div>
       <div class="card-footer">
         Last Update:
-        <ng-container *ngIf="server.status; else statusBlock">{{server.status.lastUpdate | date:'short'}}</ng-container>
+        <ng-container *ngIf="server.APIStatus; else statusBlock">{{server.APIStatus.lastUpdate | date:'short'}}</ng-container>
         <ng-template #statusBlock>N/A</ng-template>
       </div>
     </div>

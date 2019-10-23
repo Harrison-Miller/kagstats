@@ -286,6 +286,8 @@ func Collect(sconfig configs.ServerConfig) {
 			}
 		}
 
+		UpdateServerStatus(collector.server, false)
+
 		logger.Println("Waiting 1 minute before attempting to connect again")
 		time.Sleep(1 * time.Minute)
 	}

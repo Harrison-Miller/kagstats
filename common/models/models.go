@@ -48,6 +48,7 @@ type Server struct {
 	Port        string `json:"port"`
 	Gamemode    string `json:"gameMode"`
 	Tags        string `json:"tags"`
+	Status      bool   `json:"status"`
 }
 
 type Killer = Player
