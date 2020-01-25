@@ -30,6 +30,9 @@ type Player struct {
 	MapMaker      bool `json:"mapmaker"`
 	Moderation    bool `json:"moderation"`
 
+	//Moderation
+	LeaderboardBan bool `json:"leaderboardBan" db:"leaderboardBan"` // UPDATE players SET leaderboardBan=True WHERE ID=###
+
 	LastEventID sql.NullInt64 `json:"-" db:"lastEventID"`
 	Event       `json:"lastEvent" db:"lastEvent,prefix=lastEvent."`
 }

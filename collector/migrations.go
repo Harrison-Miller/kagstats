@@ -43,6 +43,11 @@ func RunMigrations(db *sqlx.DB) error {
 		return err
 	}
 
+	err = RunMigration(8, AddLeaderboardBan, db)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -197,6 +202,15 @@ func AddAccolades(db *sqlx.DB) error {
 
 func AddServerStatus(db *sqlx.DB) error {
 	err := AddColumn("servers", "status", "BOOLEAN NOT NULL", "FALSE", db)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func AddLeaderboardBan(db *sqlx.DB) error {
+	err := AddColumn("players", "leaderboardBan", "BOOLEAN NOT NULL", "FALSE", db)
 	if err != nil {
 		return err
 	}
