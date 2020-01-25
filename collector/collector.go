@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"regexp"
 	"time"
 
 	"github.com/Harrison-Miller/kagstats/common/utils"
@@ -15,6 +16,13 @@ import (
 	"github.com/Harrison-Miller/rcon"
 	"github.com/pkg/errors"
 )
+
+// Filter multiple clients of the same account
+var clientAltPattern = regexp.MustCompile("[^ ]+~[0-9]+")
+
+func isClientAlt(username string) bool {
+	return clientAltPattern.MatchString(username)
+}
 
 type Collector struct {
 	config      configs.ServerConfig
@@ -60,6 +68,10 @@ func (c *Collector) OnPlayerJoined(m rcon.Message, r *rcon.Client) error {
 		return nil
 	}
 
+	if isClientAlt(player.Username) {
+		return nil
+	}
+
 	if (player != models.Player{}) {
 		player.ServerID = c.server.ID
 		err = UpdatePlayer(&player)
@@ -81,6 +93,10 @@ func (c *Collector) OnPlayerLeave(m rcon.Message, r *rcon.Client) error {
 	err := json.Unmarshal([]byte(m.Args["object"]), &player)
 	if err != nil {
 		c.logger.Println(err)
+		return nil
+	}
+
+	if isClientAlt(player.Username) {
 		return nil
 	}
 
@@ -116,6 +132,10 @@ func (c *Collector) OnPlayerDie(m rcon.Message, r *rcon.Client) error {
 	err := json.Unmarshal([]byte(m.Args["object"]), &kill)
 	if err != nil {
 		c.logger.Println(err)
+		return nil
+	}
+
+	if isClientAlt(kill.Killer.Username) || isClientAlt(kill.Player.Username) {
 		return nil
 	}
 
@@ -157,8 +177,15 @@ func (c *Collector) PlayerList(m rcon.Message, r *rcon.Client) error {
 	}
 
 	if len(players) > 0 {
+		altPlayers := 0
 		for _, p := range players {
 			p.ServerID = c.server.ID
+
+			if isClientAlt(p.Username) {
+				altPlayers++
+				continue
+			}
+
 			err = UpdatePlayer(&p)
 			if err != nil {
 				return err
@@ -169,7 +196,7 @@ func (c *Collector) PlayerList(m rcon.Message, r *rcon.Client) error {
 			}
 			c.logger.Printf("%s (%d) was in the game", p.Username, p.ID)
 		}
-		c.playerCount = len(players)
+		c.playerCount = len(players) - altPlayers
 	}
 
 	r.RemoveHandler("^PlayerList (?P<object>.*)")
