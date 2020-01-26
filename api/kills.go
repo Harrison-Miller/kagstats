@@ -13,11 +13,11 @@ const killsQuery = `SELECT kills.*,
 	victim.ID "victim.ID", victim.username "victim.username", victim.charactername "victim.charactername", victim.clantag "victim.clantag",
 	victim.avatar "victim.avatar", victim.oldgold "victim.oldgold", victim.registered "victim.registered", victim.role "victim.role", victim.tier "victim.tier",
 	victim.gold "victim.gold", victim.silver "victim.silver", victim.gold "victim.gold", victim.participation "victim.participation",
-	victim.github "victim.github", victim.community "victim.community", victim.mapmaker "victim.mapmaker", victim.moderation "victim.moderation",
+	victim.github "victim.github", victim.community "victim.community", victim.mapmaker "victim.mapmaker", victim.moderation "victim.moderation", victim.leaderboardBan "victim.leaderboardBan", victim.statsBan "victim.statsBan",
 	killer.ID "killer.ID", killer.username "killer.username", killer.charactername "killer.charactername", killer.clantag "killer.clantag",
 	killer.avatar "killer.avatar", killer.oldgold "killer.oldgold", killer.registered "killer.registered", killer.role "killer.role", killer.tier "killer.tier",
 	killer.gold "killer.gold", killer.silver "killer.silver", killer.gold "killer.gold", killer.participation "killer.participation",
-	killer.github "killer.github", killer.community "killer.community", killer.mapmaker "killer.mapmaker", killer.moderation "killer.moderation",
+	killer.github "killer.github", killer.community "killer.community", killer.mapmaker "killer.mapmaker", killer.moderation "killer.moderation", killer.leaderboardBan "killer.leaderboardBan", killer.statsBan "killer.statsBan",
 	server.ID "server.ID", server.name "server.name" FROM kills
 	INNER JOIN players as victim ON kills.victimID=victim.ID
 	INNER JOIN players as killer ON kills.killerID=killer.ID
@@ -41,7 +41,7 @@ func getKills(w http.ResponseWriter, r *http.Request) {
 		start = int64(s)
 	}
 
-	err := db.Select(&kills, killsQuery+"ORDER BY kills.ID DESC LIMIT ?,?", start, limit)
+	err := db.Select(&kills, killsQuery+"WHERE NOT victim.statsBan AND NOT killer.statsBan ORDER BY kills.ID DESC LIMIT ?,?", start, limit)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return
@@ -99,8 +99,13 @@ func getPlayerKills(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var showBanned = "NOT victim.statsBan AND NOT killer.statsBan AND"
+	if v := r.URL.Query().Get("showbanned"); v == "true" {
+		showBanned = ""
+	}
+
 	var kills []models.Kill
-	err = db.Select(&kills, killsQuery+"WHERE killerID=? OR victimID=? ORDER BY kills.ID DESC LIMIT ?,?", playerID, playerID, start, limit)
+	err = db.Select(&kills, killsQuery+"WHERE "+showBanned+" (killerID=? OR victimID=?) ORDER BY kills.ID DESC LIMIT ?,?", playerID, playerID, start, limit)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("error getting kills: %v", err), http.StatusInternalServerError)
 		return
@@ -137,7 +142,7 @@ func getKill(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var kill models.Kill
-	err = db.Get(&kill, killsQuery+"WHERE kills.ID=?", int64(killID))
+	err = db.Get(&kill, killsQuery+"WHERE NOT victim.statsBan AND NOT killer.statsBan AND kills.ID=?", int64(killID))
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Kill not found: %v", err), http.StatusInternalServerError)
 		return
@@ -155,7 +160,7 @@ func getServerKills(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var kills []models.Kill
-	err = db.Select(&kills, killsQuery+"WHERE serverID=? LIMIT 100", serverID)
+	err = db.Select(&kills, killsQuery+"WHERE NOT victim.statsBan AND NOT player.statsBan AND serverID=? LIMIT 100", serverID)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("error getting kills: %s", err), http.StatusInternalServerError)
 		return

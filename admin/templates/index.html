@@ -1,0 +1,117 @@
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-3.4.0.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        .top-buffer {
+            margin-top: 32px;
+            margin-left: 32px;
+            margin-right: 32px;
+        }
+        .bottom-buffer {
+            margin-bottom: 32px;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-dark bg-primary">
+    <a class="navbar-brand" href="{{ .Prefix }}/">KAG Stats Admin</a>
+</nav>
+<div class="row top-buffer">
+    <div class="col-md"></div>
+    <div class="col-md">
+        <div class="form-group">
+            <label for="search">Player Search</label>
+            <input type="text" class="form-control bottom-buffer input-md" id="search">
+        </div>
+    </div>
+    <div class="col-md"></div>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <td>Avatar</td>
+            <td>Name</td>
+            <td>Flags</td>
+        </tr>
+    </thead>
+    <tbody id="playerlist">
+    </tbody>
+</table>
+
+<div class="row top-buffer">
+        <div class="col-md"></div>
+        <div class="col-md">
+            <button type="button" onclick="recalculate();" class="btn-lg btn btn-danger">Recalculate Stats</button>
+        </div>
+        <div class="col-md"></div>
+    </div>
+
+</div>
+</body>
+<script type="text/javascript">
+    apiEndpoint = "{{ .APIHost }}"
+
+    $(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+    })
+
+    $("#search").on("input", function() {
+        searchPlayers($("#search").val());
+    })
+
+    function searchPlayers(text) {
+        console.log(text);
+
+        playerList = $("#playerlist");
+        playerList.empty();
+
+        $.getJSON(apiEndpoint + "players/search/" + text + "?showbanned=true", function(data) {
+            if(!data) {
+                return
+            }
+
+            for (var i = 0; i < data.length; i++) {
+                player = data[i];
+
+                elem = `<tr onclick="gotoPlayer('${player.id}');">
+                <td>
+                <img src="${player.avatar}" width="64px;" height="64px;">
+                </td>
+                <td>
+                ${player.clanTag} ${player.characterName} (${player.username})
+                </td>
+                <td>`
+
+                if(player.leaderboardBan) {
+                    elem += `<span class="badge badge-pill badge-warning">Leaderboard Ban</span>`;
+                }
+
+                if(player.statsBan) {
+                    elem += `<span class="badge badge-pill badge-danger">Stats Ban</span>`;
+                }
+
+                elem += `</td></tr>`;
+                playerList.append(elem);
+            }
+        });
+    }
+
+    function gotoPlayer(id) {
+        window.location.href = "{{ .Prefix }}/player/" + id;
+    }
+
+    function recalculate() {
+        $.post("{{ .Prefix }}/recalculate", function() {
+            alert("recalculating begun");
+        })
+        .fail(function() {
+            alert("failed request");
+        });
+    }
+</script>
+</html>

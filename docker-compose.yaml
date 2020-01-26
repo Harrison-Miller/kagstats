@@ -44,6 +44,20 @@ services:
       - mysql
     hostname: api
     restart: always
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile-admin
+      args:
+        VERSION: ${TAG:-latest}
+    image: gcr.io/kagstats/admin:${TAG:-latest}
+    environment:
+      - USER=${ADMIN_USER:-admin}
+      - PASS=${ADMIN_PASS:-admin1234!}
+    links:
+      - mysql
+    hostname: admin
+    restart: always
   basic-indexer:
     build:
       context: .
@@ -86,7 +100,7 @@ services:
         VERSION: ${TAG:-latest}
     image: gcr.io/kagstats/apicache:${TAG:-latest}
     environment:
-      - INDEXER_INTERVAL=5m
+      - INDEXER_INTERVAL=20m
     links:
       - mysql
     restart: always

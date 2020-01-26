@@ -1,0 +1,41 @@
+FROM golang:1.12 AS build
+
+WORKDIR $GOPATH/src/github.com/Harrison-Miller/kagstats
+
+ADD go.mod .
+ADD go.sum .
+ADD vendor/ ./vendor
+
+ADD common/ ./common
+ADD admin/ ./admin
+
+WORKDIR $GOPATH/src/github.com/Harrison-Miller/kagstats/admin
+
+RUN GO111MODULE=on GOARCH=386 CGO_ENABLED=0 GOOS=linux go build -o admin -mod=vendor ./...
+
+RUN cp admin / && cp -r templates /
+
+FROM alpine
+
+ARG VERSION
+ENV VERSION=$VERSION
+
+RUN apk update && apk add --no-cache ca-certificates && update-ca-certificates
+
+ADD LICENSE .
+
+COPY --from=build /admin /
+
+RUN mkdir -p /templates
+COPY --from=build /templates/ /templates
+
+ENV ADMIN_DB="root:password@tcp(mysql:3306)/kagstats?charset=utf8mb4"
+ENV USER="admin"
+ENV PASSWORD="admin1234!"
+ENV HOST=":8080"
+ENV API_HOST="/api/"
+ENV PREFIX="/admin"
+
+EXPOSE 8088
+
+CMD ["/admin"]

@@ -1,0 +1,245 @@
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-3.4.0.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        .top-buffer {
+            margin-top: 32px;
+            margin-left: 32px;
+            margin-right: 32px;
+        }
+        .bottom-buffer {
+            margin-bottom: 32px;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-dark bg-primary">
+    <a class="navbar-brand" href="{{ .Prefix }}/">KAG Stats Admin</a>
+</nav>
+
+<h1 id="fullname"></h1>
+<img id="avatar" width="128px" height="128px">
+
+<h2>Info</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Variable</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Username</td>
+            <td>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="username">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Charactername</td>
+            <td id="charactername"></td>
+        </tr>
+        <tr>
+            <td>Clantag</td>
+            <td id="clantag"></td>
+        </tr>
+        <tr>
+            <td>Registered</td>
+            <td id="registered"></td>
+        </tr>
+        <tr>
+            <td>Leaderboard Ban</td>
+            <td>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="leaderboardban">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Stats Ban</td>
+            <td>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="statsban">
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<button class="btn btn-primary" onclick="save();">Save</button>
+
+<h2>Stats</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <td>Kills</td>
+            <td>Deaths</td>
+            <td>Archer Kills</td>
+            <td>Archer Deaths</td>
+            <td>Builder Kills</td>
+            <td>Builder Deaths</td>
+            <td>Knight Kills</td>
+            <td>Knight Deaths</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td id="kills"></td>
+            <td id="deaths"></td>
+            <td id="archerkills"></td>
+            <td id="archerdeaths"></td>
+            <td id="builderkills"></td>
+            <td id="builderdeaths"></td>
+            <td id="knightkills"></td>
+            <td id="knightdeaths"></td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Kill History</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <td>Killer</td>
+            <td>Victim</td>
+            <td>Time</td>
+            <td>Server</td>
+        </tr>
+    </thead>
+    <tbody id="killList">
+
+    </tbody>
+</table>
+
+<button onclick="prevHistory();" class="btn btn-lg btn-primary" style="float:left;">&lt;</button>
+<button onclick="nextHistory();" class="btn btn-lg btn-primary" style="float:left;">&gt;</button>
+<h4 id="historyinfo"></h4>
+
+</body>
+<script type="text/javascript">
+    apiEndpoint = "{{ .APIHost }}"
+    playerId = {{ .PlayerId }}
+
+    $(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+    })
+
+    $.getJSON(apiEndpoint + "players/" + playerId + "/basic", function(data) {
+        if(!data) {
+            return
+        }
+
+        $("#fullname").text(data.player.clanTag + " " + data.player.characterName + " (" + data.player.username + ")");
+
+        $("#avatar").attr("src", data.player.avatar);
+
+        $("#username").val(data.player.username);
+        $("#clantag").text(data.player.clanTag);
+        $("#charactername").text(data.player.characterName);
+        $("#registered").text(data.player.registered);
+    
+        $("#leaderboardban").prop("checked", data.player.leaderboardBan);
+        $("#statsban").prop("checked", data.player.statsBan);
+
+        // Stats
+        $("#kills").text(data.totalKills);
+        $("#deaths").text(data.totalDeaths);
+        $("#archerkills").text(data.archerKills);
+        $("#archerdeaths").text(data.archerDeaths);
+        $("#builderkills").text(data.builderKills);
+        $("#builderdeaths").text(data.builderDeaths);
+        $("#knightkills").text(data.knightKills);
+        $("#knightdeaths").text(data.knightDeaths);
+    });
+
+    killsStart=0;
+    currentHistory=null;
+
+    function getKillHistory() {
+        $.getJSON(apiEndpoint + "players/" + playerId + "/kills?showbanned=true&start=" + killsStart, function(data){
+            if(!data) {
+                return;
+            }
+
+            currentHistory=data;
+
+            killList = $("#killList");
+            killList.empty();
+
+            for(var i = 0; i < data.values.length; i++) {
+                kill = data.values[i];
+                elem = `<tr>
+                    <td onclick="gotoPlayer('${kill.killer.id}');">
+                    <img src="${kill.killer.avatar}" width="64px;" height="64px;">
+                    ${kill.killer.username}
+                    </td>
+                    <td onclick="gotoPlayer('${kill.victim.id}');">
+                    <img src="${kill.victim.avatar}" width="64px;" height="64px;">
+                    ${kill.victim.username}
+                    </td>
+                    <td>${kill.time}</td>
+                    <td>${kill.server.name}</td>`
+                killList.append(elem);
+            }
+
+            $("#historyinfo").text(`Showing ${data.values.length} results ... ${data.start} - ${data.start + data.size}`);
+        });
+    }
+
+    getKillHistory();
+
+    function prevHistory() {
+        if(killsStart!=0) {
+            killsStart -= currentHistory.limit;
+            if(killsStart==0){
+                killsStart=0;
+            }
+
+            getKillHistory();
+        }
+    }
+
+    function nextHistory() {
+        if(currentHistory.next!=-1) {
+            killsStart = currentHistory.next;
+            getKillHistory();
+        }
+
+    }
+
+    function save() {
+        params = {
+            id: playerId,
+            username: $("#username").val(),
+            leaderboardBan: $("#leaderboardban").is(":checked"),
+            statsBan: $("#statsban").is(":checked")
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "{{ .Prefix }}/save",
+            data: JSON.stringify(params),
+            contentType: "application/json"
+        })
+        .fail(function(data, status) {
+            alert("save failed");
+        })
+        .done(function() {
+            alert("changes saved");
+        });
+    }
+
+    function gotoPlayer(id) {
+        window.location.href = "{{ .Prefix }}/player/" + id;
+    }
+
+</script>
+</html>

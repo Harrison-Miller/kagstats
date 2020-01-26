@@ -15,7 +15,7 @@ import (
 var nextID = 1
 
 func UpdatePlayerInfo(player *models.Player) error {
-	tx, err := db.Begin()
+	tx, err := db.Beginx()
 	if err != nil {
 		return err
 	}
@@ -27,11 +27,15 @@ func UpdatePlayerInfo(player *models.Player) error {
 		return errors.Wrap(err, "error updating/creating player")
 	}
 
-	row := tx.QueryRow("SELECT ID FROM players WHERE username=?", player.Username)
-	err = row.Scan(&player.ID)
+	// row := tx.QueryRow("SELECT * FROM players WHERE username=?", player.Username)
+	// err = row.Scan(&player.ID)
+
+	log.Println(player.StatsBan)
+	err = tx.Get(player, "SELECT * FROM players WHERE username=?", player.Username)
 	if err != nil {
 		return errors.Wrap(err, "error getting player ID")
 	}
+	log.Println(player.StatsBan)
 
 	if err := tx.Commit(); err != nil {
 		return errors.Wrap(err, "error commiting player update")

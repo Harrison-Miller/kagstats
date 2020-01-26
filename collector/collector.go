@@ -37,6 +37,7 @@ const CTF_MINIMUM_PLAYERS = 8
 func UpdatePlayer(p *models.Player) error {
 	if cache, ok := players[p.Username]; ok {
 		p.ID = cache.ID
+		p.StatsBan = cache.StatsBan
 		cache.ServerID = p.ServerID
 
 		if p.Charactername != cache.Charactername || p.Clantag != cache.Clantag {
@@ -78,6 +79,12 @@ func (c *Collector) OnPlayerJoined(m rcon.Message, r *rcon.Client) error {
 		if err != nil {
 			return err
 		}
+
+		if player.StatsBan {
+			c.logger.Println("join: player is banned")
+			return nil
+		}
+
 		err = UpdateJoinTime(player.ID, c.server.ID)
 		if err != nil {
 			return err
@@ -105,6 +112,12 @@ func (c *Collector) OnPlayerLeave(m rcon.Message, r *rcon.Client) error {
 		if err != nil {
 			return err
 		}
+
+		if player.StatsBan {
+			c.logger.Println("leave: player is banned")
+			return nil
+		}
+
 		err = UpdateLeaveTime(player.ID, c.server.ID)
 		if err != nil {
 			return err
@@ -149,6 +162,11 @@ func (c *Collector) OnPlayerDie(m rcon.Message, r *rcon.Client) error {
 			return errors.Wrap(err, "error getting killer id")
 		}
 
+		if kill.Player.StatsBan || kill.Killer.StatsBan {
+			c.logger.Println("die: player is banned")
+			return nil
+		}
+
 		kill.VictimID = kill.Player.ID
 		kill.KillerID = kill.Killer.ID
 		kill.Time = utils.NowAsUnixMilliseconds()
@@ -190,6 +208,13 @@ func (c *Collector) PlayerList(m rcon.Message, r *rcon.Client) error {
 			if err != nil {
 				return err
 			}
+
+			if p.StatsBan {
+				c.logger.Println("list: player is banned")
+				altPlayers++
+				continue
+			}
+
 			err = UpdateJoinTime(p.ID, c.server.ID)
 			if err != nil {
 				return err

@@ -41,7 +41,7 @@ func getPlayers(w http.ResponseWriter, r *http.Request) {
 		limit = Min(int64(l), limit)
 	}
 
-	err := db.Select(&players, playersQuery+"ORDER BY event.type='joined' DESC, event.time DESC LIMIT ?,?", start, limit)
+	err := db.Select(&players, playersQuery+"WHERE NOT players.statsBan ORDER BY event.type='joined' DESC, event.time DESC LIMIT ?,?", start, limit)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return
@@ -72,8 +72,13 @@ func searchPlayers(w http.ResponseWriter, r *http.Request) {
 	search := vars["search"]
 	search = "%" + search + "%"
 
+	var showBanned = "NOT players.StatsBan AND"
+	if v := r.URL.Query().Get("showbanned"); v == "true" {
+		showBanned = ""
+	}
+
 	var players []models.Player
-	err := db.Select(&players, playersQuery+"WHERE lower(username) LIKE ? OR lower(charactername) LIKE ? OR lower(clantag) LIKE ? LIMIT 30", search, search, search)
+	err := db.Select(&players, playersQuery+"WHERE "+showBanned+" (lower(username) LIKE ? OR lower(charactername) LIKE ? OR lower(clantag) LIKE ?) LIMIT 30", search, search, search)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error search for players %v", err), http.StatusInternalServerError)
@@ -92,7 +97,7 @@ func getPlayer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var player models.Player
-	err = db.Get(&player, playersQuery+"WHERE players.ID=?", int64(playerID))
+	err = db.Get(&player, playersQuery+"WHERE NOT players.statsBan AND players.ID=?", int64(playerID))
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Player not found: %v", err), http.StatusInternalServerError)
 		return

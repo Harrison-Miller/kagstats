@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Harrison-Miller/kagstats/common/models"
 	. "github.com/Harrison-Miller/kagstats/common/models"
 	"github.com/jmoiron/sqlx"
 )
@@ -172,6 +173,44 @@ func BuildInsert(indexer Indexer, tx *sql.Tx) (*sql.Stmt, error) {
 	return stmnt, err
 }
 
+var players = make(map[int64]models.Player)
+
+func SkipKill(kill models.Kill, db *sqlx.DB) bool {
+	var victim Player
+	if cacheVictim, ok := players[kill.Player.ID]; ok {
+		victim = cacheVictim
+	} else {
+		err := db.Get(&victim, "SELECT * FROM players WHERE ID=?", kill.Player.ID)
+		if err != nil {
+			return false
+		}
+
+		players[kill.Player.ID] = victim
+	}
+
+	if victim.StatsBan {
+		return true
+	}
+
+	var killer Player
+	if cacheKiller, ok := players[kill.Killer.ID]; ok {
+		killer = cacheKiller
+	} else {
+		err := db.Get(&victim, "SELECT * FROM players WHERE ID=?", kill.Killer.ID)
+		if err != nil {
+			return false
+		}
+
+		players[kill.Killer.ID] = killer
+	}
+
+	if killer.StatsBan {
+		return true
+	}
+
+	return false
+}
+
 func Process(indexer KillsIndexer, batchSize int, db *sqlx.DB) (int, error) {
 	tx, err := db.Begin()
 	defer tx.Rollback()
@@ -192,6 +231,10 @@ func Process(indexer KillsIndexer, batchSize int, db *sqlx.DB) (int, error) {
 		if err := rows.Scan(&kill.ID, &kill.KillerID, &kill.VictimID, &kill.KillerClass,
 			&kill.VictimClass, &kill.Hitter, &kill.Time, &kill.ServerID, &kill.TeamKill); err != nil {
 			return 0, err
+		}
+
+		if SkipKill(kill, db) {
+			continue
 		}
 
 		indices := indexer.Index(kill)
