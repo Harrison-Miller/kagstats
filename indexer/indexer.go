@@ -196,7 +196,7 @@ func SkipKill(kill models.Kill, db *sqlx.DB) bool {
 	if cacheKiller, ok := players[kill.Killer.ID]; ok {
 		killer = cacheKiller
 	} else {
-		err := db.Get(&victim, "SELECT * FROM players WHERE ID=?", kill.Killer.ID)
+		err := db.Get(&killer, "SELECT * FROM players WHERE ID=?", kill.Killer.ID)
 		if err != nil {
 			return false
 		}
