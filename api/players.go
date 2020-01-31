@@ -97,7 +97,7 @@ func getPlayer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var player models.Player
-	err = db.Get(&player, playersQuery+"WHERE NOT players.statsBan AND players.ID=?", int64(playerID))
+	err = db.Get(&player, playersQuery+"WHERE players.ID=?", int64(playerID))
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Player not found: %v", err), http.StatusInternalServerError)
 		return
