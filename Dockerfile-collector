@@ -20,6 +20,8 @@ FROM alpine
 ARG VERSION
 ENV VERSION=$VERSION
 
+RUN apk update && apk add --no-cache ca-certificates && update-ca-certificates
+
 ADD LICENSE .
 
 COPY --from=build /collector /
