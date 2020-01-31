@@ -46,10 +46,31 @@
 <div class="row top-buffer">
         <div class="col-md"></div>
         <div class="col-md">
-            <button type="button" onclick="recalculate();" class="btn-lg btn btn-danger">Recalculate Stats</button>
+            <button class="btn btn-lg btn-danger" data-toggle="modal" data-target="#recalcModal">Recalculate Stats</button>
         </div>
         <div class="col-md"></div>
+</div>
+
+
+<div class="modal fade" id="recalcModal" tabindex="-1" role="dialog" aria-labelledby="saveModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Recalculate Stats</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to recalculate stats right now? This operation can take many hours, make sure you've made all changes you want before continuing.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="recalculate();">Recalculate</button>
+            </div>
+        </div>
     </div>
+</div>
 
 </div>
 </body>

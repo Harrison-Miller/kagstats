@@ -70,7 +70,7 @@ func BuildTable(indexer Indexer) string {
 	for _, k := range keys {
 		fmt.Fprintf(&b, "%s INT NOT NULL,", k.Name)
 		if k.Table != "" && k.Column != "" {
-			fmt.Fprintf(&b, "FOREIGN KEY(%s) REFERENCES %s(%s),", k.Name, k.Table, k.Column)
+			fmt.Fprintf(&b, "FOREIGN KEY(%s) REFERENCES %s(%s) ON DELETE CASCADE,", k.Name, k.Table, k.Column)
 		}
 
 		keyNames = append(keyNames, k.Name)

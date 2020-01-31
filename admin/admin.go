@@ -94,6 +94,34 @@ type SaveParam struct {
 func save(w http.ResponseWriter, r *http.Request) {
 	var params SaveParam
 	err := json.NewDecoder(r.Body).Decode(&params)
+	if err != nil || params.Username == "" || params.ID == 0 {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Delete user from database
+	tx, err := db.Begin()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec("UPDATE players SET username=?,leaderboardBan=?,statsBan=? WHERE ID=?", params.Username, params.LeaderboardBan, params.StatsBan, params.ID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	if err := tx.Commit(); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	return
+}
+
+func delete(w http.ResponseWriter, r *http.Request) {
+	var params SaveParam
+	err := json.NewDecoder(r.Body).Decode(&params)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -107,7 +135,7 @@ func save(w http.ResponseWriter, r *http.Request) {
 	}
 	defer tx.Rollback()
 
-	_, err = tx.Exec("UPDATE players SET username=?,leaderboardBan=?,statsBan=? WHERE ID=?", params.Username, params.LeaderboardBan, params.StatsBan, params.ID)
+	_, err = tx.Exec("DELETE FROM players WHERE ID=?", params.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -195,6 +223,7 @@ func main() {
 	/*TODO:
 	* paginate nemesis/bullied
 	* collector info/status
+	* DELETE FROM players WHERE username REGEXP '^.*~[0-9]+';
 	 */
 
 	var err error
@@ -208,6 +237,7 @@ func main() {
 	r.HandleFunc("/", BasicAuth(index)).Methods("GET")
 	r.HandleFunc("/player/{id:[0-9]+}", BasicAuth(player)).Methods("GET")
 	r.HandleFunc("/save", BasicAuth(save)).Methods("POST")
+	r.HandleFunc("/delete", BasicAuth(delete)).Methods("POST")
 	r.HandleFunc("/recalculate", BasicAuth(recalculate)).Methods("POST")
 
 	r.Use(LogHandler)

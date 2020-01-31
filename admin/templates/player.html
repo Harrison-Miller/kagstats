@@ -72,7 +72,48 @@
     </tbody>
 </table>
 
-<button class="btn btn-primary" onclick="save();">Save</button>
+<button class="btn btn-lg btn-primary" data-toggle="modal" data-target="#saveModal">Save</button>
+<div class="modal fade" id="saveModal" tabindex="-1" role="dialog" aria-labelledby="saveModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Save Changes</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to save these changes?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="save();">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<button class="btn btn-lg btn-danger" data-toggle="modal" data-target="#deleteModal">Delete</button>
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Player</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this players stats? The next time they join they'll be readded to the database.
+                You will also need to recalculate all stats.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="deleteplayer();">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <h2>Stats</h2>
 
@@ -132,22 +173,28 @@
     $('[data-toggle="tooltip"]').tooltip()
     })
 
-    $.getJSON(apiEndpoint + "players/" + playerId + "/basic", function(data) {
+    $.getJSON(apiEndpoint + "players/" + playerId, function(data) {
         if(!data) {
             return
         }
 
-        $("#fullname").text(data.player.clanTag + " " + data.player.characterName + " (" + data.player.username + ")");
+        $("#fullname").text(data.clanTag + " " + data.characterName + " (" + data.username + ")");
 
-        $("#avatar").attr("src", data.player.avatar);
+        $("#avatar").attr("src", data.avatar);
 
-        $("#username").val(data.player.username);
-        $("#clantag").text(data.player.clanTag);
-        $("#charactername").text(data.player.characterName);
-        $("#registered").text(data.player.registered);
+        $("#username").val(data.username);
+        $("#clantag").text(data.clanTag);
+        $("#charactername").text(data.characterName);
+        $("#registered").text(data.registered);
     
-        $("#leaderboardban").prop("checked", data.player.leaderboardBan);
-        $("#statsban").prop("checked", data.player.statsBan);
+        $("#leaderboardban").prop("checked", data.leaderboardBan);
+        $("#statsban").prop("checked", data.statsBan);
+    });
+
+    $.getJSON(apiEndpoint + "players/" + playerId + "/basic", function(data) {
+        if(!data) {
+            return
+        }
 
         // Stats
         $("#kills").text(data.totalKills);
@@ -236,6 +283,26 @@
             alert("changes saved");
         });
     }
+
+    function deleteplayer() {
+        params = {
+            id: playerId,
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "{{ .Prefix }}/delete",
+            data: JSON.stringify(params),
+            contentType: "application/json"
+        })
+        .fail(function(data, status) {
+            alert("delete failed");
+        })
+        .done(function() {
+            alert("deleted");
+        });
+    }
+
 
     function gotoPlayer(id) {
         window.location.href = "{{ .Prefix }}/player/" + id;

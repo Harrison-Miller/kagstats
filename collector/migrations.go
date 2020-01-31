@@ -53,6 +53,16 @@ func RunMigrations(db *sqlx.DB) error {
 		return err
 	}
 
+	err = RunMigration(10, OnDeleteCascade, db)
+	if err != nil {
+		return err
+	}
+
+	err = RunMigration(11, RemoveAltAccounts, db)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -225,6 +235,84 @@ func AddLeaderboardBan(db *sqlx.DB) error {
 
 func AddStatsBan(db *sqlx.DB) error {
 	err := AddColumn("players", "statsBan", "BOOLEAN NOT NULL", "FALSE", db)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ModifyFkOnDelete(constraint string, table string, key string, reference string, db *sqlx.DB) error {
+	_, err := db.Exec("ALTER TABLE " + table + " DROP FOREIGN KEY " + constraint)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec("ALTER TABLE " + table + " ADD FOREIGN KEY(" + key + ") REFERENCES " + reference + " ON DELETE CASCADE")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func OnDeleteCascade(db *sqlx.DB) error {
+	err := ModifyFkOnDelete("players_ibfk_1", "players", "lastEventID", "events(ID)", db)
+	if err != nil {
+		return err
+	}
+
+	err = ModifyFkOnDelete("kills_ibfk_1", "kills", "killerID", "players(ID)", db)
+	if err != nil {
+		return err
+	}
+
+	err = ModifyFkOnDelete("kills_ibfk_2", "kills", "victimID", "players(ID)", db)
+	if err != nil {
+		return err
+	}
+
+	err = ModifyFkOnDelete("kills_ibfk_3", "kills", "serverID", "servers(ID)", db)
+	if err != nil {
+		return err
+	}
+
+	err = ModifyFkOnDelete("events_ibfk_1", "events", "playerID", "players(ID)", db)
+	if err != nil {
+		return err
+	}
+
+	err = ModifyFkOnDelete("events_ibfk_2", "events", "serverID", "servers(ID)", db)
+	if err != nil {
+		return err
+	}
+
+	// known indexers
+	err = ModifyFkOnDelete("basic_stats_ibfk_1", "basic_stats", "playerID", "players(ID)", db)
+	if err != nil {
+		return err
+	}
+
+	err = ModifyFkOnDelete("nemesis_ibfk_1", "nemesis", "playerID", "players(ID)", db)
+	if err != nil {
+		return err
+	}
+
+	err = ModifyFkOnDelete("nemesis_ibfk_2", "nemesis", "nemesisID", "players(ID)", db)
+	if err != nil {
+		return err
+	}
+
+	err = ModifyFkOnDelete("top_hitters_ibfk_1", "top_hitters", "playerID", "players(ID)", db)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func RemoveAltAccounts(db *sqlx.DB) error {
+	_, err := db.Exec("DELETE FROM players WHERE username REGEXP '^.*~[0-9]+'")
 	if err != nil {
 		return err
 	}
