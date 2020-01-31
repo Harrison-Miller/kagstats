@@ -16,6 +16,8 @@ const boardTitle = {
   'Kills': 'Kills'
 }
 
+const monthNames =["January", "February", "March", "April", "May", "June", "July", "August", "September", "November", "December"];
+
 @Component({
   selector: 'app-class-leaderboard',
   templateUrl: './class-leaderboard.component.html',
@@ -71,7 +73,10 @@ export class ClassLeaderboardComponent implements OnInit, OnDestroy {
 
   boardDate(): string {
     if(this.class.toLocaleLowerCase().includes("monthly")) {
-
+      var date = new Date();
+      var year = date.getFullYear()
+      var month = monthNames[date.getMonth()];
+      return `- ${month} ${year}`
     }
     return "";
   }
