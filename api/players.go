@@ -78,7 +78,7 @@ func searchPlayers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var players []models.Player
-	err := db.Select(&players, playersQuery+"WHERE "+showBanned+" (lower(username) LIKE ? OR lower(charactername) LIKE ? OR lower(clantag) LIKE ?)", search, search, search)
+	err := db.Select(&players, playersQuery+"WHERE "+showBanned+" (lower(username) LIKE ? OR lower(charactername) LIKE ? OR lower(clantag) LIKE ?) LIMIT 100", search, search, search)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error search for players %v", err), http.StatusInternalServerError)
