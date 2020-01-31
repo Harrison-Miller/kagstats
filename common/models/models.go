@@ -31,8 +31,9 @@ type Player struct {
 	Moderation    bool `json:"moderation"`
 
 	//Moderation
-	LeaderboardBan bool `json:"leaderboardBan" db:"leaderboardBan"`
-	StatsBan       bool `json:"statsBan" db:"statsBan"`
+	LeaderboardBan bool   `json:"leaderboardBan" db:"leaderboardBan"`
+	StatsBan       bool   `json:"statsBan" db:"statsBan"`
+	Notes          string `json:"-" db:"notes"`
 
 	LastEventID sql.NullInt64 `json:"-" db:"lastEventID"`
 	Event       `json:"lastEvent" db:"lastEvent,prefix=lastEvent."`

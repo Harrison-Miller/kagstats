@@ -21,7 +21,28 @@ import (
 var clientAltPattern = regexp.MustCompile("[^ ]+~[0-9]+")
 
 func isClientAlt(username string) bool {
-	return clientAltPattern.MatchString(username)
+	if clientAltPattern.MatchString(username) {
+		return true
+	}
+
+	return false
+}
+
+func isNewPlayer(player *models.Player) bool {
+	layout := "2006-01-02 15:04:05"
+	t, err := time.Parse(layout, player.Registered)
+	if err != nil {
+		return true
+	}
+
+	dur := time.Now().Sub(t)
+	days := int64(dur.Hours()) / 24
+
+	if days <= 7 {
+		return true
+	}
+
+	return false
 }
 
 type Collector struct {
@@ -55,6 +76,11 @@ func UpdatePlayer(p *models.Player) error {
 			return errors.Wrap(err, "error creating player")
 		}
 
+		err = utils.GetPlayerInfo(p)
+		if err != nil {
+			return errors.Wrap(err, "error getting player info")
+		}
+
 		players[p.Username] = *p
 	}
 
@@ -80,8 +106,7 @@ func (c *Collector) OnPlayerJoined(m rcon.Message, r *rcon.Client) error {
 			return err
 		}
 
-		if player.StatsBan {
-			c.logger.Println("join: player is banned")
+		if player.StatsBan || isNewPlayer(&player) {
 			return nil
 		}
 
@@ -113,8 +138,7 @@ func (c *Collector) OnPlayerLeave(m rcon.Message, r *rcon.Client) error {
 			return err
 		}
 
-		if player.StatsBan {
-			c.logger.Println("leave: player is banned")
+		if player.StatsBan || isNewPlayer(&player) {
 			return nil
 		}
 
@@ -162,8 +186,7 @@ func (c *Collector) OnPlayerDie(m rcon.Message, r *rcon.Client) error {
 			return errors.Wrap(err, "error getting killer id")
 		}
 
-		if kill.Player.StatsBan || kill.Killer.StatsBan {
-			c.logger.Println("die: player is banned")
+		if kill.Player.StatsBan || kill.Killer.StatsBan || isNewPlayer(&kill.Player) || isNewPlayer(&kill.Killer) {
 			return nil
 		}
 
@@ -209,8 +232,7 @@ func (c *Collector) PlayerList(m rcon.Message, r *rcon.Client) error {
 				return err
 			}
 
-			if p.StatsBan {
-				c.logger.Println("list: player is banned")
+			if p.StatsBan || isNewPlayer(&p) {
 				altPlayers++
 				continue
 			}

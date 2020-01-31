@@ -63,6 +63,16 @@ func RunMigrations(db *sqlx.DB) error {
 		return err
 	}
 
+	err = RunMigration(12, AddNotes, db)
+	if err != nil {
+		return err
+	}
+
+	err = RunMigration(13, RemoveWeekOldAccounts, db)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -313,6 +323,29 @@ func OnDeleteCascade(db *sqlx.DB) error {
 
 func RemoveAltAccounts(db *sqlx.DB) error {
 	_, err := db.Exec("DELETE FROM players WHERE username REGEXP '^.*~[0-9]+'")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func AddNotes(db *sqlx.DB) error {
+	err := AddColumn("players", "notes", "varchar(255) NOT NULL", "''", db)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func RemoveWeekOldAccounts(db *sqlx.DB) error {
+	_, err := db.Exec("DELETE FROM players WHERE registered = ''")
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec("DELETE FROM players WHERE registered BETWEEN NOW() - INTERVAL 7 DAY AND NOW()")
 	if err != nil {
 		return err
 	}

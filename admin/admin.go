@@ -27,6 +27,13 @@ var host = ":8080"
 var apiHost = "http://localhost/api/"
 var prefix = ""
 
+func JSONResponse(w http.ResponseWriter, i interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	enc := json.NewEncoder(w)
+	enc.SetIndent("", "  ")
+	enc.Encode(i)
+}
+
 func LogHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -89,6 +96,7 @@ type SaveParam struct {
 	Username       string `json:"username"`
 	LeaderboardBan bool   `json:"leaderboardBan"`
 	StatsBan       bool   `json:"statsBan"`
+	Notes          string `json:"notes"`
 }
 
 func save(w http.ResponseWriter, r *http.Request) {
@@ -107,7 +115,7 @@ func save(w http.ResponseWriter, r *http.Request) {
 	}
 	defer tx.Rollback()
 
-	_, err = tx.Exec("UPDATE players SET username=?,leaderboardBan=?,statsBan=? WHERE ID=?", params.Username, params.LeaderboardBan, params.StatsBan, params.ID)
+	_, err = tx.Exec("UPDATE players SET username=?,leaderboardBan=?,statsBan=?,notes=? WHERE ID=?", params.Username, params.LeaderboardBan, params.StatsBan, params.Notes, params.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -194,6 +202,26 @@ func recalculate(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type NotesParams struct {
+	ID    string `json:"id" db:"ID"`
+	Notes string `json:"notes"`
+}
+
+func getNotes(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	playerId := vars["id"]
+
+	var n NotesParams
+
+	err := db.Get(&n, "SELECT ID,notes FROM players WHERE ID=?", playerId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	JSONResponse(w, &n)
+}
+
 func main() {
 	config, _ = configs.Get()
 	if value, ok := os.LookupEnv("ADMIN_DB"); ok {
@@ -239,6 +267,7 @@ func main() {
 	r.HandleFunc("/save", BasicAuth(save)).Methods("POST")
 	r.HandleFunc("/delete", BasicAuth(delete)).Methods("POST")
 	r.HandleFunc("/recalculate", BasicAuth(recalculate)).Methods("POST")
+	r.HandleFunc("/notes/{id:[0-9]+}", BasicAuth(getNotes)).Methods("GET")
 
 	r.Use(LogHandler)
 

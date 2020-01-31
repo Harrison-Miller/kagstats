@@ -69,6 +69,14 @@
                 </div>
             </td>
         </tr>
+        <tr>
+            <td>Notes</td>
+            <td >
+                <div class="form-group">
+                    <textarea class="form-control" id="notes" rows="3"></textarea>
+                </div>
+            </td>
+        </tr>
     </tbody>
 </table>
 
@@ -191,6 +199,10 @@
         $("#statsban").prop("checked", data.statsBan);
     });
 
+    $.getJSON("{{ .Prefix }}/notes/{{ .PlayerId }}", function(data) {
+        $("#notes").val(data.notes);
+    });
+
     $.getJSON(apiEndpoint + "players/" + playerId + "/basic", function(data) {
         if(!data) {
             return
@@ -223,6 +235,10 @@
 
             for(var i = 0; i < data.values.length; i++) {
                 kill = data.values[i];
+
+                date = new Date(kill.time);
+                dateformatted = `${date.getMonth()}/${date.getDay()}/${date.getYear()} ${date.getHours()}:${date.getMinutes()}`
+
                 elem = `<tr>
                     <td onclick="gotoPlayer('${kill.killer.id}');">
                     <img src="${kill.killer.avatar}" width="64px;" height="64px;">
@@ -232,7 +248,7 @@
                     <img src="${kill.victim.avatar}" width="64px;" height="64px;">
                     ${kill.victim.username}
                     </td>
-                    <td>${kill.time}</td>
+                    <td>${dateformatted}</td>
                     <td>${kill.server.name}</td>`
                 killList.append(elem);
             }
@@ -267,7 +283,8 @@
             id: playerId,
             username: $("#username").val(),
             leaderboardBan: $("#leaderboardban").is(":checked"),
-            statsBan: $("#statsban").is(":checked")
+            statsBan: $("#statsban").is(":checked"),
+            notes: $("#notes").val()
         };
 
         $.ajax({

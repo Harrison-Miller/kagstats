@@ -36,7 +36,7 @@ func ProcessPlayers(currentIndex int, maxRows int, db *sqlx.DB) (int, error) {
 			log.Println(err)
 		}
 
-		utils.GetPlayerInfo(&p)
+		err = utils.GetPlayerInfo(&p)
 		if err != nil {
 			log.Println(err)
 		}
