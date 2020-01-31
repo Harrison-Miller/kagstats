@@ -29,7 +29,7 @@ export class LeaderboardService {
       subApi = "monthly/";
       var date = new Date();
       var year = date.getFullYear()
-      var month = date.getMonth();
+      var month = date.getMonth()+1;
       query = `?year=${year}&month=${month}`;
     }
     this.http.get<LeaderboardResult>(`${environment.apiUrl}/leaderboard/${subApi}${board.toLowerCase().replace("monthly", "")}${query}`).subscribe(board => {
