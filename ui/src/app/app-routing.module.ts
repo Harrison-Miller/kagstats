@@ -12,7 +12,7 @@ import { AboutComponent } from './pages/about/about.component';
 
 const routes: Routes = [{
   path: '',
-  redirectTo: 'leaderboards',
+  redirectTo: 'leaderboards/MonthlyArcher',
   pathMatch: 'full'
 }, {
   path: 'leaderboards',

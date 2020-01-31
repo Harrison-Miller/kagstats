@@ -104,6 +104,7 @@ func main() {
 	BasicStatsRoutes(r)
 	NemesisRoutes(r)
 	HitterRoutes(r)
+	MonthlyStatsRoutes(r)
 
 	r.Use(LogHandler)
 

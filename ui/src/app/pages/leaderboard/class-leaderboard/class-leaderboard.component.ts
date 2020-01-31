@@ -5,7 +5,16 @@ import { BasicStats } from '../../../models';
 import { takeUntil } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 
-const availableClasses = ['Archer', 'Builder', 'Knight', 'Kills'];
+const availableClasses = ['Archer', 'Builder', 'Knight', 'Kills', 'MonthlyArcher', 'MonthlyBuilder', 'MonthlyKnight'];
+const boardTitle = {
+  'Archer': 'All Time Archer',
+  'Builder': 'All Time Builder',
+  'Knight': 'All Time Knight',
+  'MonthlyArcher': 'Monthly Archer',
+  'MonthlyBuilder': 'Monthly Builder',
+  'MonthlyKnight': 'Monthly Knight',
+  'Kills': 'Kills'
+}
 
 @Component({
   selector: 'app-class-leaderboard',
@@ -30,7 +39,7 @@ export class ClassLeaderboardComponent implements OnInit, OnDestroy {
         this.class = params.get('board');
 
         if (!availableClasses.includes(this.class)) {
-          this.router.navigateByUrl('/leaderboards');
+          this.router.navigateByUrl('/MonthlyArcher');
           console.error('Invalid class');
         }
 
@@ -53,14 +62,25 @@ export class ClassLeaderboardComponent implements OnInit, OnDestroy {
     if(this.class == "Kills") {
       return leader.totalKills;
     }
-    return leader[`${this.class.toLowerCase()}Kills`]
+    return leader[`${this.class.toLowerCase().replace("monthly", "")}Kills`]
+  }
+
+  boardTitle(): string {
+    return boardTitle[this.class];
+  }
+
+  boardDate(): string {
+    if(this.class.toLocaleLowerCase().includes("monthly")) {
+
+    }
+    return "";
   }
 
   totalDeaths(leader: BasicStats): number {
     if(this.class == "Kills") {
       return leader.totalDeaths;
     }
-    return leader[`${this.class.toLowerCase()}Deaths`]
+    return leader[`${this.class.toLowerCase().replace("monthly", "")}Deaths`]
   }
   
   kd(leader: BasicStats): string {

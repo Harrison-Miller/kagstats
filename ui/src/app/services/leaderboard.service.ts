@@ -23,7 +23,11 @@ export class LeaderboardService {
   }
 
   getLeaderboard(board: string): void {
-    this.http.get<LeaderboardResult>(`${environment.apiUrl}/leaderboard/${board.toLowerCase()}`).subscribe(board => {
+    var subApi = "";
+    if(board.toLowerCase().includes("monthly")){
+      subApi = "monthly/"
+    }
+    this.http.get<LeaderboardResult>(`${environment.apiUrl}/leaderboard/${subApi}${board.toLowerCase().replace("monthly", "")}`).subscribe(board => {
       this.leaderboard.next(board);
     });
   }
