@@ -24,10 +24,15 @@ export class LeaderboardService {
 
   getLeaderboard(board: string): void {
     var subApi = "";
+    var query= "";
     if(board.toLowerCase().includes("monthly")){
-      subApi = "monthly/"
+      subApi = "monthly/";
+      var date = new Date();
+      var year = date.getFullYear()
+      var month = date.getMonth();
+      query = `?year=${year}&month=${month}`;
     }
-    this.http.get<LeaderboardResult>(`${environment.apiUrl}/leaderboard/${subApi}${board.toLowerCase().replace("monthly", "")}`).subscribe(board => {
+    this.http.get<LeaderboardResult>(`${environment.apiUrl}/leaderboard/${subApi}${board.toLowerCase().replace("monthly", "")}${query}`).subscribe(board => {
       this.leaderboard.next(board);
     });
   }
