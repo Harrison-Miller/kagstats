@@ -177,15 +177,15 @@ var players = make(map[int64]models.Player)
 
 func SkipKill(kill models.Kill, db *sqlx.DB) bool {
 	var victim Player
-	if cacheVictim, ok := players[kill.Player.ID]; ok {
+	if cacheVictim, ok := players[kill.VictimID]; ok {
 		victim = cacheVictim
 	} else {
-		err := db.Get(&victim, "SELECT * FROM players WHERE ID=?", kill.Player.ID)
+		err := db.Get(&victim, "SELECT * FROM players WHERE ID=?", kill.VictimID)
 		if err != nil {
 			return false
 		}
 
-		players[kill.Player.ID] = victim
+		players[kill.VictimID] = victim
 	}
 
 	if victim.StatsBan {
@@ -193,15 +193,15 @@ func SkipKill(kill models.Kill, db *sqlx.DB) bool {
 	}
 
 	var killer Player
-	if cacheKiller, ok := players[kill.Killer.ID]; ok {
+	if cacheKiller, ok := players[kill.KillerID]; ok {
 		killer = cacheKiller
 	} else {
-		err := db.Get(&killer, "SELECT * FROM players WHERE ID=?", kill.Killer.ID)
+		err := db.Get(&killer, "SELECT * FROM players WHERE ID=?", kill.KillerID)
 		if err != nil {
 			return false
 		}
 
-		players[kill.Killer.ID] = killer
+		players[kill.KillerID] = killer
 	}
 
 	if killer.StatsBan {
