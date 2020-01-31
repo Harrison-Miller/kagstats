@@ -98,7 +98,7 @@ services:
       args:
         indexer: monthly
         VERSION: ${TAG:-latest}
-    image: gcr.io/kagstats/hitters-indexer:${TAG:-latest}
+    image: gcr.io/kagstats/monthly-indexer:${TAG:-latest}
     links:
       - mysql
     restart: always
