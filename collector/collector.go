@@ -60,6 +60,7 @@ func UpdatePlayer(p *models.Player) error {
 		p.ID = cache.ID
 		p.StatsBan = cache.StatsBan
 		cache.ServerID = p.ServerID
+		p.Registered = cache.Registered
 
 		if p.Charactername != cache.Charactername || p.Clantag != cache.Clantag {
 			cache.Charactername = p.Charactername
