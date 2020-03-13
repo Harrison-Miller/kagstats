@@ -344,6 +344,13 @@ func Collect(sconfig configs.ServerConfig) {
 			}
 		}()
 
+		// Reset connection because of rcon server hiccups
+		go func() {
+			time.Sleep(2 * time.Hour)
+			logger.Printf("Disconnecting to refresh connection")
+			client.Close()
+		}()
+
 		err := client.Handle()
 		stopMOTD <- true
 		if err != nil {
