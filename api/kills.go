@@ -174,7 +174,7 @@ func getServerKills(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var kills []models.Kill
-	err = db.Select(&kills, killsQuery+"WHERE NOT victim.statsBan AND NOT player.statsBan AND serverID=? LIMIT 100", serverID)
+	err = db.Select(&kills, killsQuery+"WHERE NOT victim.statsBan AND NOT killer.statsBan AND serverID=? LIMIT 100", serverID)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("error getting kills: %s", err), http.StatusInternalServerError)
 		return
