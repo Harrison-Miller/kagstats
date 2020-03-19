@@ -9,6 +9,7 @@ import { PlayersComponent } from './pages/players/players.component';
 import { PlayerDetailComponent } from './pages/player-detail/player-detail.component';
 import { KillsComponent } from './pages/kills/kills.component';
 import { AboutComponent } from './pages/about/about.component';
+import { ServerDetailComponent } from './pages/server-detail/server-detail.component'
 
 const routes: Routes = [{
   path: '',
@@ -27,6 +28,9 @@ const routes: Routes = [{
 }, {
   path: 'servers',
   component: ServersComponent
+},{
+  path: 'servers/:id',
+  component: ServerDetailComponent
 },{
   path: 'players',
   component: PlayersComponent

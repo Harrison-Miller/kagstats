@@ -31,6 +31,7 @@ import { AboutComponent } from './pages/about/about.component';
 import { StatusService } from './services/status.service';
 import { RegisteredAccoladePipe } from './pipes/registered-accolade.pipe';
 import { TimeAgoPipe } from './pipes/time-ago.pipe';
+import { ServerDetailComponent } from './pages/server-detail/server-detail.component';
 
 @NgModule({
   declarations: [
@@ -54,7 +55,8 @@ import { TimeAgoPipe } from './pipes/time-ago.pipe';
     HitterIconPipe,
     KillsComponent,
     AboutComponent,
-    RegisteredAccoladePipe
+    RegisteredAccoladePipe,
+    ServerDetailComponent,
   ],
   imports: [
     BrowserModule,

@@ -173,12 +173,49 @@ func getServerKills(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	start, err := GetURLParam("start", 0, r)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("could not parse start: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	if start < 0 {
+		http.Error(w, fmt.Sprintf("start must be >= 0"), http.StatusBadRequest)
+		return
+	}
+
+	limit, err := GetURLParam("limit", 50, r)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("could not parse start: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	limit = int(Min(Max(int64(limit), 1), 50))
+
+
 	var kills []models.Kill
-	err = db.Select(&kills, killsQuery+"WHERE NOT victim.statsBan AND NOT killer.statsBan AND serverID=? LIMIT 100", serverID)
+	err = db.Select(&kills, killsQuery+"WHERE NOT victim.statsBan AND NOT killer.statsBan AND serverID=? ORDER BY kills.ID DESC LIMIT ?,?", serverID, start, limit)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("error getting kills: %s", err), http.StatusInternalServerError)
 		return
 	}
 
-	JSONResponse(w, &kills)
+	next := int(start) + len(kills)
+	if len(kills) < int(limit) {
+		next = -1
+	}
+
+	JSONResponse(w, struct {
+		Limit  int           `json:"limit"`
+		Start  int           `json:"start"`
+		Size   int           `json:"size"`
+		Next   int           `json:"next"`
+		Kills  []models.Kill `json:"values"`
+	}{
+		Limit:  limit,
+		Start:  start,
+		Size:   len(kills),
+		Next:   next,
+		Kills:  kills,
+	})
 }

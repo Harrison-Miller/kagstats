@@ -1,7 +1,7 @@
 <h2>Servers</h2>
 <div class="row h-100">
   <div class="col-4 buffer" style="min-height: 33vh" *ngFor="let server of servers">
-    <div class="card h-100">
+    <div class="card h-100" routerLink="/servers/{{server.id}}">
       <div *ngIf="!server.status" style="position:absolute;width:100%;height:100%;display:block;background-color: rgba(0,0,0,0.5);z-index: 2;color:white" class="text-center">
         <h3>Not Collecting</h3>
       </div>
@@ -14,7 +14,7 @@
             <span class="dot float-right bg-warning"></span>
         </ng-template>
       </div>
-      <div class="card-body card-overflow">
+      <div class="card-body card-overflow" >
         <div class="card-text">{{server.description}}</div>
         <div>Players:
           <ng-container *ngIf="server.APIStatus; else playersBlock">{{server.APIStatus.currentPlayers}}/{{server.APIStatus.maxPlayers}}</ng-container>

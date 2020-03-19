@@ -17,7 +17,11 @@ export class KillsService {
     this.url$.subscribe(newUrl => {
       if (!!newUrl) {
         this.url = newUrl;
-        this.getKills();
+        // If the api endpoint involves a server endpoint, perform appropriate api call.
+        if(this.url.includes('/server'))
+          this.getServerKills();
+        else
+          this.getKills();
       }
     });
 
@@ -40,9 +44,29 @@ export class KillsService {
     const options = start
       ? { params: new HttpParams().set('start', start.toString()) }
       : {};
-
+    
     this.http.get<PagedResult<Kill>>(environment.apiUrl + this.url, options).subscribe(result => {
       this.kills$.next(result.values);
+    });
+  }
+
+  /**
+   * Performs GET request at a /server/:id/kills.
+   * 
+   * Presently, this is required as the above endpoint returns an array of Kills[], rather
+   * than a PagedResult of kills.
+   * 
+   * @param start Optional starting point for paged results.
+   */
+  getServerKills(start?: number)
+  {
+     // Only create a parameter object if passed a start value.
+     const options = start
+     ? { params: new HttpParams().set('start', start.toString()) }
+     : {};
+
+     this.http.get<Kill[]>(environment.apiUrl + this.url, options).subscribe(result => {
+      this.kills$.next(result);
     });
   }
 }

@@ -1,0 +1,109 @@
+<br>
+<ng-container *ngIf="server">
+  <div class="row justify-content-center">
+    <div class="col-4">
+      <h2> {{server.name}}</h2>
+      <p class="text-muted">{{server.description}}</p>
+    </div>
+  </div>
+  <div class="row buffer top-margin">
+    <div class="col-3">
+      <img class="minimap" src="https://api.kag2d.com/server/ip/{{server.address}}/port/{{server.port}}/minimap"
+        onError="this.src='/assets/unkownmap.png'">
+    </div>
+    <div class="col-4">
+      <div *ngIf="server" class="row">
+        <div class="col">
+          <span>Last updated: <b>{{server.APIStatus.lastUpdate}}</b></span>
+          <br>
+          <span>First seen: <b>{{server.APIStatus.firstSeen}}</b></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ngb-tabset [justify]="center" #t="ngbTabset">
+    <ngb-tab id="leaderboard">
+      <ng-template ngbTabTitle>
+        <h3>Leaderboard</h3>
+      </ng-template>
+      <ng-template ngbTabContent>
+        <div class="row buffer">
+          <div class="col">
+          <div class="shadow-sm col text-center">
+            In Progress
+          </div>
+        </div>
+      </div>
+      </ng-template>
+    </ngb-tab>
+    <ngb-tab>
+      <ng-template ngbTabTitle>
+        <h3>Current Players ({{server.APIStatus.currentPlayers}} / {{server.APIStatus.maxPlayers}})</h3>
+      </ng-template>
+      <ng-template ngbTabContent>
+        <ng-container *ngIf="currentPlayers.length > 0; else noPlayers">
+          <div class="row">
+            <div class="col-3 buffer" *ngFor="let player of currentPlayers">
+              <div class="card h-100" >
+                <div class="card-header">
+                  <app-player-banner [player]="player"></app-player-banner>
+                </div>
+                <div class="card-body">
+                  <div>Username: {{player.username}}</div>
+                  <div *ngIf="player.clanTag!=''">Clan: {{player.clanTag}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-template>
+    </ngb-tab>
+    <ngb-tab>
+      <ng-template ngbTabTitle>
+        <h3>Kill Feed</h3>
+      </ng-template>
+      <ng-template ngbTabContent>
+        <div class="top-margin">
+          <app-killfeed [url]="'/servers/' + server.id + '/kills'" [limit]="20"></app-killfeed>
+        </div>
+      </ng-template>
+    </ngb-tab>
+    <ngb-tab id="details">
+      <ng-template ngbTabTitle>
+        <h3>Details</h3>
+      </ng-template>
+      <ng-template ngbTabContent>
+        <div class="row buffer">
+          <div class="col">
+            <ul class="list-group-flush">
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Cras justo odio
+                <span class="badge badge-primary badge-pill">14</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Dapibus ac facilisis in
+                <span class="badge badge-primary badge-pill">2</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Morbi leo risus
+                <span class="badge badge-primary badge-pill">1</span>
+              </li>
+            </ul>
+        </div>
+        <div class="col">
+          <div class="card" style="width: 18rem;">
+            <div class="card-body">
+              <h5 class="card-title">Card title</h5>
+              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            </div>
+          </div>
+      </div>
+      </div>
+      </ng-template>
+    </ngb-tab>
+  </ngb-tabset>
+</ng-container>
+<ng-template #noPlayers>
+  <h3 class="text-center">There are currently no active players</h3>
+</ng-template>
