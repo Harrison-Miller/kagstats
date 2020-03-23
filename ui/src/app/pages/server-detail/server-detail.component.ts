@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Server, Player, APIServer } from '../../models';
+import { Server, Player } from '../../models';
 import { ActivatedRoute } from '@angular/router';
 import { ServersService } from 'src/app/services/servers.service';
 import { PlayersService } from 'src/app/services/players.service';
@@ -20,7 +20,6 @@ export class ServerDetailComponent implements OnInit {
   serverId: number;
   server: Server;
   currentPlayers: Player[];
-  APIStatus: APIServer;
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
@@ -45,6 +44,7 @@ export class ServerDetailComponent implements OnInit {
     this.serversService.getServer(this.serverId)
       .subscribe( s => {
         this.server = s;
+        // Fill our model's APIStatus object.
         this.getApiServer();
       },
       error => {})
@@ -59,7 +59,7 @@ export class ServerDetailComponent implements OnInit {
       .subscribe(status => {
         
         // Update model's field.
-        this.APIStatus = status;
+        this.server.APIStatus = status;
 
         // From the simple playerList given by kag2d api, retrieve player model data from kagstats api.
         // TODO: This has gotta be costly, can we perform a bulk request/lookup?

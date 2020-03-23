@@ -14,9 +14,9 @@
     <div class="col-4">
       <div *ngIf="server" class="row">
         <div class="col">
-          <span>Last updated: <b>{{server.APIStatus.lastUpdate}}</b></span>
+          <span>Last updated: <b>{{server.APIStatus.lastUpdate | timeAgo}}</b></span>
           <br>
-          <span>First seen: <b>{{server.APIStatus.firstSeen}}</b></span>
+          <span>First seen: <b>{{server.APIStatus.firstSeen | timeAgo}}</b></span>
         </div>
       </div>
     </div>
@@ -30,11 +30,11 @@
       <ng-template ngbTabContent>
         <div class="row buffer">
           <div class="col">
-          <div class="shadow-sm col text-center">
-            In Progress
+            <div class="shadow-sm col text-center">
+              In Progress
+            </div>
           </div>
         </div>
-      </div>
       </ng-template>
     </ngb-tab>
     <ngb-tab>
@@ -45,7 +45,7 @@
         <ng-container *ngIf="currentPlayers.length > 0; else noPlayers">
           <div class="row">
             <div class="col-3 buffer" *ngFor="let player of currentPlayers">
-              <div class="card h-100" >
+              <div class="card h-100">
                 <div class="card-header">
                   <app-player-banner [player]="player"></app-player-banner>
                 </div>
@@ -74,32 +74,129 @@
         <h3>Details</h3>
       </ng-template>
       <ng-template ngbTabContent>
-        <div class="row buffer">
+        <div class="row buffer top-margin">
           <div class="col">
-            <ul class="list-group-flush">
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                Cras justo odio
-                <span class="badge badge-primary badge-pill">14</span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                Dapibus ac facilisis in
-                <span class="badge badge-primary badge-pill">2</span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                Morbi leo risus
-                <span class="badge badge-primary badge-pill">1</span>
-              </li>
-            </ul>
-        </div>
-        <div class="col">
-          <div class="card" style="width: 18rem;">
-            <div class="card-body">
-              <h5 class="card-title">Card title</h5>
-              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">General</h5>
+              </div>
+              <ul class="list-group list-group-flush">
+                <a class="list-group-item list-group-item-action flex-column align-items-start">
+                  <div class="d-flex w-100 justify-content-between">
+                    <p>Name</p>
+                    <p class="text-muted">{{server.name}}</p>
+                  </div>
+                </a>
+                <a class="list-group-item list-group-item-action flex-column align-items-start">
+                  <div class="d-flex w-100 justify-content-between">
+                    <p>Description</p>
+                  </div>
+                  <p class="text-muted">{{server.description}}</p>
+                </a>
+                <a class="list-group-item list-group-item-action flex-column align-items-start">
+                  <div class="d-flex w-100 justify-content-between">
+                    <p>Password Required</p>
+                    <p class="text-muted" *ngIf="server.APIStatus">{{server.APIStatus.password == 1 ? 'Yes' : 'No'}}</p>
+                  </div>
+                </a>
+                <a class="list-group-item list-group-item-action flex-column align-items-start">
+                  <div class="d-flex w-100 justify-content-between">
+                    <p>Gold Required</p>
+                    <p class="text-muted" *ngIf="server.APIStatus">{{server.APIStatus.gold == 1 ? 'Yes' : 'No'}}</p>
+                  </div>
+                </a>
+                <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                  Tags
+                  <div>
+                    <span class="badge badge-primary badge-pill"
+                      *ngFor="let tag of server.tags?.split(',')">{{tag}}</span>
+                  </div>
+                </a>
+              </ul>
+              <div class="card-body">
+                <a href="kag://{{server.address}}:{{server.port}}" class="card-link">Join Server</a>
+              </div>
             </div>
           </div>
-      </div>
-      </div>
+          <div class="col">
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">Gameplay Details</h5>
+              </div>
+              <ul class="list-group list-group-flush">
+                <a class="list-group-item list-group-item-action flex-column align-items-start">
+                  <div class="d-flex w-100 justify-content-between">
+                    <p>Game Mode</p>
+                    <p class="text-muted">{{server.gameMode}}</p>
+                  </div>
+                </a>
+                <a class="list-group-item list-group-item-action flex-column align-items-start">
+                  <div class="d-flex w-100 justify-content-between">
+                    Map Dimensions:
+                    <p class="text-muted">{{server.APIStatus.mapW}}x{{server.APIStatus.mapH}}</p>
+                  </div>
+                </a>
+                <a class="list-group-item list-group-item-action flex-column align-items-start">
+                  <div class="d-flex w-100 justify-content-between">
+                    <p>Game State</p>
+                    <p class="text-muted" *ngIf="server.APIStatus">
+                      {{server.APIStatus.gameState == 1 ? 'In Game' : 'In Warmup'}}</p>
+                  </div>
+                </a>
+                <a class="list-group-item list-group-item-action flex-column align-items-start">
+                  <div class="d-flex w-100 justify-content-between">
+                    <p>Day/Night Cycle</p>
+                    <p class="text-muted" *ngIf="server.APIStatus">
+                      {{server.APIStatus.DNcycle == 1 ? 'Enabled' : 'Disabled'}}</p>
+                  </div>
+                  <p class="text-muted" *ngIf="server.APIStatus.DNcycle == 1">Time: {{server.APIStatus.DNstate}}</p>
+                </a>
+              </ul>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">Misc</h5>
+              </div>
+              <ul class="list-group list-group-flush">
+                <a class="list-group-item list-group-item-action flex-column align-items-start">
+                  <div class="d-flex w-100 justify-content-between">
+                    <p>Build</p>
+                    <p class="text-muted">{{server.APIStatus.build}}</p>
+                  </div>
+                </a>
+                <a class="list-group-item list-group-item-action flex-column align-items-start">
+                  <div class="d-flex w-100 justify-content-between">
+                    <p>Number of Reserved Players</p>
+                    <p class="text-muted">{{server.APIStatus.reservedPlayers}}</p>
+                  </div>
+                </a>
+                <a class="list-group-item list-group-item-action flex-column align-items-start">
+                  <div class="d-flex w-100 justify-content-between">
+                    <p>Using Mods</p>
+                    <p class="text-muted" *ngIf="server.APIStatus">{{server.APIStatus.usingMods == 1 ? 'Yes' : 'No'}}
+                    </p>
+                  </div>
+                  <p class="text-muted" *ngIf="server.APIStatus.usingMods == 1">Number of verified mods:
+                    {{server.APIStatus.modsVerified}}</p>
+                </a>
+                <a class="list-group-item list-group-item-action flex-column align-items-start">
+                  <div class="d-flex w-100 justify-content-between">
+                    <p>Address</p>
+                    <p class="text-muted">{{server.address}}</p>
+                  </div>
+                </a>
+                <a class="list-group-item list-group-item-action flex-column align-items-start">
+                  <div class="d-flex w-100 justify-content-between">
+                    <p>Port</p>
+                    <p class="text-muted">{{server.port}}</p>
+                  </div>
+                </a>
+              </ul>
+            </div>
+          </div>
+        </div>
       </ng-template>
     </ngb-tab>
   </ngb-tabset>

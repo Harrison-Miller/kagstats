@@ -89,6 +89,7 @@ export interface APIServer {
   DNstate: number;
   description: string;
   playerList: JSON[];
+
 }
 
 export interface Server {
@@ -100,6 +101,7 @@ export interface Server {
   port: string;
   tags: string;
   status: boolean;
+  APIStatus: APIServer;
 }
 
 export interface LeaderboardResult {
