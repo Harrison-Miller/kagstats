@@ -319,7 +319,6 @@ func Collect(sconfig configs.ServerConfig) {
 			}
 		}
 
-		defer client.Close()
 		logger.Printf("Connected to %s!\n", address)
 
 		collector.playerCount = 0
@@ -353,6 +352,7 @@ func Collect(sconfig configs.ServerConfig) {
 
 		err := client.Handle()
 		stopMOTD <- true
+		client.Close()
 		if err != nil {
 			logger.Println(err)
 		}
