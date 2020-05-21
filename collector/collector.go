@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 	"regexp"
+	"strconv"
 	"time"
 
 	"github.com/Harrison-Miller/kagstats/common/utils"
@@ -281,11 +282,107 @@ func (c *Collector) ServerInfo(m rcon.Message, r *rcon.Client) error {
 	return nil
 }
 
+func (c *Collector) FlagCaptured(m rcon.Message, r *rcon.Client) error {
+	var capture models.FlagCapture
+	err := json.Unmarshal([]byte(m.Args["object"]), &capture)
+	if err != nil {
+		c.logger.Println(err)
+		return nil
+	}
+
+	if (c.server.Gamemode == "CTF") && c.playerCount < CTF_MINIMUM_PLAYERS {
+		c.logger.Println("not enough players, not flag capture to db")
+		return nil
+	}
+
+	if isClientAlt(capture.Player) {
+		return nil
+	}
+
+	if (capture != models.FlagCapture{}) {
+		var player models.Player
+		if cache, ok := players[capture.Player]; ok {
+			player.ID = cache.ID
+			player.StatsBan = cache.StatsBan
+			player.Registered = cache.Registered
+		}
+
+		if player.StatsBan || isNewPlayer(&player) {
+			return nil
+		}
+
+		capture.PlayerID = player.ID
+
+		err = CommitFlagCapture(capture)
+		if err != nil {
+			return errors.Wrap(err, "can't commit flag capture")
+		}
+
+		c.logger.Printf("%+v", capture)
+	}
+
+	return nil
+}
+
+func (c *Collector) MapStats(m rcon.Message, r *rcon.Client) error {
+	var stats models.MapStats
+	err := json.Unmarshal([]byte(m.Args["object"]), &stats)
+	if err != nil {
+		c.logger.Println(err)
+		return nil
+	}
+
+	// For now lets just ignore TDM since game duration isn't to important
+	if c.server.Gamemode == "TDM" {
+		return nil
+	}
+	// if c.server.Gamemode == "TDM" && c.playerCount < TDM_MINIMUM_PLAYERS {
+	// 	c.logger.Println("not enough players, not adding kill to db")
+	// 	return nil
+	// }
+
+	if (c.server.Gamemode == "CTF" || c.server.Gamemode == "WAR") && c.playerCount < CTF_MINIMUM_PLAYERS {
+		c.logger.Println("not enough players, not adding kill to db")
+		return nil
+	}
+
+	err = CommitMapStats(stats)
+	if err != nil {
+		return errors.Wrap(err, "can't commit map stats")
+	}
+
+	return nil
+}
+
+func (c *Collector) MapVotes(m rcon.Message, r *rcon.Client) error {
+	var votes models.MapVotes
+	votes.Map1Name = m.Args["map1_name"]
+	votes.Map1Votes, _ = strconv.ParseInt(m.Args["map1_votes"], 10, 64)
+	votes.Map2Name = m.Args["map2_name"]
+	votes.Map2Votes, _ = strconv.ParseInt(m.Args["map2_votes"], 10, 64)
+	votes.RandomVotes, _ = strconv.ParseInt(m.Args["random_votes"], 10, 64)
+
+	if (c.server.Gamemode == "CTF" || c.server.Gamemode == "WAR") && c.playerCount < CTF_MINIMUM_PLAYERS {
+		c.logger.Println("not enough players, not adding kill to db")
+		return nil
+	}
+
+	err := CommitMapVotes(votes)
+	if err != nil {
+		return errors.Wrap(err, "can't commit map votes")
+	}
+
+	return nil
+}
+
 func AddHandlers(client *rcon.Client, collector *Collector) {
 	client.HandleFunc("^PlayerJoined (?P<object>.*)", collector.OnPlayerJoined).RemoveTimestamp()
 	client.HandleFunc("^PlayerLeft (?P<object>.*)", collector.OnPlayerLeave).RemoveTimestamp()
 	client.HandleFunc("^PlayerDied (?P<object>.*)", collector.OnPlayerDie).RemoveTimestamp()
 	client.HandleFunc("^PlayerList (?P<object>.*)", collector.PlayerList).RemoveTimestamp()
+	client.HandleFunc("^FlagCaptured (?P<object>.*)", collector.FlagCaptured).RemoveTimestamp()
+	client.HandleFunc("^MapStats (?P<object>.*)", collector.MapStats).RemoveTimestamp()
+	client.HandleFunc("^\\(MapVotes\\) Map1: (?P<map1_name>.*) = (?P<map1_votes>\\d+) Map2: (?P<map2_name>.*) = (?P<map2_votes>\\d+) Random = (?P<random_votes>\\d+)", collector.MapVotes).RemoveTimestamp()
 }
 
 func Collect(sconfig configs.ServerConfig) {

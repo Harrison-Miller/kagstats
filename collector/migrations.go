@@ -73,6 +73,21 @@ func RunMigrations(db *sqlx.DB) error {
 		return err
 	}
 
+	err = RunMigration(14, AddFlagCaptures, db)
+	if err != nil {
+		return err
+	}
+
+	err = RunMigration(15, AddMapStats, db)
+	if err != nil {
+		return err
+	}
+
+	err = RunMigration(16, AddMapVotes, db)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -346,6 +361,49 @@ func RemoveWeekOldAccounts(db *sqlx.DB) error {
 	}
 
 	_, err = db.Exec("DELETE FROM players WHERE registered BETWEEN NOW() - INTERVAL 7 DAY AND NOW()")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func AddFlagCaptures(db *sqlx.DB) error {
+	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS flag_captures (
+		ID INTEGER PRIMARY KEY AUTO_INCREMENT,
+		playerID INT NOT NULL,
+		ticks INT NOT NULL,
+		FOREIGN KEY(playerID) REFERENCES players(ID) ON DELETE CASCADE
+	)`)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func AddMapStats(db *sqlx.DB) error {
+	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS map_stats (
+		ID INTEGER PRIMARY KEY AUTO_INCREMENT,
+		mapName varchar(255) NOT NULL,
+		ticks INT NOT NULL
+	)`)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func AddMapVotes(db *sqlx.DB) error {
+	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS map_votes (
+		ID INTEGER PRIMARY KEY AUTO_INCREMENT,
+		map1Name varchar(255) NOT NULL,
+		map1Votes INT NOT NULL,
+		map2Name varchar(255) NOT NULL,
+		map2Votes INT NOT NULL,
+		randomVotes INT NOT NULL
+	)`)
 	if err != nil {
 		return err
 	}

@@ -231,6 +231,69 @@ func AddEvent(playerID int64, eventType string, serverID int64) error {
 	return nil
 }
 
+func CommitFlagCapture(capture models.FlagCapture) error {
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec("INSERT INTO flag_captures (playerID,ticks) VALUES (?,?)",
+		capture.PlayerID, capture.Ticks)
+
+	if err != nil {
+		return errors.Wrap(err, "error inserting flag capture")
+	}
+
+	if err := tx.Commit(); err != nil {
+		return errors.Wrap(err, "error committing flag capture")
+	}
+
+	return nil
+}
+
+func CommitMapStats(stats models.MapStats) error {
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec("INSERT INTO map_stats (mapName,ticks) VALUES (?,?)",
+		stats.MapName, stats.Ticks)
+
+	if err != nil {
+		return errors.Wrap(err, "error inserting map stats")
+	}
+
+	if err := tx.Commit(); err != nil {
+		return errors.Wrap(err, "error committing map stats")
+	}
+
+	return nil
+}
+
+func CommitMapVotes(votes models.MapVotes) error {
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec("INSERT INTO map_votes (map1Name,map1Votes,map2Name,map2Votes,randomVotes) VALUES (?,?,?,?,?)",
+		votes.Map1Name, votes.Map1Votes, votes.Map2Name, votes.Map2Votes, votes.RandomVotes)
+
+	if err != nil {
+		return errors.Wrap(err, "error inserting map votes")
+	}
+
+	if err := tx.Commit(); err != nil {
+		return errors.Wrap(err, "error committing map votes")
+	}
+
+	return nil
+}
+
 func RunMigration(version int64, migrations func(db *sqlx.DB) error, db *sqlx.DB) error {
 	db.Exec("INSERT INTO stats_info (key_name, value) VALUES(?,?)", "database_version", version)
 	row := db.QueryRow("SELECT value FROM stats_info WHERE key_name=?", "database_version")

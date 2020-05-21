@@ -81,3 +81,25 @@ type Event struct {
 	Time     int64  `json:"time"`
 	ServerID int64  `json:"serverId" db:"serverID"`
 }
+
+type FlagCapture struct {
+	ID       int64  `json:"id" db:"ID"`
+	PlayerID int64  `json:"playerID" db:"playerID"`
+	Player   string `json:"player" db"-"`
+	Ticks    int64  `json:"ticks" db:"ticks"`
+}
+
+type MapStats struct {
+	ID      int64  `json:"id" db:"ID"`
+	MapName string `json:"mapName" db:"mapName"`
+	Ticks   int64  `json:"ticks" db:"ticks"`
+}
+
+type MapVotes struct {
+	ID          int64  `json:"id" db:"ID"`
+	Map1Name    string `json:"map1Name" db:"map1Name"`
+	Map1Votes   int64  `json:"map1Votes" db:"map1Votes"`
+	Map2Name    string `json:"map2Name" db:"map2Name"`
+	Map2Votes   int64  `json:"map2Votes" db:"map2Votes"`
+	RandomVotes int64  `json:"randomVotes" db:"randomVotes"`
+}

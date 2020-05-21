@@ -6,6 +6,7 @@ for(int i = 0; i < getPlayersCount(); i++) {
 	if (p.exists("stats_id")) {
 		playerString += "\"ID\":"+ p.get_u32("stats_id") + ",";
 	}
+	playerString += "\"ip\":\"" + p.server_getIP() + "\",";
 	playerString += "\"clantag\":\"" + p.getClantag() + "\"}";
 	players.push_back(playerString);
 }
