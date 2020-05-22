@@ -91,8 +91,8 @@ type FlagCapture struct {
 
 type MapStats struct {
 	ID      int64  `json:"id" db:"ID"`
-	MapName string `json:"mapName" db:"mapName"`
-	Ticks   int64  `json:"ticks" db:"ticks"`
+	MapName string `json:"name" db:"mapName"`
+	Ticks   int64  `json:"duration" db:"ticks"`
 }
 
 type MapVotes struct {
