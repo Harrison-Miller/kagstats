@@ -346,9 +346,13 @@ func (c *Collector) MapStats(m rcon.Message, r *rcon.Client) error {
 		return nil
 	}
 
-	err = CommitMapStats(stats)
-	if err != nil {
-		return errors.Wrap(err, "can't commit map stats")
+	c.logger.Printf("%+v", stats)
+
+	if (stats != models.MapStats{}) {
+		err = CommitMapStats(stats)
+		if err != nil {
+			return errors.Wrap(err, "can't commit map stats")
+		}
 	}
 
 	return nil
@@ -441,11 +445,11 @@ func Collect(sconfig configs.ServerConfig) {
 		}()
 
 		// Reset connection because of rcon server hiccups
-		go func() {
-			time.Sleep(2 * time.Hour)
-			logger.Printf("Disconnecting to refresh connection")
-			client.Close()
-		}()
+		// go func() {
+		// 	time.Sleep(2 * time.Hour)
+		// 	logger.Printf("Disconnecting to refresh connection")
+		// 	client.Close()
+		// }()
 
 		err := client.Handle()
 		stopMOTD <- true
