@@ -75,12 +75,12 @@ func main() {
 
 	currentIndex := 0
 
-	go func() {
-		for {
-			time.Sleep(24 * time.Hour)
-			currentIndex = 0
-		}
-	}()
+	// go func() {
+	// 	for {
+	// 		time.Sleep(24 * time.Hour)
+	// 		currentIndex = 0
+	// 	}
+	// }()
 
 	for {
 		processed, err := ProcessPlayers(currentIndex, config.Indexer.BatchSize, db)

@@ -23,3 +23,7 @@ services:
   monthly-indexer:
     environment:
       - INDEXER_BATCHSIZE=10000
+  apicache:
+    environment:
+      - INDEXER_BATCHSIZE=200
+      - INDEXER_INTERVAL=10m
