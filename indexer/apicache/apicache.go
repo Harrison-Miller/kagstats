@@ -88,6 +88,8 @@ func main() {
 			log.Println(err)
 		} else if processed != 0 {
 			log.Printf("Processed %d rows\n", processed)
+		} else if processed == 0 {
+			currentIndex = 0
 		}
 
 		currentIndex += processed

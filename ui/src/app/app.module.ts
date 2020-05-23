@@ -32,6 +32,8 @@ import { StatusService } from './services/status.service';
 import { RegisteredAccoladePipe } from './pipes/registered-accolade.pipe';
 import { TimeAgoPipe } from './pipes/time-ago.pipe';
 import { CapturesService } from './services/captures.service';
+import { MapsService } from './services/maps.service';
+import { MapsComponent } from './pages/maps/maps.component';
 
 @NgModule({
   declarations: [
@@ -55,7 +57,8 @@ import { CapturesService } from './services/captures.service';
     HitterIconPipe,
     KillsComponent,
     AboutComponent,
-    RegisteredAccoladePipe
+    RegisteredAccoladePipe,
+    MapsComponent
   ],
   imports: [
     BrowserModule,
@@ -64,7 +67,7 @@ import { CapturesService } from './services/captures.service';
     ReactiveFormsModule,
     NgbModule,
   ],
-  providers: [LeaderboardService, PlayersService, ServersService, KillsService, StatusService, CapturesService],
+  providers: [LeaderboardService, PlayersService, ServersService, KillsService, StatusService, CapturesService, MapsService],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

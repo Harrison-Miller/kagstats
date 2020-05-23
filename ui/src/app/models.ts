@@ -116,3 +116,18 @@ export interface PagedResult<T> {
   next: number;
   values: T[];
 }
+
+export interface MapBasics {
+  mapName: string;
+  average: number;
+  matches: number;
+  image: string;
+}
+
+export interface GithubTreeEntry {
+  path: string;
+}
+
+export interface GithubTree {
+  tree: GithubTreeEntry[];
+}

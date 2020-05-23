@@ -1,0 +1,17 @@
+<h2>Maps</h2>
+<div class="row h-100">
+  <div class="col-4 buffer" style="min-height: 33vh" *ngFor="let map of maps">
+    <div class="card h-100">
+      <div class="card-header">
+        {{map.mapName}}
+      </div>
+      <div class="card-body card-overflow">
+          <div>Average Match Duration: {{map.average}} minutes</div>
+          <div>Total Matches: {{map.matches}}</div>
+          <div>
+            <img class="minimap" src="{{map.image}}" onError="this.src='/assets/unkownmap.png'">
+          </div>
+        </div>
+    </div>
+  </div>
+</div>

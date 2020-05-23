@@ -7,6 +7,7 @@ import { BaseLeaderboardComponent } from './pages/leaderboard/base-leaderboard/b
 import { ClassLeaderboardComponent } from './pages/leaderboard/class-leaderboard/class-leaderboard.component';
 import { PlayersComponent } from './pages/players/players.component';
 import { PlayerDetailComponent } from './pages/player-detail/player-detail.component';
+import { MapsComponent } from './pages/maps/maps.component';
 import { KillsComponent } from './pages/kills/kills.component';
 import { AboutComponent } from './pages/about/about.component';
 
@@ -33,6 +34,9 @@ const routes: Routes = [{
 },{
   path: 'players/:id',
   component: PlayerDetailComponent
+},{
+  path: 'maps',
+  component: MapsComponent
 },{
   path: 'kills',
   component: KillsComponent
