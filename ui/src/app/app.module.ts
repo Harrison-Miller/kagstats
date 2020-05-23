@@ -31,6 +31,7 @@ import { AboutComponent } from './pages/about/about.component';
 import { StatusService } from './services/status.service';
 import { RegisteredAccoladePipe } from './pipes/registered-accolade.pipe';
 import { TimeAgoPipe } from './pipes/time-ago.pipe';
+import { CapturesService } from './services/captures.service';
 
 @NgModule({
   declarations: [
@@ -63,7 +64,7 @@ import { TimeAgoPipe } from './pipes/time-ago.pipe';
     ReactiveFormsModule,
     NgbModule,
   ],
-  providers: [LeaderboardService, PlayersService, ServersService, KillsService, StatusService],
+  providers: [LeaderboardService, PlayersService, ServersService, KillsService, StatusService, CapturesService],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

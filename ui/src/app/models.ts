@@ -31,6 +31,11 @@ export interface Hitter {
   kills: number;
 }
 
+export interface Captures {
+  playerID: number;
+  captures: number;
+}
+
 export interface Event {
   id: number;
   type: string;

@@ -138,3 +138,27 @@ func refreshPlayer(w http.ResponseWriter, r *http.Request) {
 		Message: "success",
 	})
 }
+
+type Captures struct {
+	PlayerID int64 `json:"playerID" db:"-"`
+	Captures int64 `json:"captures" db:"captures"`
+}
+
+func getCaptures(w http.ResponseWriter, r *http.Request) {
+	playerID, err := GetIntURLArg("id", r)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("coud not get id: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	var c Captures
+	c.PlayerID = int64(playerID)
+
+	err = db.Get(&c, "SELECT COUNT(*) as captures FROM flag_captures WHERE playerID=?", playerID)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("could get captures for player: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	JSONResponse(w, c)
+}

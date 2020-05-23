@@ -9,6 +9,7 @@ import { REGISTERED_TOOLTIP } from '../../shared/player-banner/player-banner.com
 import { HittersService } from '../../services/hitters.service';
 import { ServersService } from '../../services/servers.service';
 import { Title } from '@angular/platform-browser';
+import { CapturesService } from '../../services/captures.service';
 
 @Component({
   selector: 'app-player-detail',
@@ -39,6 +40,7 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
 
   server: Server;
 
+  captures: number;
   nemesis: Nemesis;
   bullied: Nemesis[];
   hitters: Hitter[];
@@ -54,7 +56,8 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
     private nemesisService: NemesisService,
     private hittersService: HittersService,
     private serversService: ServersService,
-    private titleService: Title) { }
+    private titleService: Title,
+    private capturesService: CapturesService) { }
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
@@ -64,6 +67,7 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
       this.nemesis = null;
       this.bullied = null;
       this.hitters = null;
+      this.captures = 0;
 
 
       if(this.t) {
@@ -90,6 +94,13 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
             this.hitters = hitters.slice(0, 3);
           }
         });
+
+      this.capturesService.getCaptures(this.playerId)
+        .subscribe( c => {
+          if(c) {
+            this.captures = c.captures;
+          }
+        })
     });
   }
 
