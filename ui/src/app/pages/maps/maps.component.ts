@@ -16,7 +16,10 @@ export class MapsComponent implements OnInit {
   ngOnInit() {
     this.mapsService.getMaps().subscribe(
       maps => {
-        this.maps = maps
+        this.maps = maps;
+        this.maps.sort((a,b) => {
+          return b.matches - a.matches;
+        });
       this.mapsService.getMapPaths().subscribe(
         paths => {
           this.paths = paths;
