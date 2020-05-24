@@ -102,6 +102,17 @@ services:
     links:
       - mysql
     restart: always
+  mapvotes-indexer:
+    build:
+      context: .
+      dockerfile: Dockerfile-indexer
+      args:
+        indexer: mapvotes
+        VERSION: ${TAG:-latest}
+    image: gcr.io/kagstats/mapvotes-indexer:${TAG:-latest}
+    links:
+      - mysql
+    restart: always
   apicache:
     build:
       context: .

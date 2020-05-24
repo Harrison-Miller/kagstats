@@ -14,14 +14,15 @@ type IndexKey struct {
 	Name   string
 	Table  string
 	Column string
+	Type   string
 }
 
 type Index struct {
-	Keys     []int
+	Keys     []interface{}
 	Counters map[string]int
 }
 
-func Equal(a []int, b []int) bool {
+func Equal(a []interface{}, b []interface{}) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -60,6 +61,21 @@ type KillsIndexer interface {
 	Index(kill Kill) []Index
 }
 
+type MapVotesIndexer interface {
+	Indexer
+	Index(votes MapVotes) []Index
+}
+
+func GetIndexedTable(indexer Indexer) string {
+	if _, ok := indexer.(KillsIndexer); ok {
+		return "kills"
+	} else if _, ok := indexer.(MapVotesIndexer); ok {
+		return "map_votes"
+	}
+
+	return "kills"
+}
+
 func BuildTable(indexer Indexer) string {
 	keys := indexer.Keys()
 	var keyNames []string
@@ -68,7 +84,11 @@ func BuildTable(indexer Indexer) string {
 	fmt.Fprintf(&b, "CREATE TABLE IF NOT EXISTS %s (", indexer.Name())
 
 	for _, k := range keys {
-		fmt.Fprintf(&b, "%s INT NOT NULL,", k.Name)
+		t := "INT"
+		if k.Type != "" {
+			t = k.Type
+		}
+		fmt.Fprintf(&b, "%s %s NOT NULL,", k.Name, t)
 		if k.Table != "" && k.Column != "" {
 			fmt.Fprintf(&b, "FOREIGN KEY(%s) REFERENCES %s(%s) ON DELETE CASCADE,", k.Name, k.Table, k.Column)
 		}
@@ -147,8 +167,10 @@ func UnprocessedRows(indexer Indexer, batchSize int, tx *sql.Tx) (int64, *sql.Ro
 		return 0, nil, err
 	}
 
+	indexedTable := GetIndexedTable(indexer)
+
 	upperBound := currentIndex + int64(batchSize) + 1
-	rows, err := tx.Query("SELECT * from kills WHERE ID>? AND ID<?", currentIndex, upperBound)
+	rows, err := tx.Query("SELECT * from "+indexedTable+" WHERE ID>? AND ID<?", currentIndex, upperBound)
 	return currentIndex, rows, err
 }
 
@@ -211,7 +233,7 @@ func SkipKill(kill models.Kill, db *sqlx.DB) bool {
 	return false
 }
 
-func Process(indexer KillsIndexer, batchSize int, db *sqlx.DB) (int, error) {
+func Process(indexer Indexer, batchSize int, db *sqlx.DB) (int, error) {
 	tx, err := db.Begin()
 	defer tx.Rollback()
 	if err != nil {
@@ -227,17 +249,33 @@ func Process(indexer KillsIndexer, batchSize int, db *sqlx.DB) (int, error) {
 	newIndex := currentIndex
 	updates := make(map[string]Index)
 	for rows.Next() {
-		var kill Kill
-		if err := rows.Scan(&kill.ID, &kill.KillerID, &kill.VictimID, &kill.KillerClass,
-			&kill.VictimClass, &kill.Hitter, &kill.Time, &kill.ServerID, &kill.TeamKill); err != nil {
-			return 0, err
+		nextIndex := newIndex
+		var indices []Index
+
+		if killsIndexer, ok := indexer.(KillsIndexer); ok {
+			var kill Kill
+			if err := rows.Scan(&kill.ID, &kill.KillerID, &kill.VictimID, &kill.KillerClass,
+				&kill.VictimClass, &kill.Hitter, &kill.Time, &kill.ServerID, &kill.TeamKill); err != nil {
+				return 0, err
+			}
+
+			if SkipKill(kill, db) {
+				continue
+			}
+
+			indices = killsIndexer.Index(kill)
+			nextIndex = kill.ID
+		} else if mapVotesIndexer, ok := indexer.(MapVotesIndexer); ok {
+			var votes MapVotes
+			if err := rows.Scan(&votes.ID, &votes.Map1Name, &votes.Map1Votes, &votes.Map2Name,
+				&votes.Map2Votes, &votes.RandomVotes); err != nil {
+				return 0, err
+			}
+
+			indices = mapVotesIndexer.Index(votes)
+			nextIndex = votes.ID
 		}
 
-		if SkipKill(kill, db) {
-			continue
-		}
-
-		indices := indexer.Index(kill)
 		for _, index := range indices {
 			if len(index.Keys) != len(indexer.Keys()) {
 				return 0, fmt.Errorf("Indexer failed to return the correct number of keys\n\texpected: %d got %d", len(indexer.Keys()), len(index.Keys))
@@ -255,8 +293,8 @@ func Process(indexer KillsIndexer, batchSize int, db *sqlx.DB) (int, error) {
 				updates[mapKey] = index
 			}
 
-			if kill.ID > newIndex {
-				newIndex = kill.ID
+			if nextIndex > newIndex {
+				newIndex = nextIndex
 			}
 
 		}

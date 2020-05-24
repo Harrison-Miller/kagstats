@@ -48,7 +48,7 @@ func (i *HittersIndexer) Index(kill Kill) []Index {
 		}
 
 		indices = append(indices, Index{
-			Keys:     []int{int(kill.KillerID), int(kill.Hitter)},
+			Keys:     []interface{}{int(kill.KillerID), int(kill.Hitter)},
 			Counters: map[string]int{"kills": 1},
 		})
 	}

@@ -41,7 +41,7 @@ func (i *NemesisIndexer) Index(kill Kill) []Index {
 
 	if kill.KillerID != kill.VictimID && !kill.TeamKill {
 		indices = append(indices, Index{
-			Keys:     []int{int(kill.VictimID), int(kill.KillerID)},
+			Keys:     []interface{}{int(kill.VictimID), int(kill.KillerID)},
 			Counters: map[string]int{"deaths": 1},
 		})
 	}

@@ -120,8 +120,15 @@ export interface PagedResult<T> {
 export interface MapBasics {
   mapName: string;
   average: number;
+  stddev: number;
   matches: number;
+  ballots: number;
+  votes: number;
+  wins: number;
+
+  // used for UI only
   image: string;
+  percent: number;
 }
 
 export interface GithubTreeEntry {

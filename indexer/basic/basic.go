@@ -65,12 +65,12 @@ func (i *BasicIndexer) Index(kill Kill) []Index {
 	if kill.KillerID != kill.VictimID {
 		if kill.TeamKill {
 			indices = append(indices, Index{
-				Keys:     []int{int(kill.KillerID)},
+				Keys:     []interface{}{int(kill.KillerID)},
 				Counters: map[string]int{"teamkills": 1},
 			})
 		} else {
 			indices = append(indices, Index{
-				Keys: []int{int(kill.KillerID)},
+				Keys: []interface{}{int(kill.KillerID)},
 				Counters: map[string]int{
 					"archer_kills":  OneIfEqual(kill.KillerClass, "archer"),
 					"builder_kills": OneIfEqual(kill.KillerClass, "builder"),
@@ -84,7 +84,7 @@ func (i *BasicIndexer) Index(kill Kill) []Index {
 
 	if !kill.TeamKill {
 		indices = append(indices, Index{
-			Keys: []int{int(kill.VictimID)},
+			Keys: []interface{}{int(kill.VictimID)},
 			Counters: map[string]int{
 				"suicides":       ToInt(kill.KillerID == kill.VictimID),
 				"archer_deaths":  OneIfEqual(kill.VictimClass, "archer"),

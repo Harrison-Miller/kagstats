@@ -18,14 +18,16 @@ export class MapsComponent implements OnInit {
       maps => {
         this.maps = maps;
         this.maps.sort((a,b) => {
-          return b.matches - a.matches;
+          a.percent = Math.floor(a.wins / a.ballots * 100)
+          b.percent = Math.floor(b.wins / b.ballots * 100)
+          return b.percent - a.percent;
         });
       this.mapsService.getMapPaths().subscribe(
         paths => {
           this.paths = paths;
           for(var map of maps) {
             for(var p of this.paths.tree) {
-              if(p.path.endsWith(map.mapName + ".png")) {
+              if(p.path.toLowerCase().endsWith(map.mapName.toLowerCase() + ".png")) {
                 map.image = "https://raw.githubusercontent.com/transhumandesign/kag-base/master/" + p.path;
               }
             }

@@ -71,10 +71,7 @@ func Run(indexer Indexer) error {
 		var processed int
 		var err error
 
-		switch indexer.(type) {
-		case KillsIndexer:
-			processed, err = Process(indexer.(KillsIndexer), config.Indexer.BatchSize, db)
-		}
+		processed, err = Process(indexer, config.Indexer.BatchSize, db)
 
 		if err != nil {
 			log.Println(err)
