@@ -13,6 +13,12 @@ import (
 const patreonPath = "https://api.kag2d.com/patreon/tier"
 const apiPath = "https://api.kag2d.com/v1/player"
 
+var client = http.Client{
+	Transport: &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	},
+}
+
 type PlayerAvatarResponse struct {
 	Large string `json:"large"`
 }
@@ -20,11 +26,6 @@ type PlayerAvatarResponse struct {
 func GetPlayerAvatar(player *models.Player) error {
 	path := fmt.Sprintf("%s/%s/avatar", apiPath, player.Username)
 
-	client := http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
-	}
 	resp, err := client.Get(path)
 	if err != nil {
 		return errors.Wrap(err, "error gettitng player avatar")
@@ -68,11 +69,6 @@ type PlayerTierResponse struct {
 func GetPlayerTier(player *models.Player) error {
 	path := fmt.Sprintf("%s/%s", patreonPath, player.Username)
 
-	client := http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
-	}
 	resp, err := client.Get(path)
 	if err != nil {
 		return errors.Wrap(err, "error getting player tier")
@@ -105,11 +101,6 @@ type PlayerInfoResponse struct {
 func GetPlayerInfo(player *models.Player) error {
 	path := fmt.Sprintf("%s/%s", apiPath, player.Username)
 
-	client := http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
-	}
 	resp, err := client.Get(path)
 	if err != nil {
 		return errors.Wrap(err, "error getting player info")
