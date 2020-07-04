@@ -37,6 +37,6 @@ steps:
       sudo docker-compose -p release down --remove-orphans
       . /release-env.sh
       sudo -E docker-compose -f docker-compose.yaml -f release-compose.yaml pull
-      sudo -E docker-compose -f docker-compose.yaml -f release-compose.yaml -p release up -d
+      sudo -E docker-compose -f docker-compose.yaml -f release-compose.yaml -p release --compatibility up -d
       EOF
       echo "Deployment finsihed"
