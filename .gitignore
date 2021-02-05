@@ -31,3 +31,5 @@ indexer/basic/basic
 indexer/hitters/hitters
 indexer/nemesis/nemesis
 api/api
+
+indexer-debug-compose.yaml

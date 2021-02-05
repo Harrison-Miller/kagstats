@@ -15,7 +15,7 @@ func (i *NemesisIndexer) Name() string {
 }
 
 func (i *NemesisIndexer) Version() int {
-	return 2
+	return 3
 }
 
 func (i *NemesisIndexer) Keys() []IndexKey {

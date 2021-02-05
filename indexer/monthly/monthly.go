@@ -16,7 +16,7 @@ func (i *MonthlyIndexer) Name() string {
 }
 
 func (i *MonthlyIndexer) Version() int {
-	return 3
+	return 4
 }
 
 func (i *MonthlyIndexer) Keys() []IndexKey {

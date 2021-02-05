@@ -15,7 +15,7 @@ func (i *MapVoteStatsIndexer) Name() string {
 }
 
 func (i *MapVoteStatsIndexer) Version() int {
-	return 1
+	return 2
 }
 
 func (i *MapVoteStatsIndexer) Keys() []IndexKey {

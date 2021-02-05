@@ -169,8 +169,7 @@ func UnprocessedRows(indexer Indexer, batchSize int, tx *sql.Tx) (int64, *sql.Ro
 
 	indexedTable := GetIndexedTable(indexer)
 
-	upperBound := currentIndex + int64(batchSize) + 1
-	rows, err := tx.Query("SELECT * from "+indexedTable+" WHERE ID>? AND ID<?", currentIndex, upperBound)
+	rows, err := tx.Query("SELECT * from "+indexedTable+" WHERE ID>? LIMIT ?", currentIndex, batchSize)
 	return currentIndex, rows, err
 }
 
@@ -248,6 +247,7 @@ func Process(indexer Indexer, batchSize int, db *sqlx.DB) (int, error) {
 
 	newIndex := currentIndex
 	updates := make(map[string]Index)
+	processedRows := 0
 	for rows.Next() {
 		nextIndex := newIndex
 		var indices []Index
@@ -265,6 +265,7 @@ func Process(indexer Indexer, batchSize int, db *sqlx.DB) (int, error) {
 
 			indices = killsIndexer.Index(kill)
 			nextIndex = kill.ID
+			processedRows += 1
 		} else if mapVotesIndexer, ok := indexer.(MapVotesIndexer); ok {
 			var votes MapVotes
 			if err := rows.Scan(&votes.ID, &votes.Map1Name, &votes.Map1Votes, &votes.Map2Name,
@@ -274,6 +275,7 @@ func Process(indexer Indexer, batchSize int, db *sqlx.DB) (int, error) {
 
 			indices = mapVotesIndexer.Index(votes)
 			nextIndex = votes.ID
+			processedRows += 1
 		}
 
 		for _, index := range indices {
@@ -336,7 +338,7 @@ func Process(indexer Indexer, batchSize int, db *sqlx.DB) (int, error) {
 		}
 
 		err = tx.Commit()
-		return int(newIndex - currentIndex), err
+		return processedRows, err
 	}
 
 	return 0, nil

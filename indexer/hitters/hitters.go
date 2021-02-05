@@ -16,7 +16,7 @@ func (i *HittersIndexer) Name() string {
 }
 
 func (i *HittersIndexer) Version() int {
-	return 3
+	return 4
 }
 
 func (i *HittersIndexer) Keys() []IndexKey {
