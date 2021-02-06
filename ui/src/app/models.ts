@@ -129,6 +129,7 @@ export interface MapBasics {
   // used for UI only
   image: string;
   percent: number;
+  gamemode: string;
 }
 
 export interface GithubTreeEntry {

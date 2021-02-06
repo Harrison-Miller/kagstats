@@ -27,7 +27,18 @@ export class MapsComponent implements OnInit {
           this.paths = paths;
           for(var map of maps) {
             for(var p of this.paths.tree) {
-              if(p.path.toLowerCase().endsWith(map.mapName.toLowerCase() + ".png")) {
+              var path = p.path.toLowerCase()
+              if(path.endsWith(map.mapName.toLowerCase() + ".png")) {
+                map.gamemode = "other";
+                if (path.includes("smallctf")) {
+                  map.gamemode = "Small CTF";
+                }
+                else if (path.includes("ctf")) {
+                  map.gamemode = "CTF";
+                } else if (path.includes("tth") || path.includes("war")) {
+                  map.gamemode = "TTH";
+                }
+                console.log(path);
                 map.image = "https://raw.githubusercontent.com/transhumandesign/kag-base/master/" + p.path;
               }
             }

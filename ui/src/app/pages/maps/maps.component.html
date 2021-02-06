@@ -4,6 +4,9 @@
     <div class="card h-100">
       <div class="card-header">
         {{map.mapName}}
+        <span *ngIf="map.gamemode == 'CTF'" class="badge badge-pill badge-success">CTF</span>
+        <span *ngIf="map.gamemode == 'Small CTF'" class="badge badge-pill badge-info">Small CTF</span>
+        <span *ngIf="map.gamemode == 'TTH'" class="badge badge-pill badge-warning">TTH</span>
       </div>
       <div class="card-body card-overflow">
           <div>Match Duration: {{map.average}} &#177; {{map.stddev}} minutes</div>
