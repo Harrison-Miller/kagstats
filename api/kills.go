@@ -28,7 +28,23 @@ func killsError(w http.ResponseWriter, err error) {
 	http.Error(w, "Error getting kills", http.StatusInternalServerError)
 }
 
-func getKills(w http.ResponseWriter, r *http.Request) {
+type KillsList struct {
+	Limit int           `json:"limit"`
+	Start int           `json:"start"`
+	Size  int           `json:"size"`
+	Next  int           `json:"next"`
+	Kills []models.Kill `json:"values"`
+}
+
+// GetKills godoc
+// @Tags Kills
+// @Summary gets kills sorted by the most recent
+// @Produce json
+// @Param start query int false "Start offset for listing kills"
+// @Param limit query int false "Number of response to return"
+// @Success 200 {object} KillsList
+// @Router /kills [get]
+func GetKills(w http.ResponseWriter, r *http.Request) {
 	var kills []models.Kill
 	var start int64
 	var limit int64 = 100
@@ -71,13 +87,7 @@ func getKills(w http.ResponseWriter, r *http.Request) {
 		next = -1
 	}
 
-	JSONResponse(w, struct {
-		Limit int           `json:"limit"`
-		Start int           `json:"start"`
-		Size  int           `json:"size"`
-		Next  int           `json:"next"`
-		Kills []models.Kill `json:"values"`
-	}{
+	JSONResponse(w, KillsList{
 		Limit: int(limit),
 		Start: int(start),
 		Size:  len(kills),
@@ -86,10 +96,19 @@ func getKills(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func getPlayerKills(w http.ResponseWriter, r *http.Request) {
+// GetPlayerKills godoc
+// @Tags Players, Kills
+// @Summary gets kills for player sorted by most recent
+// @Produce json
+// @Param id path int true "Player ID"
+// @Param start query int false "start offset for returning kills"
+// @Param limit query int false "number of responses to return"
+// @Success 200 {object} KillsList
+// @Router /players/{id}/kills [get]
+func GetPlayerKills(w http.ResponseWriter, r *http.Request) {
 	playerID, err := GetIntURLArg("id", r)
 	if err != nil {
-		http.Error(w, "coud not get id", http.StatusBadRequest)
+		http.Error(w, "could not get id", http.StatusBadRequest)
 		return
 	}
 
@@ -112,7 +131,7 @@ func getPlayerKills(w http.ResponseWriter, r *http.Request) {
 
 	limit = int(Min(Max(int64(limit), 1), 50))
 
-	player, err := models.GetPlayer(playerID, db)
+	_, err = models.GetPlayer(playerID, db)
 	if err != nil {
 		playerNotFoundError(w, err)
 		return
@@ -135,15 +154,7 @@ func getPlayerKills(w http.ResponseWriter, r *http.Request) {
 		next = -1
 	}
 
-	JSONResponse(w, struct {
-		Player models.Player `json:"player"`
-		Limit  int           `json:"limit"`
-		Start  int           `json:"start"`
-		Size   int           `json:"size"`
-		Next   int           `json:"next"`
-		Kills  []models.Kill `json:"values"`
-	}{
-		Player: player,
+	JSONResponse(w, KillsList{
 		Limit:  limit,
 		Start:  start,
 		Size:   len(kills),
@@ -153,7 +164,14 @@ func getPlayerKills(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func getKill(w http.ResponseWriter, r *http.Request) {
+// GetKill godoc
+// @Tags Kills
+// @Summary gets a specific kill by id
+// @Produce json
+// @Param id path int true "Kill ID"
+// @Success 200 {object} models.Kill
+// @Router /kills/{id} [get]
+func GetKill(w http.ResponseWriter, r *http.Request) {
 	killID, err := GetIntURLArg("id", r)
 	if err != nil {
 		http.Error(w, "Could not get id", http.StatusBadRequest)
@@ -170,7 +188,14 @@ func getKill(w http.ResponseWriter, r *http.Request) {
 	JSONResponse(w, &kill)
 }
 
-func getServerKills(w http.ResponseWriter, r *http.Request) {
+// GetServerKills godoc
+// @Tags Servers, Kills
+// @Summary lists the most recent kills on a server
+// @Produce json
+// @Param id path int true "Server ID"
+// @Success 200 {object} []models.Kill
+// @Router /servers/{id}/kills [get]
+func GetServerKills(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	serverID, err := strconv.Atoi(vars["id"])
 	if err != nil {

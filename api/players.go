@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Harrison-Miller/kagstats/common/utils"
-
 	"github.com/Harrison-Miller/kagstats/common/models"
 	"github.com/gorilla/mux"
 )
@@ -26,7 +24,23 @@ func playersError(w http.ResponseWriter, err error) {
 	http.Error(w, "Could not get players", http.StatusInternalServerError)
 }
 
-func getPlayers(w http.ResponseWriter, r *http.Request) {
+type PlayersList struct {
+	Limit   int             `json:"limit"`
+	Start   int             `json:"start"`
+	Size    int             `json:"size"`
+	Next    int             `json:"next"`
+	Players []models.Player `json:"values"`
+}
+
+// GetPlayers godoc
+// @Tags Players
+// @Summary returns a list of players sorted by the when they were added
+// @Produce json
+// @Param start query int false "offset of query"
+// @Param limit query int false "number of responses max 100"
+// @Success 200 {object} PlayersList
+// @Router /players [get]
+func GetPlayers(w http.ResponseWriter, r *http.Request) {
 	var players []models.Player
 	var start int64
 	var limit int64 = 100
@@ -64,13 +78,7 @@ func getPlayers(w http.ResponseWriter, r *http.Request) {
 		next = -1
 	}
 
-	JSONResponse(w, struct {
-		Limit   int             `json:"limit"`
-		Start   int             `json:"start"`
-		Size    int             `json:"size"`
-		Next    int             `json:"next"`
-		Players []models.Player `json:"values"`
-	}{
+	JSONResponse(w, PlayersList{
 		Limit:   int(limit),
 		Start:   int(start),
 		Size:    len(players),
@@ -79,7 +87,14 @@ func getPlayers(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func searchPlayers(w http.ResponseWriter, r *http.Request) {
+// SearchPlayers godoc
+// @Tags Players
+// @Summary returns a list of players where any part of their name matches the provided string
+// @Produce json
+// @Param search path string true "Search text"
+// @Success 200 {object} []models.Player
+// @Router /players/search/{search} [get]
+func SearchPlayers(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	search := vars["search"]
 	search = "%" + search + "%"
@@ -99,7 +114,14 @@ func searchPlayers(w http.ResponseWriter, r *http.Request) {
 	JSONResponse(w, &players)
 }
 
-func getPlayer(w http.ResponseWriter, r *http.Request) {
+// GetPlayer godoc
+// @Tags Players
+// @Summary gets a player given an id
+// @Produce json
+// @Param id path int true "Player ID"
+// @Success 200 {object} models.Player
+// @Router /players/{id} [get]
+func GetPlayer(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	playerID, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -117,45 +139,19 @@ func getPlayer(w http.ResponseWriter, r *http.Request) {
 	JSONResponse(w, &player)
 }
 
-func refreshPlayer(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	playerID, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		http.Error(w, "could not parse id", http.StatusBadRequest)
-		return
-	}
-
-	var player models.Player
-	err = db.Get(&player, playersQuery+"WHERE players.ID=?", int64(playerID))
-	if err != nil {
-		playerNotFoundError(w, err)
-		return
-	}
-
-	utils.GetPlayerAvatar(&player)
-	utils.GetPlayerTier(&player)
-	utils.GetPlayerInfo(&player)
-
-	_, err = db.Exec("UPDATE players SET oldgold=?,registered=?,role=?,avatar=?,tier=? WHERE ID=?",
-		player.OldGold, player.Registered, player.Role, player.Avatar, player.Tier, player.ID)
-	if err != nil {
-		playerNotFoundError(w, err)
-		return
-	}
-
-	JSONResponse(w, &struct {
-		Message string `json:"message"`
-	}{
-		Message: "success",
-	})
-}
-
 type Captures struct {
 	PlayerID int64 `json:"playerID" db:"-"`
 	Captures int64 `json:"captures" db:"captures"`
 }
 
-func getCaptures(w http.ResponseWriter, r *http.Request) {
+// GetCaptures godoc
+// @Tags Detailed Stats
+// @Summary gets the number of flags captures for a player given an id
+// @Produce json
+// @Param id path int true "Player ID"
+// @Success 200 {object} Captures
+// @Router /players/{id}/captures [get]
+func GetCaptures(w http.ResponseWriter, r *http.Request) {
 	playerID, err := GetIntURLArg("id", r)
 	if err != nil {
 		http.Error(w, "coud not get id", http.StatusBadRequest)

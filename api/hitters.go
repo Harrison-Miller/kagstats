@@ -16,13 +16,26 @@ type Hitter struct {
 }
 
 func HitterRoutes(r *mux.Router) {
-	r.HandleFunc("/players/{id:[0-9]+}/hitters", getHitters).Methods("GET")
+	r.HandleFunc("/players/{id:[0-9]+}/hitters", GetHitters).Methods("GET")
 }
 
-func getHitters(w http.ResponseWriter, r *http.Request) {
+type HittersList struct {
+	MyPlayer models.Player `json:"player"`
+	Size     int           `json:"size"`
+	Hitters  []Hitter      `json:"hitters"`
+}
+
+// GetHitters godoc
+// @Tags Detailed Stats
+// @Summary Returns the top five weapons (hitters) used by the player
+// @Produce json
+// @Param id path int true "PlayerID"
+// @Success 200 {object} HittersList
+// @Router /players/{id}/hitters [get]
+func GetHitters(w http.ResponseWriter, r *http.Request) {
 	playerID, err := GetIntURLArg("id", r)
 	if err != nil {
-		http.Error(w, "coud not get id", http.StatusBadRequest)
+		http.Error(w, "could not get id", http.StatusBadRequest)
 		return
 	}
 
@@ -45,11 +58,7 @@ func getHitters(w http.ResponseWriter, r *http.Request) {
 		h[i].Name = models.HitterName(hitter.Hitter)
 	}
 
-	JSONResponse(w, struct {
-		MyPlayer models.Player `json:"player"`
-		Size     int           `json:"size"`
-		Hitters  []Hitter      `json:"hitters"`
-	}{
+	JSONResponse(w, HittersList{
 		MyPlayer: player,
 		Size:     len(h),
 		Hitters:  h,

@@ -16,14 +16,27 @@ type Nemesis struct {
 }
 
 func NemesisRoutes(r *mux.Router) {
-	r.HandleFunc("/players/{id:[0-9]+}/nemesis", getNemesis).Methods("GET")
-	r.HandleFunc("/players/{id:[0-9]+}/bullied", getBullied).Methods("GET")
+	r.HandleFunc("/players/{id:[0-9]+}/nemesis", GetNemesis).Methods("GET")
+	r.HandleFunc("/players/{id:[0-9]+}/bullied", GetBullied).Methods("GET")
 }
 
-func getNemesis(w http.ResponseWriter, r *http.Request) {
+type NemesisResp struct {
+	Deaths int `json:"deaths"`
+	Nemesis interface{} `json:"nemesis"`
+}
+
+// GetNemesis godoc
+// @Tags Detailed Stats
+// @Summary gets the nemesis of the given player
+// @Description the nemesis of a player is the player who has killed them the most
+// @Produce json
+// @Param id path int true "Player ID"
+// @Success 200 {object} NemesisResp
+// @Router /players/{id}/nemesis [get]
+func GetNemesis(w http.ResponseWriter, r *http.Request) {
 	playerID, err := GetIntURLArg("id", r)
 	if err != nil {
-		http.Error(w, "coud not get id", http.StatusBadRequest)
+		http.Error(w, "could not get id", http.StatusBadRequest)
 		return
 	}
 
@@ -31,10 +44,7 @@ func getNemesis(w http.ResponseWriter, r *http.Request) {
 	err = db.Get(&n, `SELECT * FROM nemesis AS n INNER JOIN players 
 		ON n.nemesisID=players.ID WHERE n.playerID=? AND n.deaths >= ? ORDER BY n.deaths DESC LIMIT 1`, playerID, config.API.NemesisGate)
 	if err != nil {
-		JSONResponse(w, struct{
-			Deaths int `json:"deaths"`
-			Nemesis interface{} `json:"nemesis"`
-		}{
+		JSONResponse(w, NemesisResp{
 			Deaths: 0,
 			Nemesis: nil,
 		})
@@ -44,7 +54,19 @@ func getNemesis(w http.ResponseWriter, r *http.Request) {
 	JSONResponse(w, n)
 }
 
-func getBullied(w http.ResponseWriter, r *http.Request) {
+type BulliedList struct {
+	Bullied []Nemesis `json:"bullied"`
+}
+
+// GetBullied godoc
+// @Tags Detailed Stats
+// @Summary returns a list of players bullied by the given player
+// @Description a player is bullied by the given player if the given player appears as their nemesis
+// @Produce json
+// @Param id path int true "Player ID"
+// @Success 200 {object} BulliedList
+// @Router /players/{id}/bullied [get]
+func GetBullied(w http.ResponseWriter, r *http.Request) {
 	playerID, err := GetIntURLArg("id", r)
 	if err != nil {
 		http.Error(w, "could not get id", http.StatusBadRequest)
@@ -62,9 +84,7 @@ func getBullied(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	JSONResponse(w, struct {
-		Bullied []Nemesis `json:"bullied"`
-	}{
+	JSONResponse(w, BulliedList{
 		Bullied: b,
 	})
 }

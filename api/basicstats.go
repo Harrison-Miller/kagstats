@@ -35,14 +35,14 @@ type BasicStats struct {
 }
 
 func BasicStatsRoutes(r *mux.Router) {
-	r.HandleFunc("/players/{id:[0-9]+}/basic", getBasicStats).Methods("GET")
-	r.HandleFunc("/players/lookup/{name:.+}", getBasicStatsByName).Methods("GET")
-	r.HandleFunc("/leaderboard", getBasicLeaderBoard).Methods("GET")
-	r.HandleFunc("/leaderboard/kills", getKillsLeaderBoard).Methods("GET")
-	r.HandleFunc("/leaderboard/archer", getArcherLeaderBoard).Methods("GET")
-	r.HandleFunc("/leaderboard/builder", getBuilderLeaderBoard).Methods("GET")
-	r.HandleFunc("/leaderboard/knight", getKnightLeaderBoard).Methods("GET")
-	r.HandleFunc("/status", getStatus).Methods("GET")
+	r.HandleFunc("/players/{id:[0-9]+}/basic", GetBasicStats).Methods("GET")
+	r.HandleFunc("/players/lookup/{name:.+}", GetBasicStatsByName).Methods("GET")
+	r.HandleFunc("/leaderboard", GetBasicLeaderBoard).Methods("GET")
+	r.HandleFunc("/leaderboard/kills", GetKillsLeaderBoard).Methods("GET")
+	r.HandleFunc("/leaderboard/archer", GetArcherLeaderBoard).Methods("GET")
+	r.HandleFunc("/leaderboard/builder", GetBuilderLeaderBoard).Methods("GET")
+	r.HandleFunc("/leaderboard/knight", GetKnightLeaderBoard).Methods("GET")
+	r.HandleFunc("/status", GetStatus).Methods("GET")
 }
 
 func playerNotFoundError(w http.ResponseWriter, err error) {
@@ -50,7 +50,14 @@ func playerNotFoundError(w http.ResponseWriter, err error) {
 	http.Error(w, "Player not found", http.StatusInternalServerError)
 }
 
-func getBasicStats(w http.ResponseWriter, r *http.Request) {
+// GetBasicStats godoc
+// @Tags Basic Stats
+// @Summary Gets basics stats for a player given and ID
+// @Produce json
+// @Param id path integer true "Player ID"
+// @Success 200 {object} BasicStats
+// @Router /players/{id}/basic [get]
+func GetBasicStats(w http.ResponseWriter, r *http.Request) {
 	playerID, err := GetIntURLArg("id", r)
 	if err != nil {
 		http.Error(w, "could not get id", http.StatusBadRequest)
@@ -70,7 +77,14 @@ func getBasicStats(w http.ResponseWriter, r *http.Request) {
 	JSONResponse(w, &stats)
 }
 
-func getBasicStatsByName(w http.ResponseWriter, r *http.Request) {
+// GetBasicStatsByName godoc
+// @Tags Basic Stats
+// @Summary gets basic stats for a player given their username
+// @Produces json
+// @Param username path string true "Username"
+// @Success 200 {object} BasicStats
+// @Router /players/lookup/{name} [get]
+func GetBasicStatsByName(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	playerName := vars["name"]
 
@@ -93,7 +107,18 @@ func leaderboardError(w http.ResponseWriter, err error) {
 	http.Error(w, "Error fetching leaderboard", http.StatusInternalServerError)
 }
 
-func getBasicLeaderBoard(w http.ResponseWriter, r *http.Request) {
+type LeaderboardList struct {
+	Size        int          `json:"size"`
+	LeaderBoard []BasicStats `json:"leaderboard"`
+}
+
+// GetBasicLeaderBoard godoc
+// @Tags Leaderboards
+// @Summary gets the BasicStats for the top 20 players sorted by total kdr
+// @Produce json
+// @Success 200 {object} LeaderboardList
+// @Router /leaderboard [get]
+func GetBasicLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	var stats []BasicStats
 
 	err := db.Select(&stats, basicQuery+`WHERE NOT p.leaderboardBan AND NOT p.statsBan AND basic_stats.total_kills >= ? AND basic_stats.total_deaths >= ? 
@@ -103,16 +128,19 @@ func getBasicLeaderBoard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	JSONResponse(w, struct {
-		Size        int          `json:"size"`
-		LeaderBoard []BasicStats `json:"leaderboard"`
-	}{
+	JSONResponse(w, LeaderboardList{
 		Size:        len(stats),
 		LeaderBoard: stats,
 	})
 }
 
-func getKillsLeaderBoard(w http.ResponseWriter, r *http.Request) {
+// GetKillsLeaderBoard godoc
+// @Tags Leaderboards
+// @Summary gets the BasicStats for the top 20 players sorted by total kills
+// @Produce json
+// @Success 200 {object} LeaderboardList
+// @Router /leaderboard/kills [get]
+func GetKillsLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	var stats []BasicStats
 
 	err := db.Select(&stats, basicQuery+`WHERE NOT p.leaderboardBan AND NOT p.statsBan AND basic_stats.total_kills >= ? AND basic_stats.total_deaths >= ? 
@@ -122,16 +150,19 @@ func getKillsLeaderBoard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	JSONResponse(w, struct {
-		Size        int          `json:"size"`
-		LeaderBoard []BasicStats `json:"leaderboard"`
-	}{
+	JSONResponse(w, LeaderboardList{
 		Size:        len(stats),
 		LeaderBoard: stats,
 	})
 }
 
-func getArcherLeaderBoard(w http.ResponseWriter, r *http.Request) {
+// GetArcherLeaderBoard godoc
+// @Tags Leaderboards
+// @Summary gets the BasicStats for the top 20 players sorted by archer kdr
+// @Produce json
+// @Success 200 {object} LeaderboardList
+// @Router /leaderboard/archer [get]
+func GetArcherLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	var stats []BasicStats
 
 	err := db.Select(&stats, basicQuery+`WHERE NOT p.leaderboardBan AND NOT p.statsBan AND basic_stats.archer_kills >= ? AND basic_stats.archer_deaths >= ? 
@@ -141,16 +172,19 @@ func getArcherLeaderBoard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	JSONResponse(w, struct {
-		Size        int          `json:"size"`
-		LeaderBoard []BasicStats `json:"leaderboard"`
-	}{
+	JSONResponse(w, LeaderboardList{
 		Size:        len(stats),
 		LeaderBoard: stats,
 	})
 }
 
-func getBuilderLeaderBoard(w http.ResponseWriter, r *http.Request) {
+// GetBuilderLeaderBoard godoc
+// @Tags Leaderboards
+// @Summary gets the BasicStats for the top 20 players sorted by builder kdr
+// @Produce json
+// @Success 200 {object} LeaderboardList
+// @Router /leaderboard/builder [get]
+func GetBuilderLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	var stats []BasicStats
 
 	err := db.Select(&stats, basicQuery+`WHERE NOT p.leaderboardBan AND NOT p.statsBan AND basic_stats.builder_kills >= ? AND basic_stats.builder_deaths >= ? 
@@ -160,16 +194,19 @@ func getBuilderLeaderBoard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	JSONResponse(w, struct {
-		Size        int          `json:"size"`
-		LeaderBoard []BasicStats `json:"leaderboard"`
-	}{
+	JSONResponse(w, LeaderboardList{
 		Size:        len(stats),
 		LeaderBoard: stats,
 	})
 }
 
-func getKnightLeaderBoard(w http.ResponseWriter, r *http.Request) {
+// GetKnightLeaderBoard godoc
+// @Tags Leaderboards
+// @Summary gets the BasicStats for the top 20 players sorted by knight kdr
+// @Produce json
+// @Success 200 {object} LeaderboardList
+// @Router /leaderboard/knight [get]
+func GetKnightLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	var stats []BasicStats
 
 	err := db.Select(&stats, basicQuery+`WHERE NOT p.leaderboardBan AND NOT p.statsBan AND basic_stats.knight_kills >= ? AND basic_stats.knight_deaths >= ? 
@@ -179,16 +216,20 @@ func getKnightLeaderBoard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	JSONResponse(w, struct {
-		Size        int          `json:"size"`
-		LeaderBoard []BasicStats `json:"leaderboard"`
-	}{
+	JSONResponse(w, LeaderboardList{
 		Size:        len(stats),
 		LeaderBoard: stats,
 	})
 }
 
-func getStatus(w http.ResponseWriter, r *http.Request) {
+// GetStatus godoc
+// @Tags Misc
+// @Summary Show basic info about the KAG Stats site
+// @Produce json
+// @Success 200 {object} Status
+// @Failure 500
+// @Router /status [get]
+func GetStatus(w http.ResponseWriter, r *http.Request) {
 	var status Status
 
 	err := db.Get(&status, `SELECT (SELECT COUNT(id) FROM players) as players, (select ID from kills order by ID DESC limit 1) as kills, (SELECT COUNT(id) FROM servers) as servers`)

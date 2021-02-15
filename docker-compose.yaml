@@ -35,6 +35,8 @@ services:
       args:
         VERSION: ${TAG:-latest}
     image: gcr.io/kagstats/api:${TAG:-latest}
+    ports:
+      - "8080:8080"
     environment:
       - KD_GATE=25
       - ARCHER_GATE=15

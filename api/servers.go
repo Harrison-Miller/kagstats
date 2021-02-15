@@ -9,7 +9,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func getServers(w http.ResponseWriter, r *http.Request) {
+// GetServers godoc
+// @Tags Servers
+// @Summary returns a list of all servers
+// @Produce json
+// @Success 200 {object} []models.Server
+// @Router /servers [get]
+func GetServers(w http.ResponseWriter, r *http.Request) {
 	var servers []models.Server
 	err := db.Select(&servers, "SELECT * FROM servers")
 	if err != nil {
@@ -21,7 +27,14 @@ func getServers(w http.ResponseWriter, r *http.Request) {
 	JSONResponse(w, &servers)
 }
 
-func getServer(w http.ResponseWriter, r *http.Request) {
+// GetServer godoc
+// @Tags Servers
+// @Summary returns information about a server given an id
+// @Produce json
+// @Param id path int true "Server ID"
+// @Success 200 {object} models.Server
+// @Router /server/{id} [get]
+func GetServer(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	serverID, err := strconv.Atoi(vars["id"])
 	if err != nil {

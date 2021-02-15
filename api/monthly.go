@@ -23,9 +23,9 @@ type MonthlyStats struct {
 }
 
 func MonthlyStatsRoutes(r *mux.Router) {
-	r.HandleFunc("/leaderboard/monthly/archer", getMonthlyArcherLeaderBoard).Methods("GET")
-	r.HandleFunc("/leaderboard/monthly/builder", getMonthlyBuilderLeaderBoard).Methods("GET")
-	r.HandleFunc("/leaderboard/monthly/knight", getMonthlyKnightLeaderBoard).Methods("GET")
+	r.HandleFunc("/leaderboard/monthly/archer", GetMonthlyArcherLeaderBoard).Methods("GET")
+	r.HandleFunc("/leaderboard/monthly/builder", GetMonthlyBuilderLeaderBoard).Methods("GET")
+	r.HandleFunc("/leaderboard/monthly/knight", GetMonthlyKnightLeaderBoard).Methods("GET")
 }
 
 func getYearMonth(r *http.Request) (int, int) {
@@ -35,7 +35,22 @@ func getYearMonth(r *http.Request) (int, int) {
 	return year, month
 }
 
-func getMonthlyArcherLeaderBoard(w http.ResponseWriter, r *http.Request) {
+type MonthlyLeaderboardList struct {
+	Size        int            `json:"size"`
+	Year        int            `json:"year"`
+	Month       int            `json:"month"`
+	LeaderBoard []MonthlyStats `json:"leaderboard"`
+}
+
+// GetMonthlyArcherLeaderBoard godoc
+// @Tags Leaderboards
+// @Summary returns the top 20 players for a given month sorted by archer kdr
+// @Produce json
+// @Param year query int false "year - defaults to current year"
+// @Param month query int false "month - defaults to current month"
+// @Success 200 {object} MonthlyLeaderboardList
+// @Router /leaderboard/monthly/archer [get]
+func GetMonthlyArcherLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	var stats []MonthlyStats
 
 	year, month := getYearMonth(r)
@@ -47,12 +62,7 @@ func getMonthlyArcherLeaderBoard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	JSONResponse(w, struct {
-		Size        int            `json:"size"`
-		Year        int            `json:"year"`
-		Month       int            `json:"month"`
-		LeaderBoard []MonthlyStats `json:"leaderboard"`
-	}{
+	JSONResponse(w, MonthlyLeaderboardList{
 		Size:        len(stats),
 		Year:        year,
 		Month:       month,
@@ -60,7 +70,15 @@ func getMonthlyArcherLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func getMonthlyBuilderLeaderBoard(w http.ResponseWriter, r *http.Request) {
+// GetMonthlyBuilderLeaderBoard godoc
+// @Tags Leaderboards
+// @Summary returns the top 20 players for a given month sorted by builder kdr
+// @Produce json
+// @Param year query int false "year - defaults to current year"
+// @Param month query int false "month - defaults to current month"
+// @Success 200 {object} MonthlyLeaderboardList
+// @Router /leaderboard/monthly/builder [get]
+func GetMonthlyBuilderLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	var stats []MonthlyStats
 
 	year, month := getYearMonth(r)
@@ -72,12 +90,7 @@ func getMonthlyBuilderLeaderBoard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	JSONResponse(w, struct {
-		Size        int            `json:"size"`
-		Year        int            `json:"year"`
-		Month       int            `json:"month"`
-		LeaderBoard []MonthlyStats `json:"leaderboard"`
-	}{
+	JSONResponse(w, MonthlyLeaderboardList{
 		Size:        len(stats),
 		Year:        year,
 		Month:       month,
@@ -85,7 +98,15 @@ func getMonthlyBuilderLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func getMonthlyKnightLeaderBoard(w http.ResponseWriter, r *http.Request) {
+// GetMonthlyKnightLeaderBoard godoc
+// @Tags Leaderboards
+// @Summary returns the top 20 players for a given month sorted by knight kdr
+// @Produce json
+// @Param year query int false "year - defaults to current year"
+// @Param month query int false "month - defaults to current month"
+// @Success 200 {object} MonthlyLeaderboardList
+// @Router /leaderboard/monthly/knight [get]
+func GetMonthlyKnightLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	var stats []MonthlyStats
 
 	year, month := getYearMonth(r)
@@ -97,12 +118,7 @@ func getMonthlyKnightLeaderBoard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	JSONResponse(w, struct {
-		Size        int            `json:"size"`
-		Year        int            `json:"year"`
-		Month       int            `json:"month"`
-		LeaderBoard []MonthlyStats `json:"leaderboard"`
-	}{
+	JSONResponse(w, MonthlyLeaderboardList{
 		Size:        len(stats),
 		Year:        year,
 		Month:       month,

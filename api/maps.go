@@ -18,10 +18,16 @@ type MapBasics struct {
 }
 
 func MapsRoutes(r *mux.Router) {
-	r.HandleFunc("/maps", getMaps).Methods("GET")
+	r.HandleFunc("/maps", GetMaps).Methods("GET")
 }
 
-func getMaps(w http.ResponseWriter, r *http.Request) {
+// GetMaps godoc
+// @Tags Maps
+// @Summary returns all maps
+// @Produce json
+// @Success 200 {object} []MapBasics
+// @Router /maps [get]
+func GetMaps(w http.ResponseWriter, r *http.Request) {
 	var m []MapBasics
 	err := db.Select(&m, `SELECT map_stats.mapName, average, stddev, matches, ballots, votes, wins 
 		FROM (SELECT mapName, ROUND((AVG(ticks)/30)/60) AS average, ROUND(STDDEV((ticks/30)/60)) AS stddev, COUNT(mapName) AS matches 

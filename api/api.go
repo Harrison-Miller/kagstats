@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Harrison-Miller/kagstats/api/docs"
 	"log"
 	"net/http"
 	"os"
@@ -15,6 +16,9 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
+
+	"github.com/swaggo/http-swagger"
+	_ "github.com/Harrison-Miller/kagstats/api/docs"
 )
 
 var db *sqlx.DB
@@ -28,6 +32,16 @@ func LogHandler(next http.Handler) http.Handler {
 		log.Printf("%s - %s %v %d %dms\n", r.RemoteAddr, r.Method, r.URL, m.Code, m.Duration/time.Millisecond)
 	})
 }
+
+// @title KAG Stats
+// @description KAG Stats records statics of players in King Arthur's Gold such as kills, flag captures, map votes
+
+// @license.name MIT
+// @license.url https://github.com/Harrison-Miller/kagstats/blob/master/LICENSE
+
+// @host kagstats.com
+// @BasePath /api
+// @Schemes https
 
 func main() {
 	config, _ = configs.Get()
@@ -78,6 +92,8 @@ func main() {
 	version, _ = os.LookupEnv("VERSION")
 	log.Printf("KAG Stats  %s\n", version)
 
+	docs.SwaggerInfo.Version = version
+
 	db, err = utils.ConnectToDatabase(config.DatabaseConnection, 10)
 	if err != nil {
 		log.Fatal(err)
@@ -85,22 +101,20 @@ func main() {
 	log.Println("Connected to the database!")
 
 	r := mux.NewRouter()
+	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
-	r.HandleFunc("/players", getPlayers).Methods("GET")
-	r.HandleFunc("/players/{id:[0-9]+}", getPlayer).Methods("GET")
-	r.HandleFunc("/players/{id:[0-9]+}/kills", getPlayerKills).Methods("GET")
-	//r.HandleFunc("/players/{id:[0-9]+}/events", getPlayerEvents).Methods("GET")
-	r.HandleFunc("/players/search/{search:.+}", searchPlayers).Methods("GET")
-	r.HandleFunc("/players/{id:[0-9]+}/refresh", refreshPlayer).Methods("GET")
-	r.HandleFunc("/players/{id:[0-9]+}/captures", getCaptures).Methods("GET")
+	r.HandleFunc("/players", GetPlayers).Methods("GET")
+	r.HandleFunc("/players/{id:[0-9]+}", GetPlayer).Methods("GET")
+	r.HandleFunc("/players/{id:[0-9]+}/kills", GetPlayerKills).Methods("GET")
+	r.HandleFunc("/players/search/{search:.+}", SearchPlayers).Methods("GET")
+	r.HandleFunc("/players/{id:[0-9]+}/captures", GetCaptures).Methods("GET")
 
-	r.HandleFunc("/servers", getServers).Methods("GET")
-	r.HandleFunc("/servers/{id:[0-9]+}", getServer).Methods("GET")
-	//r.HandleFunc("/servers/{id:[0-9]+}/events", getServerEvents).Methods("GET")
-	r.HandleFunc("/servers/{id:[0-9]+}/kills", getServerKills).Methods("GET")
+	r.HandleFunc("/servers", GetServers).Methods("GET")
+	r.HandleFunc("/servers/{id:[0-9]+}", GetServer).Methods("GET")
+	r.HandleFunc("/servers/{id:[0-9]+}/kills", GetServerKills).Methods("GET")
 
-	r.HandleFunc("/kills", getKills).Methods("GET")
-	r.HandleFunc("/kills/{id:[0-9]+}", getKill).Methods("GET")
+	r.HandleFunc("/kills", GetKills).Methods("GET")
+	r.HandleFunc("/kills/{id:[0-9]+}", GetKill).Methods("GET")
 
 	BasicStatsRoutes(r)
 	NemesisRoutes(r)
