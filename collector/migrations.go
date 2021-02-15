@@ -431,7 +431,7 @@ func AddMapVotes(db *sqlx.DB) error {
 func RemoveEvents(db *sqlx.DB) error {
 	err := DelFK("players", "players_ibfk_1", db)
 	if err != nil {
-		return errd
+		return err
 	}
 
 	err = DelColumn("players", "lastEventID", db)

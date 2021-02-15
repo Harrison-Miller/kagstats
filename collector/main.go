@@ -30,7 +30,7 @@ func main() {
 	var err error
 	config, err = configs.Get()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	if value, ok := os.LookupEnv("DB"); ok {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -36,7 +36,7 @@ func getKills(w http.ResponseWriter, r *http.Request) {
 	if v := r.URL.Query().Get("start"); v != "" {
 		s, err := strconv.Atoi(v)
 		if err != nil {
-			http.Error(w, "Could not parse start", err), http.StatusBadRequest)
+			http.Error(w, "Could not parse start", http.StatusBadRequest)
 		}
 
 		if s < 0 {
@@ -95,7 +95,7 @@ func getPlayerKills(w http.ResponseWriter, r *http.Request) {
 
 	start, err := GetURLParam("start", 0, r)
 	if err != nil {
-		http.Error(w, "could not parse start", err), http.StatusBadRequest)
+		http.Error(w, "could not parse start", http.StatusBadRequest)
 		return
 	}
 
@@ -114,7 +114,7 @@ func getPlayerKills(w http.ResponseWriter, r *http.Request) {
 
 	player, err := models.GetPlayer(playerID, db)
 	if err != nil {
-		playerNotFound(w, err)
+		playerNotFoundError(w, err)
 		return
 	}
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/Harrison-Miller/kagstats/common/models"
@@ -31,7 +32,7 @@ func getNemesis(w http.ResponseWriter, r *http.Request) {
 		ON n.nemesisID=players.ID WHERE n.playerID=? AND n.deaths >= ? ORDER BY n.deaths DESC LIMIT 1`, playerID, config.API.NemesisGate)
 	if err != nil {
 		log.Printf("Could not find nemesis for player: %v\n", err)
-		http.Error(w, "Could not find nemeses for player", http.StatusInternalServerError)
+		http.Error(w, "Could not find nemesis for player", http.StatusInternalServerError)
 		return
 	}
 
@@ -41,17 +42,17 @@ func getNemesis(w http.ResponseWriter, r *http.Request) {
 func getBullied(w http.ResponseWriter, r *http.Request) {
 	playerID, err := GetIntURLArg("id", r)
 	if err != nil {
-		http.Error(w, "coud not get id", http.StatusBadRequest)
+		http.Error(w, "could not get id", http.StatusBadRequest)
 		return
 	}
 
-	var b []Nemesis
+	b := []Nemesis{}
 	err = db.Select(&b, `SELECT players.*, n1.playerID as playerID, n1.nemesisID as nemesisID, n1.deaths as deaths 
 		FROM nemesis as n1 INNER JOIN (SELECT playerID, MAX(deaths) as deaths FROM nemesis GROUP BY playerID) AS n2 
 		ON n1.playerID = n2.playerID AND n1.deaths = n2.deaths AND n1.deaths >= ? AND n1.nemesisID = ? INNER JOIN players ON n1.playerID=players.ID
 	`, config.API.NemesisGate, playerID)
 	if err != nil {
-		log.Printff("Could not find bullied players for player: %v\n", err)
+		log.Printf("Could not find bullied players for player: %v\n", err)
 		http.Error(w, "Could not find bullied players for player", http.StatusInternalServerError)
 		return
 	}

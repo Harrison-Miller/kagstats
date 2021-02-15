@@ -33,7 +33,7 @@ func getHitters(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var h []Hitter
+	h := []Hitter{}
 	err = db.Select(&h, `SELECT * FROM top_hitters AS hitters WHERE hitters.playerID=? ORDER BY hitters.kills DESC LIMIT 5`, playerID)
 	if err != nil {
 		log.Printf("Could not find hitters for player: %v\n", err)

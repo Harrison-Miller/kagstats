@@ -61,8 +61,10 @@ func getBasicStats(w http.ResponseWriter, r *http.Request) {
 
 	err = db.Get(&stats, basicQuery+"WHERE basic_stats.playerID=?", int64(playerID))
 	if err != nil {
-		playerNotFoundError(w, err)
-		return
+		err = getBasicPlayerInfoInstead(&stats.Player, w, playerID)
+		if err != nil {
+			return
+		}
 	}
 
 	JSONResponse(w, &stats)
@@ -76,8 +78,11 @@ func getBasicStatsByName(w http.ResponseWriter, r *http.Request) {
 
 	err := db.Get(&stats, basicQuery+"WHERE LOWER(p.username)=LOWER(?)", playerName)
 	if err != nil {
-		playerNotFoundError(w, err)
-		return
+		err = db.Get(&stats.Player, "SELECT * FROM players WHERE LOWER(players.username)=LOWER(?)", playerName)
+		if err != nil {
+			playerNotFoundError(w, err)
+			return
+		}
 	}
 
 	JSONResponse(w, &stats)

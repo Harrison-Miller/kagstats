@@ -11,11 +11,17 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const playersQuery = `SELECT players.* FROM players `
+const playersQuery = `SELECT * FROM players `
+
+func getBasicPlayerInfoInstead(player *models.Player, w http.ResponseWriter, playerID int) error {
+	err := db.Get(player, "SELECT * FROM players WHERE players.ID=?", int64(playerID))
+	playerNotFoundError(w, err)
+	return err
+}
 
 func playersError(w http.ResponseWriter, err error) {
 	log.Printf("Could not get players: %v\n", err)
-	http.Erorr(w, "Could not get players", http.StatusInternalServerError)
+	http.Error(w, "Could not get players", http.StatusInternalServerError)
 }
 
 func getPlayers(w http.ResponseWriter, r *http.Request) {
@@ -43,6 +49,7 @@ func getPlayers(w http.ResponseWriter, r *http.Request) {
 		}
 		limit = Min(int64(l), limit)
 	}
+
 
 	err := db.Select(&players, playersQuery+"WHERE NOT players.statsBan ORDER BY players.ID DESC LIMIT ?,?", start, limit)
 	if err != nil {
