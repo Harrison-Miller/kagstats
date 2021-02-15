@@ -23,11 +23,3 @@ services:
   monthly-indexer:
     environment:
       - INDEXER_BATCHSIZE=10000
-  apicache:
-    deploy:
-      resources:
-        limits:
-          memory: 100M
-    environment:
-      - INDEXER_BATCHSIZE=200
-      - INDEXER_INTERVAL=10m
