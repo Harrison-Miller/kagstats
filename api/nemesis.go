@@ -31,8 +31,13 @@ func getNemesis(w http.ResponseWriter, r *http.Request) {
 	err = db.Get(&n, `SELECT * FROM nemesis AS n INNER JOIN players 
 		ON n.nemesisID=players.ID WHERE n.playerID=? AND n.deaths >= ? ORDER BY n.deaths DESC LIMIT 1`, playerID, config.API.NemesisGate)
 	if err != nil {
-		log.Printf("Could not find nemesis for player: %v\n", err)
-		http.Error(w, "Could not find nemesis for player", http.StatusInternalServerError)
+		JSONResponse(w, struct{
+			Deaths int `json:"deaths"`
+			Nemesis interface{} `json:"nemesis"`
+		}{
+			Deaths: 0,
+			Nemesis: nil,
+		})
 		return
 	}
 

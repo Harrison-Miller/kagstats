@@ -15,7 +15,9 @@ const playersQuery = `SELECT * FROM players `
 
 func getBasicPlayerInfoInstead(player *models.Player, w http.ResponseWriter, playerID int) error {
 	err := db.Get(player, "SELECT * FROM players WHERE players.ID=?", int64(playerID))
-	playerNotFoundError(w, err)
+	if err != nil {
+		playerNotFoundError(w, err)
+	}
 	return err
 }
 

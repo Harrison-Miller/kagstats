@@ -14,7 +14,7 @@
         </ng-container>
         <ng-template #avatarElse>
             <img id="avatar" src="{{ player.id | unkownAvatar }}" class="rounded-circle" style="width: 100px; height: 100px;">
-        </ng-template>      
+        </ng-template>
     </div>
     <div class="col">
     <div class="row buffer">
@@ -65,7 +65,7 @@
             </div>
         </div>
     </div>
-    
+
     <!--
     <div class="row buffer">
         <div class="col">
@@ -179,7 +179,7 @@
         <div class="row buffer">
             <div class="shadow-sm col text-center">
                 <h3>Nemesis</h3>
-                <ng-container *ngIf="nemesis; else noNemesis">
+                <ng-container *ngIf="nemesis && nemesis.nemesis; else noNemesis">
                 <div class="row margin-top text-center">
                     <div class="col offset-4">
                         <app-player-banner [player]="nemesis.nemesis" [status]="false"></app-player-banner>
