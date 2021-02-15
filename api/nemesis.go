@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/Harrison-Miller/kagstats/common/models"
@@ -23,7 +22,7 @@ func NemesisRoutes(r *mux.Router) {
 func getNemesis(w http.ResponseWriter, r *http.Request) {
 	playerID, err := GetIntURLArg("id", r)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("coud not get id: %v", err), http.StatusBadRequest)
+		http.Error(w, "coud not get id", http.StatusBadRequest)
 		return
 	}
 
@@ -31,7 +30,8 @@ func getNemesis(w http.ResponseWriter, r *http.Request) {
 	err = db.Get(&n, `SELECT * FROM nemesis AS n INNER JOIN players 
 		ON n.nemesisID=players.ID WHERE n.playerID=? AND n.deaths >= ? ORDER BY n.deaths DESC LIMIT 1`, playerID, config.API.NemesisGate)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("could not find nemeses for player: %v", err), http.StatusInternalServerError)
+		log.Printf("Could not find nemesis for player: %v\n", err)
+		http.Error(w, "Could not find nemeses for player", http.StatusInternalServerError)
 		return
 	}
 
@@ -41,7 +41,7 @@ func getNemesis(w http.ResponseWriter, r *http.Request) {
 func getBullied(w http.ResponseWriter, r *http.Request) {
 	playerID, err := GetIntURLArg("id", r)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("coud not get id: %v", err), http.StatusBadRequest)
+		http.Error(w, "coud not get id", http.StatusBadRequest)
 		return
 	}
 
@@ -51,7 +51,8 @@ func getBullied(w http.ResponseWriter, r *http.Request) {
 		ON n1.playerID = n2.playerID AND n1.deaths = n2.deaths AND n1.deaths >= ? AND n1.nemesisID = ? INNER JOIN players ON n1.playerID=players.ID
 	`, config.API.NemesisGate, playerID)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("could not find bullied players for player: %v", err), http.StatusInternalServerError)
+		log.Printff("Could not find bullied players for player: %v\n", err)
+		http.Error(w, "Could not find bullied players for player", http.StatusInternalServerError)
 		return
 	}
 

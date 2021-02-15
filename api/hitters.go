@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/Harrison-Miller/kagstats/common/models"
@@ -22,21 +22,22 @@ func HitterRoutes(r *mux.Router) {
 func getHitters(w http.ResponseWriter, r *http.Request) {
 	playerID, err := GetIntURLArg("id", r)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("coud not get id: %v", err), http.StatusBadRequest)
+		http.Error(w, "coud not get id", http.StatusBadRequest)
 		return
 	}
 
 	var player models.Player
 	err = db.Get(&player, "SELECT * FROM players WHERE ID=?", playerID)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("could not find player: %v", err), http.StatusInternalServerError)
+		playerNotFoundError(w, err)
 		return
 	}
 
 	var h []Hitter
 	err = db.Select(&h, `SELECT * FROM top_hitters AS hitters WHERE hitters.playerID=? ORDER BY hitters.kills DESC LIMIT 5`, playerID)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("could not find hitters for player: %v", err), http.StatusInternalServerError)
+		log.Printf("Could not find hitters for player: %v\n", err)
+		http.Error(w, "Could not find hitters for player", http.StatusInternalServerError)
 		return
 	}
 

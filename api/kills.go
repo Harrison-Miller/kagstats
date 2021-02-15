@@ -23,6 +23,11 @@ const killsQuery = `SELECT kills.*,
 	INNER JOIN players as killer ON kills.killerID=killer.ID
 	INNER JOIN servers as server ON kills.serverID=server.ID `
 
+func killsError(w http.ResponseWriter, err error) {
+	log.Printf("Error getting kills: %v\n", err)
+	http.Error(w, "Error getting kills", http.StatusInternalServerError)
+}
+
 func getKills(w http.ResponseWriter, r *http.Request) {
 	var kills []models.Kill
 	var start int64
@@ -31,7 +36,7 @@ func getKills(w http.ResponseWriter, r *http.Request) {
 	if v := r.URL.Query().Get("start"); v != "" {
 		s, err := strconv.Atoi(v)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Could not parse start: %v", err), http.StatusBadRequest)
+			http.Error(w, "Could not parse start", err), http.StatusBadRequest)
 		}
 
 		if s < 0 {
@@ -57,7 +62,7 @@ func getKills(w http.ResponseWriter, r *http.Request) {
 		INNER JOIN servers AS server ON kills.serverID=server.ID
 		WHERE NOT victim.statsBan AND NOT killer.statsBan`, start, limit)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+		killsError(w, err)
 		return
 	}
 
@@ -84,24 +89,24 @@ func getKills(w http.ResponseWriter, r *http.Request) {
 func getPlayerKills(w http.ResponseWriter, r *http.Request) {
 	playerID, err := GetIntURLArg("id", r)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("coud not get id: %v", err), http.StatusBadRequest)
+		http.Error(w, "coud not get id", http.StatusBadRequest)
 		return
 	}
 
 	start, err := GetURLParam("start", 0, r)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("could not parse start: %v", err), http.StatusBadRequest)
+		http.Error(w, "could not parse start", err), http.StatusBadRequest)
 		return
 	}
 
 	if start < 0 {
-		http.Error(w, fmt.Sprintf("start must be >= 0"), http.StatusBadRequest)
+		http.Error(w, "start must be >= 0", http.StatusBadRequest)
 		return
 	}
 
 	limit, err := GetURLParam("limit", 50, r)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("could not parse start: %v", err), http.StatusBadRequest)
+		http.Error(w, "could not parse limit", http.StatusBadRequest)
 		return
 	}
 
@@ -109,7 +114,7 @@ func getPlayerKills(w http.ResponseWriter, r *http.Request) {
 
 	player, err := models.GetPlayer(playerID, db)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("could not find player: %v", err), http.StatusInternalServerError)
+		playerNotFound(w, err)
 		return
 	}
 
@@ -121,7 +126,7 @@ func getPlayerKills(w http.ResponseWriter, r *http.Request) {
 	var kills []models.Kill
 	err = db.Select(&kills, killsQuery+"WHERE "+showBanned+" (killerID=? OR victimID=?) ORDER BY kills.ID DESC LIMIT ?,?", playerID, playerID, start, limit)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("error getting kills: %v", err), http.StatusInternalServerError)
+		killsError(w, err)
 		return
 	}
 
@@ -158,7 +163,7 @@ func getKill(w http.ResponseWriter, r *http.Request) {
 	var kill models.Kill
 	err = db.Get(&kill, killsQuery+"WHERE NOT victim.statsBan AND NOT killer.statsBan AND kills.ID=?", int64(killID))
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Kill not found: %v", err), http.StatusInternalServerError)
+		killsError(w, err)
 		return
 	}
 
@@ -176,7 +181,7 @@ func getServerKills(w http.ResponseWriter, r *http.Request) {
 	var kills []models.Kill
 	err = db.Select(&kills, killsQuery+"WHERE NOT victim.statsBan AND NOT killer.statsBan AND serverID=? LIMIT 100", serverID)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("error getting kills: %s", err), http.StatusInternalServerError)
+		killsError(w, err)
 		return
 	}
 

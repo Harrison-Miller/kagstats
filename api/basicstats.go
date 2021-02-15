@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/Harrison-Miller/kagstats/common/models"
@@ -45,6 +45,11 @@ func BasicStatsRoutes(r *mux.Router) {
 	r.HandleFunc("/status", getStatus).Methods("GET")
 }
 
+func playerNotFoundError(w http.ResponseWriter, err error) {
+	log.Printf("Player not found: %v\n", err)
+	http.Error(w, "Player not found", http.StatusInternalServerError)
+}
+
 func getBasicStats(w http.ResponseWriter, r *http.Request) {
 	playerID, err := GetIntURLArg("id", r)
 	if err != nil {
@@ -56,7 +61,7 @@ func getBasicStats(w http.ResponseWriter, r *http.Request) {
 
 	err = db.Get(&stats, basicQuery+"WHERE basic_stats.playerID=?", int64(playerID))
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Player not found: %v", err), http.StatusInternalServerError)
+		playerNotFoundError(w, err)
 		return
 	}
 
@@ -71,11 +76,16 @@ func getBasicStatsByName(w http.ResponseWriter, r *http.Request) {
 
 	err := db.Get(&stats, basicQuery+"WHERE LOWER(p.username)=LOWER(?)", playerName)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Player not found: %v", err), http.StatusInternalServerError)
+		playerNotFoundError(w, err)
 		return
 	}
 
 	JSONResponse(w, &stats)
+}
+
+func leaderboardError(w http.ResponseWriter, err error) {
+	log.Printf("Error fetching leaderboard: %v\n", err)
+	http.Error(w, "Error fetching leaderboard", http.StatusInternalServerError)
 }
 
 func getBasicLeaderBoard(w http.ResponseWriter, r *http.Request) {
@@ -84,7 +94,7 @@ func getBasicLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	err := db.Select(&stats, basicQuery+`WHERE NOT p.leaderboardBan AND NOT p.statsBan AND basic_stats.total_kills >= ? AND basic_stats.total_deaths >= ? 
 		ORDER BY (basic_stats.total_kills / basic_stats.total_deaths) DESC LIMIT 20`, config.API.KDGate, config.API.KDGate)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Error fetching leader board: %v", err), http.StatusInternalServerError)
+		leaderboardError(w, err)
 		return
 	}
 
@@ -103,7 +113,7 @@ func getKillsLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	err := db.Select(&stats, basicQuery+`WHERE NOT p.leaderboardBan AND NOT p.statsBan AND basic_stats.total_kills >= ? AND basic_stats.total_deaths >= ? 
 		ORDER BY basic_stats.total_kills DESC LIMIT 20`, config.API.KDGate, config.API.KDGate)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Error fetching leader board: %v", err), http.StatusInternalServerError)
+		leaderboardError(w, err)
 		return
 	}
 
@@ -122,7 +132,7 @@ func getArcherLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	err := db.Select(&stats, basicQuery+`WHERE NOT p.leaderboardBan AND NOT p.statsBan AND basic_stats.archer_kills >= ? AND basic_stats.archer_deaths >= ? 
 		ORDER BY (basic_stats.archer_kills / basic_stats.archer_deaths) DESC LIMIT 20`, config.API.ArcherGate, config.API.ArcherGate)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Error fetching leader board: %v", err), http.StatusInternalServerError)
+		leaderboardError(w, err)
 		return
 	}
 
@@ -141,7 +151,7 @@ func getBuilderLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	err := db.Select(&stats, basicQuery+`WHERE NOT p.leaderboardBan AND NOT p.statsBan AND basic_stats.builder_kills >= ? AND basic_stats.builder_deaths >= ? 
 		ORDER BY (basic_stats.builder_kills / basic_stats.builder_deaths) DESC LIMIT 20`, config.API.BuilderGate, config.API.BuilderGate)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Error fetching leader board: %v", err), http.StatusInternalServerError)
+		leaderboardError(w, err)
 		return
 	}
 
@@ -160,7 +170,7 @@ func getKnightLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	err := db.Select(&stats, basicQuery+`WHERE NOT p.leaderboardBan AND NOT p.statsBan AND basic_stats.knight_kills >= ? AND basic_stats.knight_deaths >= ? 
 		ORDER BY (basic_stats.knight_kills / basic_stats.knight_deaths) DESC LIMIT 20`, config.API.KnightGate, config.API.KnightGate)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Error fetching leader board: %v", err), http.StatusInternalServerError)
+		leaderboardError(w, err)
 		return
 	}
 
@@ -178,7 +188,8 @@ func getStatus(w http.ResponseWriter, r *http.Request) {
 
 	err := db.Get(&status, `SELECT (SELECT COUNT(id) FROM players) as players, (select ID from kills order by ID DESC limit 1) as kills, (SELECT COUNT(id) FROM servers) as servers`)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Error fetching status: %v", err), http.StatusInternalServerError)
+		log.Printf("Error fetching status: %v\n", err)
+		http.Error(w, "Error fetching status", http.StatusInternalServerError)
 		return
 	}
 

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -44,7 +43,7 @@ func getMonthlyArcherLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	err := db.Select(&stats, monthlyQuery+`WHERE NOT p.leaderboardBan AND NOT p.statsBan AND monthly_stats.year=? AND monthly_stats.month=? AND monthly_stats.archer_kills >= ? AND monthly_stats.archer_deaths >= ? 
 		ORDER BY (monthly_stats.archer_kills / monthly_stats.archer_deaths) DESC LIMIT 20`, year, month, config.API.ArcherGate, config.API.ArcherGate)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Error fetching leader board: %v", err), http.StatusInternalServerError)
+		leaderboardError(w, err)
 		return
 	}
 
@@ -69,7 +68,7 @@ func getMonthlyBuilderLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	err := db.Select(&stats, monthlyQuery+`WHERE NOT p.leaderboardBan AND NOT p.statsBan AND monthly_stats.year=? AND monthly_stats.month=? AND monthly_stats.builder_kills >= ? AND monthly_stats.builder_deaths >= ? 
 		ORDER BY (monthly_stats.builder_kills / monthly_stats.builder_deaths) DESC LIMIT 20`, year, month, config.API.BuilderGate, config.API.BuilderGate)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Error fetching leader board: %v", err), http.StatusInternalServerError)
+		leaderboardError(w, err)
 		return
 	}
 
@@ -94,7 +93,7 @@ func getMonthlyKnightLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	err := db.Select(&stats, monthlyQuery+`WHERE NOT p.leaderboardBan AND NOT p.statsBan AND monthly_stats.year=? AND monthly_stats.month=? AND monthly_stats.knight_kills >= ? AND monthly_stats.knight_deaths >= ? 
 		ORDER BY (monthly_stats.knight_kills / monthly_stats.knight_deaths) DESC LIMIT 20`, year, month, config.API.KnightGate, config.API.KnightGate)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Error fetching leader board: %v", err), http.StatusInternalServerError)
+		leaderboardError(w, err)
 		return
 	}
 

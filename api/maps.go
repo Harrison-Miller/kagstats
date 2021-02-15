@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -28,7 +28,8 @@ func getMaps(w http.ResponseWriter, r *http.Request) {
 		FROM map_stats GROUP BY mapName) as map_stats JOIN map_vote_stats ON map_stats.mapName=map_vote_stats.mapName;
 	`)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("could not get basic map stats: %v", err), http.StatusInternalServerError)
+		log.Printf("Could not get map stats: %v\n", err)
+		http.Error(w, "could not get basic map stats", http.StatusInternalServerError)
 		return
 	}
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -13,7 +13,8 @@ func getServers(w http.ResponseWriter, r *http.Request) {
 	var servers []models.Server
 	err := db.Select(&servers, "SELECT * FROM servers")
 	if err != nil {
-		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+		log.Printf("Could not get servers: %v\n", err)
+		http.Error(w, "Could not get servers", http.StatusInternalServerError)
 		return
 	}
 
@@ -31,7 +32,8 @@ func getServer(w http.ResponseWriter, r *http.Request) {
 	var server models.Server
 	err = db.Get(&server, "SELECT * FROM servers WHERE ID=?", int64(serverID))
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Server not found: %v", err), http.StatusInternalServerError)
+		log.Printf("Could not get server: %v\n", err)
+		http.Error(w, "Could not get server", http.StatusInternalServerError)
 		return
 	}
 
