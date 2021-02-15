@@ -17,6 +17,7 @@ var db *sqlx.DB
 var players map[string]models.Player
 var kills chan models.Kill
 var uncommitted []models.Kill
+var updater *PlayerInfoUpdater
 
 func commitTimer(notify chan bool) {
 	for {
@@ -49,6 +50,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	updater = NewPlayerInfoUpdater(db)
+
 	log.Println("Connected to the database!")
 	err = InitDB()
 	if err != nil {
@@ -56,7 +59,7 @@ func main() {
 	}
 
 	players = make(map[string]models.Player)
-	kills = make(chan models.Kill)
+	kills = make(chan models.Kill, 1000)
 	uncommitted = make([]models.Kill, 0, 100)
 
 	for _, c := range config.Servers {

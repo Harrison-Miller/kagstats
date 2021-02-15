@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/Harrison-Miller/kagstats/common/models"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -89,6 +90,11 @@ func RunMigrations(db *sqlx.DB) error {
 	}
 
 	err = RunMigration(17, RemoveEvents, db)
+	if err != nil {
+		return err
+	}
+
+	err = RunMigration(18, RefreshPlayerInfo, db)
 	if err != nil {
 		return err
 	}
@@ -444,5 +450,18 @@ func RemoveEvents(db *sqlx.DB) error {
 		return err
 	}
 
+	return nil
+}
+
+func RefreshPlayerInfo(db *sqlx.DB) error {
+	players := []*models.Player{}
+	err := db.Select(&players, "SELECT * FROM players")
+	if err != nil {
+		return err
+	}
+
+	for _, player := range players {
+		updater.incoming <- *player
+	}
 	return nil
 }

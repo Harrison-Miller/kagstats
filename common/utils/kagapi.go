@@ -28,8 +28,9 @@ func GetPlayerAvatar(player *models.Player) error {
 
 	resp, err := client.Get(path)
 	if err != nil {
-		return errors.Wrap(err, "error gettitng player avatar")
+		return errors.Wrap(err, "error getting player avatar")
 	}
+	defer resp.Body.Close()
 
 	avatarResp := PlayerAvatarResponse{}
 
@@ -46,12 +47,14 @@ func GetPlayerAvatar(player *models.Player) error {
 	}
 
 	// check that the link is valid
-	resp, err = client.Get(avatarResp.Large)
+	resp2, err := client.Get(avatarResp.Large)
 	if err != nil {
 		return errors.Wrap(err, "error checking player avatar")
 	}
+	defer resp2.Body.Close()
 
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+
+	if resp2.StatusCode < 200 || resp2.StatusCode >= 300 {
 		return fmt.Errorf("player avatar link for %s returned error code: %d", player.Username, resp.StatusCode)
 	}
 
@@ -73,6 +76,7 @@ func GetPlayerTier(player *models.Player) error {
 	if err != nil {
 		return errors.Wrap(err, "error getting player tier")
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return fmt.Errorf("player tier for %s returned error code: %d", player.Username, resp.StatusCode)
@@ -105,6 +109,7 @@ func GetPlayerInfo(player *models.Player) error {
 	if err != nil {
 		return errors.Wrap(err, "error getting player info")
 	}
+	defer resp.Body.Close()
 
 	infoResp := PlayerInfoResponse{}
 	err = json.NewDecoder(resp.Body).Decode(&infoResp)

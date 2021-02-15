@@ -113,19 +113,6 @@ services:
     links:
       - mysql
     restart: always
-  apicache:
-    build:
-      context: .
-      dockerfile: Dockerfile-indexer
-      args:
-        indexer: apicache
-        VERSION: ${TAG:-latest}
-    image: gcr.io/kagstats/apicache:${TAG:-latest}
-    environment:
-      - INDEXER_INTERVAL=20m
-    links:
-      - mysql
-    restart: always
   accolades:
     build:
       context: .

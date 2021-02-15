@@ -108,6 +108,8 @@ func (c *Collector) OnPlayerJoined(m rcon.Message, r *rcon.Client) error {
 			return err
 		}
 
+		updater.incoming <- player
+
 		if player.StatsBan || isNewPlayer(&player) {
 			return nil
 		}
