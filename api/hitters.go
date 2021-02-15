@@ -9,9 +9,10 @@ import (
 )
 
 type Hitter struct {
-	PlayerID int64 `json:"-" db:"playerID"`
-	Hitter   int64 `json:"hitter"`
-	Kills    int64 `json:"kills"`
+	PlayerID int64  `json:"-" db:"playerID"`
+	Hitter   int64  `json:"hitter"`
+	Kills    int64  `json:"kills"`
+	Name     string `json:"name"`
 }
 
 func HitterRoutes(r *mux.Router) {
@@ -37,6 +38,10 @@ func getHitters(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, fmt.Sprintf("could not find hitters for player: %v", err), http.StatusInternalServerError)
 		return
+	}
+
+	for i, hitter := range h {
+		h[i].Name = models.HitterName(hitter.Hitter)
 	}
 
 	JSONResponse(w, struct {
