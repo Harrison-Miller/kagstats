@@ -1,8 +1,6 @@
 package models
 
 import (
-	"database/sql"
-
 	"github.com/jmoiron/sqlx"
 )
 
@@ -35,8 +33,8 @@ type Player struct {
 	StatsBan       bool   `json:"statsBan" db:"statsBan"`
 	Notes          string `json:"-" db:"notes"`
 
-	LastEventID sql.NullInt64 `json:"-" db:"lastEventID"`
-	Event       `json:"lastEvent" db:"lastEvent,prefix=lastEvent."`
+	//LastEventID sql.NullInt64 `json:"-" db:"lastEventID"`
+	//Event       `json:"lastEvent" db:"lastEvent,prefix=lastEvent."`
 }
 
 func GetPlayer(playerID int, db *sqlx.DB) (Player, error) {
@@ -74,6 +72,7 @@ type Kill struct {
 	Server `json:"server" db:"server,prefix=server."`
 }
 
+/*
 type Event struct {
 	ID       int64  `json:"id" db:"ID"`
 	PlayerID int64  `json:"playerId" db:"playerID"`
@@ -81,6 +80,7 @@ type Event struct {
 	Time     int64  `json:"time"`
 	ServerID int64  `json:"serverId" db:"serverID"`
 }
+*/
 
 type FlagCapture struct {
 	ID       int64  `json:"id" db:"ID"`

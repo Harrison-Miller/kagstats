@@ -1,14 +1,6 @@
 package main
 
-import (
-	"fmt"
-	"net/http"
-	"strconv"
-
-	"github.com/Harrison-Miller/kagstats/common/models"
-	"github.com/gorilla/mux"
-)
-
+/*
 func getPlayerEvents(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	playerID, err := strconv.Atoi(vars["id"])
@@ -44,3 +36,4 @@ func getServerEvents(w http.ResponseWriter, r *http.Request) {
 
 	JSONResponse(w, &events)
 }
+*/

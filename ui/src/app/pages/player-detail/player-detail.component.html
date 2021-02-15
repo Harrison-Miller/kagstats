@@ -66,6 +66,7 @@
         </div>
     </div>
     
+    <!--
     <div class="row buffer">
         <div class="col">
             <ng-container *ngIf="player.lastEvent.type == 'joined'; else statusElse">
@@ -81,15 +82,11 @@
             </ng-template>
         </div>
     </div>
+    -->
 
-    <div *ngIf="server" class="row">
+    <div *ngIf="status && status.apiServer" class="row">
         <div class="col">
-            <ng-container *ngIf="player.lastEvent.type == 'joined'; else offline">
-                <span class="float-left">Currently playing on: <b>{{ server.name }}</b></span>
-            </ng-container>
-            <ng-template #offline>
-                <span class="float-left">Last seen on: <b>{{ server.name }}</b> {{ player.lastEvent.time | timeAgo }}</span>
-            </ng-template>
+            <span class="float-left">Last seen on: <b>{{ status.apiServer.serverName }}</b> {{ status.lastUpdate | timeAgo }}</span>
         </div>
     </div>
     </div>

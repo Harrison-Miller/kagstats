@@ -36,6 +36,7 @@ export interface Captures {
   captures: number;
 }
 
+/*
 export interface Event {
   id: number;
   type: string;
@@ -43,6 +44,7 @@ export interface Event {
   serverId: number;
   playerId: number;
 }
+*/
 
 export interface Kill {
   id: number;
@@ -80,7 +82,7 @@ export interface Player {
   mapmaker: boolean;
   moderation: boolean;
 
-  lastEvent: Event;
+  //lastEvent: Event;
 
 
 }
@@ -90,6 +92,20 @@ export interface APIServer {
   maxPlayers: number;
   firstSeen: string;
   lastUpdate: string;
+  description: string;
+  serverName: string;
+}
+
+export interface APIPlayerStatus {
+  action: number;
+  lastUpdate: string;
+  server: APIPlayerServer;
+  apiServer: APIServer;
+}
+
+export interface APIPlayerServer {
+  serverIPv4Address: string;
+  serverPort: string;
 }
 
 export interface Server {

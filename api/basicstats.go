@@ -11,13 +11,11 @@ import (
 const basicQuery = `SELECT basic_stats.*, p.ID "player.ID", p.username "player.username",
 p.charactername "player.charactername", p.clantag "player.clantag", p.oldgold "player.oldgold",
 p.registered "player.registered", p.role "player.role", p.avatar "player.avatar", p.tier "player.tier",
-e.type "player.lastEvent.type", e.time "player.lastEvent.time", e.serverID "player.lastEvent.serverID",
 p.gold "player.gold", p.silver "player.silver", p.bronze "player.bronze", p.participation "player.participation",
 p.github "player.github", p.community "player.community", p.mapmaker "player.mapmaker", p.moderation "player.moderation",
 p.leaderboardBan "player.leaderboardBan", p.statsBan "player.statsBan"
  FROM basic_stats 
-INNER JOIN players as p ON basic_stats.playerID=p.ID 
-INNER JOIN events as e ON p.lastEventID=e.ID `
+ INNER JOIN players as p ON basic_stats.playerID=p.ID `
 
 type BasicStats struct {
 	models.Player `json:"player" db:"player,prefix=player."`

@@ -38,7 +38,7 @@ export class MapsComponent implements OnInit {
                 } else if (path.includes("tth") || path.includes("war")) {
                   map.gamemode = "TTH";
                 }
-                console.log(path);
+                //console.log(path);
                 map.image = "https://raw.githubusercontent.com/transhumandesign/kag-base/master/" + p.path;
               }
             }

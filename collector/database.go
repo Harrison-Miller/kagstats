@@ -5,8 +5,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/Harrison-Miller/kagstats/common/utils"
-
 	"github.com/Harrison-Miller/kagstats/common/models"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
@@ -39,6 +37,7 @@ func UpdatePlayerInfo(player *models.Player) error {
 	return nil
 }
 
+/*
 func UpdateJoinTime(playerID int64, serverID int64) error {
 	return AddEvent(playerID, "joined", serverID)
 }
@@ -46,6 +45,7 @@ func UpdateJoinTime(playerID int64, serverID int64) error {
 func UpdateLeaveTime(playerID int64, serverID int64) error {
 	return AddEvent(playerID, "left", serverID)
 }
+*/
 
 func UpdateServerInfo(server *models.Server) error {
 	tx, err := db.Begin()
@@ -201,6 +201,7 @@ func Commit() error {
 	return nil
 }
 
+/*
 func AddEvent(playerID int64, eventType string, serverID int64) error {
 	tx, err := db.Begin()
 	if err != nil {
@@ -230,6 +231,7 @@ func AddEvent(playerID int64, eventType string, serverID int64) error {
 	}
 	return nil
 }
+*/
 
 func CommitFlagCapture(capture models.FlagCapture) error {
 	tx, err := db.Begin()

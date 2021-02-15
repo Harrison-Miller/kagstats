@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PlayersService } from '../../services/players.service';
-import { Player, BasicStats, Nemesis, Hitter, Server } from '../../models';
+import { Player, BasicStats, Nemesis, Hitter, Server, APIPlayerStatus } from '../../models';
 import { NemesisService } from '../../services/nemesis.service';
 import { takeUntil } from 'rxjs/operators';
 import { HITTER_DESCRIPTION } from '../../hitters';
@@ -38,7 +38,7 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
     totalDeaths: 0
   };
 
-  server: Server;
+  status: APIPlayerStatus;
 
   captures: number;
   nemesis: Nemesis;
@@ -113,23 +113,31 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
       .subscribe( b => {
         this.basicStats = b;
         this.player = this.basicStats.player;
-        this.getServer(this.player.lastEvent.serverId);
+        this.getStatus(this.player.username);
         this.titleService.setTitle("KAG Stats - " + this.player.characterName);
       },
       error => {
         this.playersService.getPlayerName(this.playerId)
           .subscribe( a => {
             this.player = a;
-            this.getServer(this.player.lastEvent.serverId);
+            this.getStatus(this.player.username);
             this.titleService.setTitle("KAG Stats - " + this.player.characterName);
           })
       });
   }
 
-  getServer(id: number): void {
-    this.serversService.getServer(id)
+  getStatus(username: string): void {
+    this.playersService.getStatus(username)
+      .subscribe( status => {
+        this.status = status;
+        this.getServer(status.server.serverIPv4Address, status.server.serverPort);
+      });
+  }
+
+  getServer(ip: string, port: string): void {
+    this.serversService.getAPIServer(ip,  port)
       .subscribe( server => {
-        this.server =  server;
+        this.status.apiServer = server;
       });
   }
 

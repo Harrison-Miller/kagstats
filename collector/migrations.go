@@ -88,11 +88,28 @@ func RunMigrations(db *sqlx.DB) error {
 		return err
 	}
 
+	err = RunMigration(17, RemoveEvents, db)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func AddColumn(table string, name string, props string, defaultVal string, db *sqlx.DB) error {
 	stmnt := fmt.Sprintf("ALTER TABLE %s ADD %s %s DEFAULT %s", table, name, props, defaultVal)
+	_, err := db.Exec(stmnt)
+	return err
+}
+
+func DelColumn(table string, name string, db *sqlx.DB) error {
+	stmnt := fmt.Sprintf("ALTER TABLE %s DROP COLUMN %s", table, name)
+	_, err := db.Exec(stmnt)
+	return err
+}
+
+func DelFK(table string, name string, db *sqlx.DB) error {
+	stmnt := fmt.Sprintf("alter table %s drop foreign key %s", table, name)
 	_, err := db.Exec(stmnt)
 	return err
 }
@@ -404,6 +421,25 @@ func AddMapVotes(db *sqlx.DB) error {
 		map2Votes INT NOT NULL,
 		randomVotes INT NOT NULL
 	)`)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func RemoveEvents(db *sqlx.DB) error {
+	err := DelFK("players", "players_ibfk_1", db)
+	if err != nil {
+		return errd
+	}
+
+	err = DelColumn("players", "lastEventID", db)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec("DROP TABLE IF EXISTS events")
 	if err != nil {
 		return err
 	}

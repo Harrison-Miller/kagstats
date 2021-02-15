@@ -3,8 +3,9 @@ package main
 import (
 	"encoding/json"
 	"net/http"
-	"github.com/gorilla/mux"
 	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 func GetIntURLArg(name string, r *http.Request) (int, error) {

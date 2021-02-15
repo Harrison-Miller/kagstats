@@ -112,10 +112,12 @@ func (c *Collector) OnPlayerJoined(m rcon.Message, r *rcon.Client) error {
 			return nil
 		}
 
-		err = UpdateJoinTime(player.ID, c.server.ID)
-		if err != nil {
-			return err
-		}
+		/*
+			err = UpdateJoinTime(player.ID, c.server.ID)
+			if err != nil {
+				return err
+			}
+		*/
 		c.logger.Printf("%s (%d) joined the game", player.Username, player.ID)
 		c.playerCount++
 	}
@@ -144,10 +146,12 @@ func (c *Collector) OnPlayerLeave(m rcon.Message, r *rcon.Client) error {
 			return nil
 		}
 
-		err = UpdateLeaveTime(player.ID, c.server.ID)
-		if err != nil {
-			return err
-		}
+		/*
+			err = UpdateLeaveTime(player.ID, c.server.ID)
+			if err != nil {
+				return err
+			}
+		*/
 		c.logger.Printf("%s (%d) left the game", player.Username, player.ID)
 		if c.playerCount > 0 {
 			c.playerCount--
@@ -239,10 +243,12 @@ func (c *Collector) PlayerList(m rcon.Message, r *rcon.Client) error {
 				continue
 			}
 
-			err = UpdateJoinTime(p.ID, c.server.ID)
-			if err != nil {
-				return err
-			}
+			/*
+				err = UpdateJoinTime(p.ID, c.server.ID)
+				if err != nil {
+					return err
+				}
+			*/
 			c.logger.Printf("%s (%d) was in the game", p.Username, p.ID)
 		}
 		c.playerCount = len(players) - altPlayers
@@ -461,10 +467,12 @@ func Collect(sconfig configs.ServerConfig) {
 		// Add a disconnect event if the server disconects from the collector
 		for _, player := range players {
 			if player.ServerID == collector.server.ID {
-				err = UpdateLeaveTime(player.ID, player.ServerID)
-				if err != nil {
-					logger.Println(err)
-				}
+				/*
+					err = UpdateLeaveTime(player.ID, player.ServerID)
+					if err != nil {
+						logger.Println(err)
+					}
+				*/
 				logger.Printf("%s (%d) left the game", player.Username, player.ID)
 			}
 		}

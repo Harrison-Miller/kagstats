@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { PagedResult, Player, BasicStats } from '../models';
+import { PagedResult, Player, BasicStats, APIPlayerStatus } from '../models';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
@@ -28,5 +28,11 @@ export class PlayersService {
   searchPlayers(search: string): Observable<Player[]> {
     search = search.toLowerCase();
     return this.http.get<Player[]>(`${environment.apiUrl}/players/search/${search}`);
+  }
+
+  getStatus(playerName: string) : Observable<APIPlayerStatus> {
+    return this.http.get<{playerStatus:APIPlayerStatus}>(`https://api.kag2d.com/v1/player/${playerName}/status`).pipe(
+    map(status => status.playerStatus)
+  );
   }
 }
