@@ -31,9 +31,9 @@ export class ServersComponent implements OnInit {
         .subscribe(status => {
           server.APIStatus = status;
           this.servers.sort((a,b) => {
-            if (!a.status) {
+            if (!a.status || !a.APIStatus) {
               return 1;
-            }else if(!b.status) {
+            }else if(!b.status || !b.APIStatus) {
               return -1;
             }
             return b.APIStatus.currentPlayers - a.APIStatus.currentPlayers;
