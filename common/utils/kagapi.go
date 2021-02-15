@@ -55,7 +55,7 @@ func GetPlayerAvatar(player *models.Player) error {
 
 
 	if resp2.StatusCode < 200 || resp2.StatusCode >= 300 {
-		return fmt.Errorf("player avatar link for %s returned error code: %d", player.Username, resp.StatusCode)
+		return fmt.Errorf("player avatar link for %s returned error code: %d", player.Username, resp2.StatusCode)
 	}
 
 	player.Avatar = avatarResp.Large
