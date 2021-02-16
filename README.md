@@ -50,4 +50,4 @@ To tear down the environment run:
 `docker-compose down` and `docker-compose stop`
 
 ## Developing 3rd party apps using the KAG Stats api
-visit https://kagstats.com/api/swagger/
+visit https://kagstats.com/api/swagger/index.html
