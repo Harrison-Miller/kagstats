@@ -86,7 +86,7 @@
 
     <div *ngIf="status && status.apiServer" class="row">
         <div class="col">
-            <span class="float-left">Last seen on: <b>{{ status.apiServer.serverName }}</b> {{ status.lastUpdate | timeAgo }}</span>
+            <span class="float-left">Last seen on: <b>{{ status.apiServer.serverName }}</b> {{ status.lastUpdateDate | timeAgo }}</span>
         </div>
     </div>
     </div>

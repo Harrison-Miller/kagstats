@@ -99,6 +99,7 @@ export interface APIServer {
 export interface APIPlayerStatus {
   action: number;
   lastUpdate: string;
+  lastUpdateDate: number;
   server: APIPlayerServer;
   apiServer: APIServer;
 }

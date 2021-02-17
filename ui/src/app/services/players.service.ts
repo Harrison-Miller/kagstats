@@ -32,7 +32,11 @@ export class PlayersService {
 
   getStatus(playerName: string) : Observable<APIPlayerStatus> {
     return this.http.get<{playerStatus:APIPlayerStatus}>(`https://api.kag2d.com/v1/player/${playerName}/status`).pipe(
-    map(status => status.playerStatus)
+    map(status => {
+      var b = status.playerStatus.lastUpdate.split(/\D/);
+      status.playerStatus.lastUpdateDate = Date.UTC(+b[0], +b[1]-1, +b[2], +b[3], +b[4], +b[5]);
+      return status.playerStatus;
+    })
   );
   }
 }
