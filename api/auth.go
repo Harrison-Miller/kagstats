@@ -78,8 +78,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Name:       "KAGSTATS_TOKEN",
 		Value:      signed,
 		Expires:    expiration,
-		//Secure:     true,
-		//HttpOnly:   true,
+		Secure:     true,
+		HttpOnly:   true,
 	})
 
 	JSONResponse(w, struct{
