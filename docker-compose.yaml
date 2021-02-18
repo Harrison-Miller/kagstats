@@ -40,6 +40,7 @@ services:
       - ARCHER_GATE=15
       - BUILDER_GATE=5
       - KNIGHT_GATE=25
+      - AUTH_SECRET=${AUTH_SECRET:-secret}
     links:
       - mysql
     hostname: api
