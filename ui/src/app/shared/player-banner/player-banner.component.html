@@ -7,22 +7,6 @@
       <ng-template #avatarElse>
         <img id="avatar" src="{{ player.id | unkownAvatar }}" class="rounded-circle" style="width: 50px; height: 50px;">
       </ng-template>
-
-      <!--
-      <ng-container *ngIf="status">
-        <ng-container *ngIf="player.lastEvent.type == 'joined'; else statusElse">
-            <span class="dot bg-success"></span>
-        </ng-container>
-        <ng-template #statusElse>
-            <ng-container *ngIf="today - player.lastEvent.time < 150000; else idleStatus">
-                <span class="dot bg-warning"></span>
-            </ng-container>
-            <ng-template #idleStatus>
-                <span class="dot bg-secondary"></span>
-            </ng-template>
-        </ng-template>
-      </ng-container>
-    -->
   </div>
 
   <ng-container *ngIf="accolades">

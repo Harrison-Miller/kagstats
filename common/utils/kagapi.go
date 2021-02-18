@@ -123,3 +123,14 @@ func GetPlayerInfo(player *models.Player) error {
 
 	return nil
 }
+
+func ValidateToken(username string, token string) error {
+	path := fmt.Sprintf("https://api.kag2d.com/player/%s/token/%s", username, token)
+
+	resp, err := client.Get(path)
+	if err != nil {
+		return errors.Wrap(err, "error authenticating player")
+	}
+	defer resp.Body.Close()
+	return nil
+}

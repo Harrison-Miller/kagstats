@@ -25,8 +25,69 @@
         <a class="nav-link" routerLink="/about" (click)="isNavbarCollapsed=true">About</a>
       </li>
     </ul>
+    <ng-container *ngIf="playerClaims; else notLoggedin">
+      <ul class="navbar-nav">
+        <li class="nav-item" ngbDropdown>
+          <a class="nav-link" tabindex="0" ngbDropdownToggle id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="mr-3">Welcome, {{playerClaims.username}}</span>
+            <ng-container *ngIf="playerClaims.avatar != ''; else avatarElse">
+              <img id="avatar" src="{{playerClaims.avatar}}" default="/assets/portrait1.png" class="rounded-circle" style="width: 50px; height: 50px;">
+            </ng-container>
+            <ng-template #avatarElse>
+              <img id="avatar" src="{{playerClaims.playerID | unkownAvatar }}" class="rounded-circle" style="width: 50px; height: 50px;">
+            </ng-template>
+          </a>
+          <div class="dropdown-menu" ngbDropdownMenu aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" ngbDropdownItem routerLink="/players/{{ playerClaims.playerID}}">Profile</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" ngbDropdownItem (click)="logout()">Logout</a>
+          </div>
+        </li>
+      </ul>
+    </ng-container>
+    <ng-template #notLoggedin>
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="#" (click)="open(login)">Login</a>
+        </li>
+      </ul>
+    </ng-template>
   </div>
 </nav>
+
+
+<ng-template #login let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">kag2d.com Login</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="alert alert-info" role="alert">
+      If you play on steam and have not created a kag2d.com account. First create one and link your steam account.
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="username">KAG Username</label>
+        <input type="email" class="form-control" id="username" placeholder="Enter kag2d.com username" formControlName="username">
+      </div>
+      <button type="button" class="btn btn-primary" (click)="generateToken()">Generate Token</button>
+      <hr>
+      <div class="form-group">
+        <label for="token">Token</label>
+        <input type="token" class="form-control" id="token" placeholder="Long value of characters and numbers between quotes" formControlName="token">
+      </div>
+      <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+
+    <div class="alert alert-danger" role="alert" [hidden]="hideError">
+      Username or token is incorrect.
+    </div>
+
+  </div>
+</ng-template>
 
 <div class="container">
   <router-outlet></router-outlet>

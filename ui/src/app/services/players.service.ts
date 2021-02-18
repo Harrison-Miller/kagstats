@@ -9,7 +9,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class PlayersService {
-  searchText: string = "";
+  searchText = '';
 
   constructor(private http: HttpClient) {}
 
@@ -28,6 +28,10 @@ export class PlayersService {
   searchPlayers(search: string): Observable<Player[]> {
     search = search.toLowerCase();
     return this.http.get<Player[]>(`${environment.apiUrl}/players/search/${search}`);
+  }
+
+  lookupPlayer(username: string): Observable<BasicStats> {
+    return this.http.get<BasicStats>(`${environment.apiUrl}/players/lookup/${username}`);
   }
 
   getStatus(playerName: string) : Observable<APIPlayerStatus> {

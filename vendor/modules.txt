@@ -9,6 +9,8 @@ github.com/PuerkitoBio/urlesc
 # github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 github.com/alecthomas/template
 github.com/alecthomas/template/parse
+# github.com/dgrijalva/jwt-go v3.2.0+incompatible
+github.com/dgrijalva/jwt-go
 # github.com/felixge/httpsnoop v1.0.0
 github.com/felixge/httpsnoop
 # github.com/go-openapi/jsonpointer v0.19.5

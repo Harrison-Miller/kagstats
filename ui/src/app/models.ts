@@ -36,16 +36,6 @@ export interface Captures {
   captures: number;
 }
 
-/*
-export interface Event {
-  id: number;
-  type: string;
-  time: number;
-  serverId: number;
-  playerId: number;
-}
-*/
-
 export interface Kill {
   id: number;
   killerClass: string;
@@ -81,9 +71,6 @@ export interface Player {
   community: boolean;
   mapmaker: boolean;
   moderation: boolean;
-
-  //lastEvent: Event;
-
 
 }
 
@@ -155,4 +142,14 @@ export interface GithubTreeEntry {
 
 export interface GithubTree {
   tree: GithubTreeEntry[];
+}
+
+export interface PlayerClaims {
+  playerID: number;
+  username: string;
+  avatar: string;
+}
+
+export interface LoginResp {
+  Token: string;
 }

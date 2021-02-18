@@ -89,6 +89,10 @@ func main() {
 		}
 	}
 
+	if value, ok := os.LookupEnv("AUTH_SECRET"); ok {
+		AUTH_SECRET = value
+	}
+
 	version, _ = os.LookupEnv("VERSION")
 	log.Printf("KAG Stats  %s\n", version)
 
@@ -121,6 +125,7 @@ func main() {
 	HitterRoutes(r)
 	MonthlyStatsRoutes(r)
 	MapsRoutes(r)
+	AuthRoutes(r)
 
 	r.Use(LogHandler)
 
