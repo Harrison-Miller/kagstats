@@ -23,7 +23,7 @@ export class AuthService {
       token,
     });
     obs.subscribe( resp => {
-      Cookies.set(tokenName, resp.token, { expires: 365});
+      Cookies.set(tokenName, resp.token, { expires: 365, secure: true});
       this.getClaims();
     });
     return obs;
