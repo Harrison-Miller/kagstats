@@ -30,6 +30,7 @@ func LogHandler(next http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		m := httpsnoop.CaptureMetrics(next, w, r)
 		log.Printf("%s - %s %v %d %dms\n", r.RemoteAddr, r.Method, r.URL, m.Code, m.Duration/time.Millisecond)
+
 	})
 }
 
@@ -125,7 +126,12 @@ func main() {
 	HitterRoutes(r)
 	MonthlyStatsRoutes(r)
 	MapsRoutes(r)
-	AuthRoutes(r)
+
+
+	protected := r.NewRoute().Subrouter()
+	protected.Use(Verify)
+	ClanRoutes(r, protected)
+	AuthRoutes(r, protected)
 
 	r.Use(LogHandler)
 

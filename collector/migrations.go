@@ -99,6 +99,11 @@ func RunMigrations(db *sqlx.DB) error {
 		return err
 	}
 
+	err = RunMigration(19, AddClanInfo, db)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -463,5 +468,28 @@ func RefreshPlayerInfo(db *sqlx.DB) error {
 	for _, player := range players {
 		updater.incoming <- *player
 	}
+	return nil
+}
+
+func AddClanInfo(db *sqlx.DB) error {
+	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS clan_info (
+		ID INTEGER PRIMARY KEY AUTO_INCREMENT,
+		name varchar(30) NOT NULL UNIQUE,
+		lowerName varchar(30) NOT NULL UNIQUE,
+		createdAt INT NOT NULL,
+		leaderID INT NOT NULL,
+		banned BOOL NOT NULL DEFAULT FALSE,
+		FOREIGN KEY(leaderID) REFERENCES players(ID) ON DELETE CASCADE
+	) CHARACTER SET UTF8mb4 COLLATE utf8mb4_bin`)
+	if err != nil {
+		return err
+	}
+
+	err = AddColumn("players", "clanID", "INT", "NULL", db)
+	err = AddColumn("players", "bannedFromMakingClans", "BOOL NOT NULL", "FALSE", db)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

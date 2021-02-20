@@ -54,6 +54,7 @@ export interface Player {
   username: string;
   characterName: string;
   clanTag: string;
+  clanID: number;
 
   //kag2d.com api
   avatar: string;
@@ -148,8 +149,17 @@ export interface PlayerClaims {
   playerID: number;
   username: string;
   avatar: string;
+  clanID: number;
+  bannedFromMakingClans: boolean;
 }
 
 export interface LoginResp {
-  Token: string;
+  token: string;
+}
+
+export interface ClanInfo {
+  id: number;
+  name: string;
+  createdAt: number;
+  leaderID: number;
 }

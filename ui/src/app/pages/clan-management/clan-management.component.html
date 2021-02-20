@@ -1,0 +1,103 @@
+<h2>Clan Management</h2>
+
+<hr>
+
+<ng-container *ngIf="playerClaims && clan; else noClan">
+  <h3>Clan: {{ clan.name }}</h3>
+
+  <ng-container *ngIf="clan.leaderID == playerClaims.playerID; else notLeader">
+    <h4>Welcome Clan Leader, {{ playerClaims.username }}</h4>
+    <hr>
+    <button type="button" class="btn btn-danger" (click)="openDisband(disband)">Disband</button>
+    <hr>
+
+    <h5>Invite New Member</h5>
+    <form [formGroup]="inviteMemberForm" (ngSubmit)="onInviteMember()">
+      <div class="form-group">
+        <label for="playername">Player Name</label>
+        <input type="text" class="form-control" id="playername" placeholder="..." formControlName="playername">
+      </div>
+      <button type="submit" class="btn btn-primary">Invite</button>
+    </form>
+    <div [hidden]="hideInviteError" class="alert alert-danger" role="alert">Failed to invite player</div>
+
+    <hr>
+    <h5>Pending Invites</h5>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Player</th>
+          <th>Sent</th>
+          <th>Cancel</th>
+        </tr>
+      </thead>
+      <tbody>
+
+      </tbody>
+    </table>
+    <hr>
+
+    <h5>Members</h5>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Player</th>
+          <th>Joined</th>
+          <th>Kick</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </ng-container>
+  <ng-template #noLeader>
+
+  </ng-template>
+
+
+  <ng-template #disband let-modal>
+    <div class="modal-header alert-danger">
+      <h4 class="modal-title" id="modal-basic-title">Disband Clan</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      Are you sure you want to disband <strong>{{clan.name}}</strong>?
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-danger btn-lg m-auto" (click)="disbandClan()">Disband</button>
+    </div>
+  </ng-template>
+
+</ng-container>
+<ng-template #noClan>
+
+<ng-container *ngIf="playerClaims && !playerClaims.bannedFromMakingClans">
+
+  <h4>Register Clan</h4>
+  <form [formGroup]="registerClanForm" (ngSubmit)="onRegister()">
+    <div class="form-group">
+      <label for="clanname">Clan Name</label>
+      <input type="text" class="form-control" id="clanname" placeholder="..." formControlName="clanname">
+    </div>
+    <button type="submit" class="btn btn-primary">Register</button>
+  </form>
+  <div [hidden]="hideRegisterError" class="alert alert-danger" role="alert">Clan name not available</div>
+
+  <hr>
+
+</ng-container>
+
+<h3>Invites</h3>
+
+</ng-template>
+
+<ng-template #registerCongrats let-modal>
+  <div class="modal-header alert-success">
+    <h4 class="modal-title" id="modal-basic-title">Congrats!</h4>
+  </div>
+  <div class="modal-body">
+    Congrats on registering your clan: <strong>{{ clan.name }}</strong>!
+  </div>
+</ng-template>

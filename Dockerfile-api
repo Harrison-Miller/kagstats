@@ -13,7 +13,7 @@ ADD api/ ./api
 
 WORKDIR $GOPATH/src/github.com/Harrison-Miller/kagstats/api
 
-RUN swag init --parseDependency --parseInternal --parseDepth 1 -g api.go
+RUN swag init --parseDependency --parseInternal --parseDepth 2 -g api.go
 RUN GO111MODULE=on GOARCH=386 CGO_ENABLED=0 GOOS=linux go install -mod=vendor ./...
 RUN cp $GOPATH/bin/linux_386/api /api
 

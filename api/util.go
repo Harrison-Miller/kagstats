@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -44,4 +45,13 @@ func Max(x, y int64) int64 {
 		return x
 	}
 	return y
+}
+
+func GetClaims(r *http.Request) (*PlayerClaims, error) {
+	claims, ok := r.Context().Value("claims").(*PlayerClaims)
+	if !ok {
+		return nil, fmt.Errorf("no claims")
+	}
+
+	return claims, nil
 }

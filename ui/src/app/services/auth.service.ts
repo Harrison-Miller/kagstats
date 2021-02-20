@@ -4,6 +4,7 @@ import {LoginResp, PlayerClaims} from '../models';
 import {HttpClient} from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import * as Cookies from 'js-cookie';
+import {share} from "rxjs/operators";
 
 const tokenName = 'KAGSTATS_TOKEN';
 
@@ -18,18 +19,18 @@ export class AuthService {
 
   login(username: string, token: string): Observable<LoginResp> {
     const path = `${environment.apiUrl}/login`;
-    const obs = this.http.post<any>(path, {
+    const obs = this.http.post<LoginResp>(path, {
       username,
       token,
-    });
+    }).pipe(share<LoginResp>());
     obs.subscribe( resp => {
-      Cookies.set(tokenName, resp.token, { expires: 365, secure: true});
+      Cookies.set(tokenName, resp.token, { expires: 365 });
       this.getClaims();
     });
     return obs;
   }
 
-  validate(): Observable<any> {
+  validate(): Observable<LoginResp> {
     const path = `${environment.apiUrl}/validate`;
     return this.http.get<any>(path);
   }
@@ -41,22 +42,33 @@ export class AuthService {
     }
 
     // check if we have a cookie and validate it
-    const token = Cookies.get(tokenName);
+    let token = Cookies.get(tokenName);
     if (typeof token !== 'undefined' && token !== '') {
-      this.validate().subscribe( noerr => {
+      this.validate().subscribe( resp => {
+        Cookies.set(tokenName, resp.token, { expires: 365 });
+        token = resp.token;
         const parts = token.split('.');
         if (parts.length === 3) {
           const payload = JSON.parse(atob(parts[1]));
+          console.log('payload');
+          console.log(payload);
           this.playerClaims.next({
             playerID: payload.playerID,
             username: payload.username,
             avatar: payload.avatar,
+            clanID: payload.clanID,
+            bannedFromMakingClans: payload.bannedFromMakingClans,
           });
         }
       });
     }
 
     return;
+  }
+
+  revalidate(): void {
+    this.playerClaims.next(null);
+    this.getClaims();
   }
 
   logout(): void {

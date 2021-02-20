@@ -10,6 +10,8 @@ import { PlayerDetailComponent } from './pages/player-detail/player-detail.compo
 import { MapsComponent } from './pages/maps/maps.component';
 import { KillsComponent } from './pages/kills/kills.component';
 import { AboutComponent } from './pages/about/about.component';
+import {ClanManagementComponent} from "./pages/clan-management/clan-management.component";
+import {AuthenticatedGuard} from "./guard/authenticated.guard";
 
 const routes: Routes = [{
   path: '',
@@ -43,6 +45,10 @@ const routes: Routes = [{
 },{
   path: 'about',
   component: AboutComponent
+},{
+  path: 'clan-management',
+  component: ClanManagementComponent,
+  canActivate: [AuthenticatedGuard]
 }];
 
 @NgModule({

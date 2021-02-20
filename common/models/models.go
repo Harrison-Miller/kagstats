@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -10,6 +11,7 @@ type Player struct {
 	Charactername string `json:"characterName"`
 	Clantag       string `json:"clanTag"`
 	ServerID      int64  // used for tracking in the collector
+	ClanID sql.NullInt64 `json:"clanID" db:"clanID"`
 
 	//Information cached from api.kag2d.com
 	OldGold    bool   `json:"oldGold"`
@@ -35,6 +37,8 @@ type Player struct {
 
 	//LastEventID sql.NullInt64 `json:"-" db:"lastEventID"`
 	//Event       `json:"lastEvent" db:"lastEvent,prefix=lastEvent."`
+
+	BannedFromMakingClans bool `json:"-" db:"bannedFromMakingClans"`
 }
 
 func GetPlayer(playerID int, db *sqlx.DB) (Player, error) {
@@ -72,16 +76,6 @@ type Kill struct {
 	Server `json:"server" db:"server,prefix=server."`
 }
 
-/*
-type Event struct {
-	ID       int64  `json:"id" db:"ID"`
-	PlayerID int64  `json:"playerId" db:"playerID"`
-	Type     string `json:"type"`
-	Time     int64  `json:"time"`
-	ServerID int64  `json:"serverId" db:"serverID"`
-}
-*/
-
 type FlagCapture struct {
 	ID       int64  `json:"id" db:"ID"`
 	PlayerID int64  `json:"playerID" db:"playerID"`
@@ -102,4 +96,13 @@ type MapVotes struct {
 	Map2Name    string `json:"map2Name" db:"map2Name"`
 	Map2Votes   int64  `json:"map2Votes" db:"map2Votes"`
 	RandomVotes int64  `json:"randomVotes" db:"randomVotes"`
+}
+
+type ClanInfo struct {
+	ID int64 `json:"id" db:"ID"`
+	Name string `json:"name" db:"name"`
+	LowerName string `json:"-" db:"lowerName"`
+	CreateAt int64 `json:"createdAt" db:"createdAt"`
+	LeaderID int64 `json:"leaderID" db:"leaderID"`
+	Banned bool `json:"-" db:"banned"`
 }

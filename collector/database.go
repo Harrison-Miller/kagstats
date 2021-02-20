@@ -37,16 +37,6 @@ func UpdatePlayerInfo(player *models.Player) error {
 	return nil
 }
 
-/*
-func UpdateJoinTime(playerID int64, serverID int64) error {
-	return AddEvent(playerID, "joined", serverID)
-}
-
-func UpdateLeaveTime(playerID int64, serverID int64) error {
-	return AddEvent(playerID, "left", serverID)
-}
-*/
-
 func UpdateServerInfo(server *models.Server) error {
 	tx, err := db.Begin()
 	if err != nil {
@@ -134,19 +124,6 @@ func InitDB() error {
 		return errors.Wrap(err, "error creating kills table")
 	}
 
-	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS events (
-		ID INTEGER PRIMARY KEY AUTO_INCREMENT,
-		playerID INT NOT NULL,
-		type varchar(30) NOT NULL,
-		time INT NOT NULL,
-		serverID INT NOT NULL,
-		FOREIGN KEY(playerID) REFERENCES players(ID),
-		FOREIGN KEY(serverID) REFERENCES servers(ID)
-	)`)
-	if err != nil {
-		return errors.Wrap(err, "error creating events table")
-	}
-
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS stats_info (
 		key_name VARCHAR(30) PRIMARY KEY,
 		value INT NOT NULL	
@@ -200,38 +177,6 @@ func Commit() error {
 	uncommitted = make([]models.Kill, 0, 100)
 	return nil
 }
-
-/*
-func AddEvent(playerID int64, eventType string, serverID int64) error {
-	tx, err := db.Begin()
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-
-	res, err := tx.Exec("INSERT INTO events (playerID,Type,Time,ServerID) VALUES(?,?,?,?)",
-		playerID, eventType, utils.NowAsUnixMilliseconds(), serverID)
-
-	if err != nil {
-		return errors.Wrap(err, "error inserting event")
-	}
-
-	id, err := res.LastInsertId()
-	if err != nil {
-		return errors.Wrap(err, "error getting last inserted id")
-	}
-
-	_, err = tx.Exec("UPDATE players SET lastEventID=? WHERE ID=?", id, playerID)
-	if err != nil {
-		return errors.Wrap(err, "error updating player lastEventID")
-	}
-
-	if err := tx.Commit(); err != nil {
-		return errors.Wrap(err, "error committing event")
-	}
-	return nil
-}
-*/
 
 func CommitFlagCapture(capture models.FlagCapture) error {
 	tx, err := db.Begin()

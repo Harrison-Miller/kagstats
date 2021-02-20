@@ -28,7 +28,7 @@ export class AppComponent {
   constructor(public router: Router,
               private modalService: NgbModal,
               private formBuilder: FormBuilder,
-              public authService: AuthService) {}
+              private authService: AuthService) {}
 
   loginForm = this.formBuilder.group({
     username: '',
@@ -80,5 +80,6 @@ export class AppComponent {
 
   logout(): void {
     this.authService.logout();
+    this.router.navigate(['/leaderboards/MonthlyArcher']);
   }
 }
