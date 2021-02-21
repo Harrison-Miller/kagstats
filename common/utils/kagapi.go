@@ -137,5 +137,10 @@ func ValidateToken(username string, token string) error {
 		return errors.Wrap(err, "error authenticating player")
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("error authenticating player")
+	}
+
 	return nil
 }
