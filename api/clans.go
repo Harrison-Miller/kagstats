@@ -49,6 +49,7 @@ func ClanRoutes(public *mux.Router, protected *mux.Router) {
 	public.HandleFunc("/clans/{id:[0-9]+}/members", GetMembers).Methods("GET")
 	protected.HandleFunc("/clans/{id:[0-9]+}/kick/{playerID:[0-9]+}", KickMember).Methods("POSt")
 	protected.HandleFunc("/clans/leave", LeaveClan).Methods("POST")
+	public.HandleFunc("/clans", GetClans).Methods("GET")
 }
 
 func RegisterClan(w http.ResponseWriter, r *http.Request) {
@@ -366,7 +367,7 @@ func GetMembers(w http.ResponseWriter, r *http.Request) {
 	members := []BasicStats{}
 	err = db.Select(&members, basicQuery + "WHERE clanID=?", clanID)
 
-	JSONResponse(w, members)
+	JSONResponse(w, &members)
 }
 
 func KickMember(w http.ResponseWriter, r *http.Request) {
@@ -418,4 +419,15 @@ func LeaveClan(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "error leaving clan", http.StatusInternalServerError)
 		return
 	}
+}
+
+func GetClans(w http.ResponseWriter, r *http.Request) {
+	clans := []models.ClanInfo{}
+	err := db.Select(&clans, "SELECT (SELECT COUNT(id) FROM players WHERE clanID=clan_info.ID) as membersCount, clan_info.*, " + leadersAs + " FROM clan_info JOIN players AS l ON clan_info.leaderID=l.ID")
+	if err != nil {
+		clanError(w, err)
+		return
+	}
+
+	JSONResponse(w, &clans)
 }

@@ -164,6 +164,7 @@ export interface ClanInfo {
   createdAt: number;
   leaderID: number;
 
+  membersCount: number;
   leader: Player;
 }
 

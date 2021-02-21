@@ -107,6 +107,8 @@ type ClanInfo struct {
 	LeaderID int64 `json:"leaderID" db:"leaderID"`
 	Banned bool `json:"-" db:"banned"`
 
+	MembersCount int64 `json:"membersCount" db:"membersCount"`
+
 	Player `json:"leader" db:"leader,prefix=leader."`
 }
 

@@ -38,4 +38,8 @@ export class ClanDetailComponent implements OnInit {
     });
   }
 
+  getKD(kills: number, deaths: number): string {
+    return (kills / (deaths === 0 ? 1 : deaths)).toFixed(2);
+  }
+
 }

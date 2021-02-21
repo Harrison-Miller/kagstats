@@ -74,4 +74,9 @@ export class ClansService {
     const path = `${environment.apiUrl}/clans/leave`;
     return this.http.post<any>(path, {});
   }
+
+  getClans(): Observable<ClanInfo[]> {
+    const path = `${environment.apiUrl}/clans`;
+    return this.http.get<ClanInfo[]>(path);
+  }
 }

@@ -20,10 +20,10 @@
         <tr>
           <td><app-player-banner [status]="false" [player]="stats.player"></app-player-banner></td>
           <td>{{ stats.player.joinedClan | date:'short' }}</td>
-          <td>{{stats.archerKills / stats.archerDeaths | number:'1.0-2'}}</td>
-          <td>{{stats.builderKills / stats.builderDeaths | number:'1.0-2'}}</td>
-          <td>{{stats.knightKills / stats.knightDeaths | number:'1.0-2'}}</td>
-          <td>{{ stats.totalKills / stats.totalDeaths | number:'1.0-2'}}</td>
+          <td>{{getKD(stats.archerKills, stats.archerDeaths)}}</td>
+          <td>{{getKD(stats.builderKills, stats.builderDeaths)}}</td>
+          <td>{{getKD(stats.knightKills, stats.knightDeaths)}}</td>
+          <td>{{getKD(stats.totalKills, stats.totalDeaths)}}</td>
         </tr>
       </tbody>
     </table>

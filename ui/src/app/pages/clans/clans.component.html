@@ -1,0 +1,17 @@
+<h2>Clans</h2>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Leader</th>
+      <th>Members</th>
+    </tr>
+  </thead>
+  <tbody *ngFor="let clan of clans">
+    <tr>
+      <th routerLink="/clans/{{clan.id}}"><strong>{{clan.name}}</strong></th>
+      <th><app-player-banner [status]="false" [player]="clan.leader"></app-player-banner></th>
+      <th>{{clan.membersCount}}</th>
+    </tr>
+  </tbody>
+</table>

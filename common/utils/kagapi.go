@@ -126,9 +126,9 @@ func GetPlayerInfo(player *models.Player) error {
 
 func ValidateToken(username string, token string) error {
 	// For development using two users on the site
-	/*if username == "Henry" &&  token == "foobar" {
+	if username == "Henry" &&  token == "foobar" {
 		return nil
-	}*/
+	}
 
 	path := fmt.Sprintf("https://api.kag2d.com/player/%s/token/%s", username, token)
 
