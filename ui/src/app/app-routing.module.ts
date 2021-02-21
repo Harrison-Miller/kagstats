@@ -12,6 +12,7 @@ import { KillsComponent } from './pages/kills/kills.component';
 import { AboutComponent } from './pages/about/about.component';
 import {ClanManagementComponent} from "./pages/clan-management/clan-management.component";
 import {AuthenticatedGuard} from "./guard/authenticated.guard";
+import {ClanDetailComponent} from "./pages/clan-detail/clan-detail.component";
 
 const routes: Routes = [{
   path: '',
@@ -37,6 +38,10 @@ const routes: Routes = [{
   path: 'players/:id',
   component: PlayerDetailComponent
 },{
+  path: 'clans/:id',
+  component: ClanDetailComponent
+},
+{
   path: 'maps',
   component: MapsComponent
 },{

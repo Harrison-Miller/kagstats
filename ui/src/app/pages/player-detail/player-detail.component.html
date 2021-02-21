@@ -66,24 +66,6 @@
         </div>
     </div>
 
-    <!--
-    <div class="row buffer">
-        <div class="col">
-            <ng-container *ngIf="player.lastEvent.type == 'joined'; else statusElse">
-                <span class="float-left badge badge-success">Online</span>
-            </ng-container>
-            <ng-template #statusElse>
-                <ng-container *ngIf="today - player.lastEvent.time < 150000; else idleStatus">
-                    <span class="float-left badge badge-warning">Offline</span>
-                </ng-container>
-                <ng-template #idleStatus>
-                    <span class="float-left badge badge-secondary">Offline</span>
-                </ng-template>
-            </ng-template>
-        </div>
-    </div>
-    -->
-
     <div *ngIf="status && status.apiServer" class="row">
         <div class="col">
             <span class="float-left">Last seen on: <b>{{ status.apiServer.serverName }}</b> {{ status.lastUpdateDate | timeAgo }}</span>

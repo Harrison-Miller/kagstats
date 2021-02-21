@@ -1,0 +1,32 @@
+<ng-container *ngIf="clan">
+  <h2>{{ clan.name }}</h2>
+  <div>Created: {{ clan.createdAt | date:'short'}}</div>
+  <div>Leader: <app-player-banner [status]="false" [player]="clan.leader"></app-player-banner></div>
+  <ng-container *ngIf="members">
+    <hr>
+    <h3>Members</h3>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Player</th>
+          <th>Joined</th>
+          <th><div class="icon archerIcon"></div></th>
+          <th><div class="icon builderIcon"></div></th>
+          <th><div class="icon knightIcon"></div></th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody *ngFor="let stats of members">
+        <tr>
+          <td><app-player-banner [status]="false" [player]="stats.player"></app-player-banner></td>
+          <td>{{ stats.player.joinedClan | date:'short' }}</td>
+          <td>{{stats.archerKills / stats.archerDeaths | number:'1.0-2'}}</td>
+          <td>{{stats.builderKills / stats.builderDeaths | number:'1.0-2'}}</td>
+          <td>{{stats.knightKills / stats.knightDeaths | number:'1.0-2'}}</td>
+          <td>{{ stats.totalKills / stats.totalDeaths | number:'1.0-2'}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </ng-container>
+</ng-container>
+

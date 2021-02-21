@@ -3,7 +3,7 @@ import {AuthService} from "../../services/auth.service";
 import {FormBuilder} from "@angular/forms";
 import {ClansService} from "../../services/clans.service";
 import {Subject} from "rxjs";
-import {ClanInfo, ClanInvite, Player, PlayerClaims} from "../../models";
+import {BasicStats, ClanInfo, ClanInvite, Player, PlayerClaims} from "../../models";
 import {takeUntil} from "rxjs/operators";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 
@@ -36,7 +36,7 @@ export class ClanManagementComponent implements OnInit {
   kickModal = null;
   clanInvites: ClanInvite[];
   myInvites: ClanInvite[];
-  members: Player[];
+  members: BasicStats[];
   kickSurePlayer: Player;
 
   constructor(private formBuilder: FormBuilder,

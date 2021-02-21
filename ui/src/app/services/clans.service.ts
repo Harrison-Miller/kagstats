@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {Observable} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import { environment } from '../../environments/environment';
-import {ClanInfo, ClanInvite, Player} from "../models";
+import {BasicStats, ClanInfo, ClanInvite, Player} from "../models";
 
 @Injectable({
   providedIn: 'root'
@@ -60,9 +60,9 @@ export class ClansService {
     return this.http.post<any>(path, {});
   }
 
-  getMembers(clanID: number): Observable<Player[]> {
+  getMembers(clanID: number): Observable<BasicStats[]> {
     const path = `${environment.apiUrl}/clans/${clanID}/members`;
-    return this.http.get<Player[]>(path);
+    return this.http.get<BasicStats[]>(path);
   }
 
   kick(clanID: number, playerID: number): Observable<any> {

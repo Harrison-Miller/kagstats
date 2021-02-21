@@ -363,8 +363,8 @@ func GetMembers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	members := []models.Player{}
-	err = db.Select(&members, "SELECT * FROM players WHERE clanID=?", clanID)
+	members := []BasicStats{}
+	err = db.Select(&members, basicQuery + "WHERE clanID=?", clanID)
 
 	JSONResponse(w, members)
 }

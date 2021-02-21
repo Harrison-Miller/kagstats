@@ -37,6 +37,7 @@ import { MapsComponent } from './pages/maps/maps.component';
 import { AuthService } from './services/auth.service';
 import { SafePipe } from './pipes/safe.pipe';
 import { ClanManagementComponent } from './pages/clan-management/clan-management.component';
+import { ClanDetailComponent } from './pages/clan-detail/clan-detail.component';
 
 @NgModule({
   declarations: [
@@ -64,6 +65,7 @@ import { ClanManagementComponent } from './pages/clan-management/clan-management
     MapsComponent,
     SafePipe,
     ClanManagementComponent,
+    ClanDetailComponent,
   ],
   imports: [
     BrowserModule,

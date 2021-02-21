@@ -3,7 +3,7 @@
 <hr>
 
 <ng-container *ngIf="playerClaims && clan; else noClan">
-  <h3>Clan: {{ clan.name }}</h3>
+  <h3 routerLink="/clans/{{clan.id}}">Clan: {{ clan.name }}</h3>
 
   <ng-container *ngIf="clan.leaderID == playerClaims.playerID; else notLeader">
     <h4>Welcome Clan Leader, {{ playerClaims.username }}</h4>
@@ -51,11 +51,11 @@
         </tr>
       </thead>
       <tbody>
-        <ng-container *ngFor="let player of members">
-          <tr *ngIf="player.id != playerClaims.playerID">
-            <td><app-player-banner [status]="false" [player]="player"></app-player-banner></td>
-            <td>{{player.joinedClan | date:'short'}}</td>
-            <td><button type="button" class="btn btn-danger" (click)="openKick(player)">Kick</button></td>
+        <ng-container *ngFor="let stats of members">
+          <tr *ngIf="stats.player.id != playerClaims.playerID">
+            <td><app-player-banner [status]="false" [player]="stats.player"></app-player-banner></td>
+            <td>{{stats.player.joinedClan | date:'short'}}</td>
+            <td><button type="button" class="btn btn-danger" (click)="openKick(stats.player)">Kick</button></td>
           </tr>
         </ng-container>
       </tbody>
@@ -109,10 +109,10 @@
       </tr>
       </thead>
       <tbody>
-      <ng-container *ngFor="let player of members">
-        <tr *ngIf="player.id != playerClaims.playerID">
-          <td><app-player-banner [status]="false" [player]="player"></app-player-banner></td>
-          <td>{{player.joinedClan | date:'short'}}</td>
+      <ng-container *ngFor="let stats of members">
+        <tr *ngIf="stats.player.id != playerClaims.playerID">
+          <td><app-player-banner [status]="false" [player]="stats.player"></app-player-banner></td>
+          <td>{{stats.player.joinedClan | date:'short'}}</td>
         </tr>
       </ng-container>
       </tbody>
