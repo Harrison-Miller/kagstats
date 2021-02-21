@@ -113,7 +113,7 @@ func RunMigrations(db *sqlx.DB) error {
 }
 
 func AddColumn(table string, name string, props string, defaultVal string, db *sqlx.DB) error {
-	stmnt := fmt.Sprintf("ALTER TABLE %s ADD %s %s DEFAULT %s", table, name, props, defaultVal)
+	stmnt := fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %s DEFAULT %s", table, name, props, defaultVal)
 	_, err := db.Exec(stmnt)
 	return err
 }
@@ -491,7 +491,13 @@ func AddClanInfo(db *sqlx.DB) error {
 	}
 
 	err = AddColumn("players", "clanID", "INT", "NULL", db)
+	if err != nil {
+		return err
+	}
 	err = AddColumn("players", "joinedClan", "BIGINT UNSIGNED NOT NULL", "0", db)
+	if err != nil {
+		return err
+	}
 	err = AddColumn("players", "bannedFromMakingClans", "BOOL NOT NULL", "FALSE", db)
 	if err != nil {
 		return err
