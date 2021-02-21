@@ -9,7 +9,7 @@ import (
 )
 
 const basicQuery = `SELECT basic_stats.*, p.ID "player.ID", p.username "player.username",
-p.charactername "player.charactername", p.clantag "player.clantag", p.oldgold "player.oldgold",
+p.charactername "player.charactername", p.clantag "player.clantag", p.clanID "player.clanID", p.joinedClan "player.joinedClan", p.oldgold "player.oldgold",
 p.registered "player.registered", p.role "player.role", p.avatar "player.avatar", p.tier "player.tier",
 p.gold "player.gold", p.silver "player.silver", p.bronze "player.bronze", p.participation "player.participation",
 p.github "player.github", p.community "player.community", p.mapmaker "player.mapmaker", p.moderation "player.moderation",

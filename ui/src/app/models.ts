@@ -55,6 +55,7 @@ export interface Player {
   characterName: string;
   clanTag: string;
   clanID: number;
+  joinedClan: number;
 
   //kag2d.com api
   avatar: string;
@@ -162,4 +163,16 @@ export interface ClanInfo {
   name: string;
   createdAt: number;
   leaderID: number;
+
+  leader: Player;
+}
+
+export interface ClanInvite {
+  clanID: number;
+  playerID: string;
+  time: number;
+
+  player: Player;
+  clan: ClanInfo;
+  leader: Player;
 }

@@ -104,6 +104,11 @@ func RunMigrations(db *sqlx.DB) error {
 		return err
 	}
 
+	err = RunMigration(20, AddClanInvites, db)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -476,7 +481,7 @@ func AddClanInfo(db *sqlx.DB) error {
 		ID INTEGER PRIMARY KEY AUTO_INCREMENT,
 		name varchar(30) NOT NULL UNIQUE,
 		lowerName varchar(30) NOT NULL UNIQUE,
-		createdAt INT NOT NULL,
+		createdAt BIGINT UNSIGNED NOT NULL,
 		leaderID INT NOT NULL,
 		banned BOOL NOT NULL DEFAULT FALSE,
 		FOREIGN KEY(leaderID) REFERENCES players(ID) ON DELETE CASCADE
@@ -486,7 +491,24 @@ func AddClanInfo(db *sqlx.DB) error {
 	}
 
 	err = AddColumn("players", "clanID", "INT", "NULL", db)
+	err = AddColumn("players", "joinedClan", "BIGINT UNSIGNED NOT NULL", "0", db)
 	err = AddColumn("players", "bannedFromMakingClans", "BOOL NOT NULL", "FALSE", db)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func AddClanInvites(db *sqlx.DB) error {
+	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS clan_invites (
+    	clanID INT,
+    	playerID INT,
+    	sentAt BIGINT UNSIGNED NOT NULL,
+    	FOREIGN KEY (clanID) REFERENCES clan_info(ID) ON DELETE CASCADE,
+    	FOREIGN KEY (playerID) REFERENCES players(ID) ON DELETE CASCADE,
+    	PRIMARY KEY (clanID, playerID)
+	)`)
 	if err != nil {
 		return err
 	}

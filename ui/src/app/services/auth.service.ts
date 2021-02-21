@@ -22,10 +22,13 @@ export class AuthService {
     const obs = this.http.post<LoginResp>(path, {
       username,
       token,
-    }).pipe(share<LoginResp>());
+    }, {withCredentials: true}).pipe(share<LoginResp>());
     obs.subscribe( resp => {
+      this.playerClaims.next(null);
+      Cookies.remove(tokenName);
       Cookies.set(tokenName, resp.token, { expires: 365 });
       this.getClaims();
+
     });
     return obs;
   }
@@ -50,8 +53,6 @@ export class AuthService {
         const parts = token.split('.');
         if (parts.length === 3) {
           const payload = JSON.parse(atob(parts[1]));
-          console.log('payload');
-          console.log(payload);
           this.playerClaims.next({
             playerID: payload.playerID,
             username: payload.username,

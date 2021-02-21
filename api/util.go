@@ -2,12 +2,18 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
-
-	"github.com/gorilla/mux"
+	"fmt"
 )
+
+const playersAs = ` p.ID "player.ID", p.username "player.username",
+p.charactername "player.charactername", p.clantag "player.clantag", p.oldgold "player.oldgold",
+p.registered "player.registered", p.role "player.role", p.avatar "player.avatar", p.tier "player.tier",
+p.gold "player.gold", p.silver "player.silver", p.bronze "player.bronze", p.participation "player.participation",
+p.github "player.github", p.community "player.community", p.mapmaker "player.mapmaker", p.moderation "player.moderation",
+p.leaderboardBan "player.leaderboardBan", p.statsBan "player.statsBan" `
 
 func GetIntURLArg(name string, r *http.Request) (int, error) {
 	vars := mux.Vars(r)

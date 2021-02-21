@@ -19,7 +19,7 @@
       </div>
       <button type="submit" class="btn btn-primary">Invite</button>
     </form>
-    <div [hidden]="hideInviteError" class="alert alert-danger" role="alert">Failed to invite player</div>
+    <div [hidden]="hideInviteError" class="alert alert-danger" role="alert">Failed to invite {{inviteMemberForm.value.playername}}</div>
 
     <hr>
     <h5>Pending Invites</h5>
@@ -32,7 +32,11 @@
         </tr>
       </thead>
       <tbody>
-
+        <tr *ngFor="let invite of clanInvites">
+          <td><app-player-banner [status]="false" [player]="invite.player"></app-player-banner></td>
+          <td>{{ invite.sentAt | date:'short'}}</td>
+          <td><button type="button" class="btn btn-danger" (click)="cancelInvite(invite.playerID)">X</button></td>
+        </tr>
       </tbody>
     </table>
     <hr>
@@ -47,11 +51,72 @@
         </tr>
       </thead>
       <tbody>
+        <ng-container *ngFor="let player of members">
+          <tr *ngIf="player.id != playerClaims.playerID">
+            <td><app-player-banner [status]="false" [player]="player"></app-player-banner></td>
+            <td>{{player.joinedClan | date:'short'}}</td>
+            <td><button type="button" class="btn btn-danger" (click)="openKick(player)">Kick</button></td>
+          </tr>
+        </ng-container>
       </tbody>
     </table>
-  </ng-container>
-  <ng-template #noLeader>
 
+    <ng-template #kickSure let-modal>
+      <div class="modal-header alert-danger">
+        <h4 class="modal-title" id="modal-basic-title">Leave Clan</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to kick {{kickSurePlayer.username}}?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger btn-lg m-auto" (click)="kickPlayer(kickSurePlayer.id)">Kick</button>
+      </div>
+    </ng-template>
+
+  </ng-container>
+  <ng-template #notLeader>
+    <hr>
+    <button type="button" class="btn btn-lg btn-danger" (click)="openLeave()">Leave Clan</button>
+
+    <ng-template #leaveSure let-modal>
+      <div class="modal-header alert-danger">
+        <h4 class="modal-title" id="modal-basic-title">Leave Clan</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to leave <strong>{{clan.name}}</strong>?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger btn-lg m-auto" (click)="leaveClan()">Leave</button>
+      </div>
+    </ng-template>
+
+    <hr>
+
+    <div style="width: 250px"><strong>Leader:</strong> <app-player-banner [status]="false" [player]="clan.leader"></app-player-banner> </div>
+    <hr>
+    <h5>Members</h5>
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th>Player</th>
+        <th>Joined</th>
+      </tr>
+      </thead>
+      <tbody>
+      <ng-container *ngFor="let player of members">
+        <tr *ngIf="player.id != playerClaims.playerID">
+          <td><app-player-banner [status]="false" [player]="player"></app-player-banner></td>
+          <td>{{player.joinedClan | date:'short'}}</td>
+        </tr>
+      </ng-container>
+      </tbody>
+    </table>
   </ng-template>
 
 
@@ -90,6 +155,26 @@
 </ng-container>
 
 <h3>Invites</h3>
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th>Clan</th>
+    <th>Leader</th>
+    <th>Sent</th>
+    <th>Accept</th>
+    <th>Decline</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let invite of myInvites">
+    <td><strong>{{ invite.clan.name }}</strong></td>
+    <td><app-player-banner [status]="false" [player]="invite.leader"></app-player-banner></td>
+    <td>{{ invite.sentAt | date:'short'}}</td>
+    <td><button type="button" class="btn btn-success" (click)="acceptInvite(invite.clanID)">Accept</button></td>
+    <td><button type="button" class="btn btn-danger" (click)="declineInvite(invite.clanID)">X</button></td>
+  </tr>
+  </tbody>
+</table>
 
 </ng-template>
 

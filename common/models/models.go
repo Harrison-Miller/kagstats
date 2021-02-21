@@ -12,6 +12,7 @@ type Player struct {
 	Clantag       string `json:"clanTag"`
 	ServerID      int64  // used for tracking in the collector
 	ClanID sql.NullInt64 `json:"clanID" db:"clanID"`
+	JoinedClan int64 `json:"joinedClan" db:"joinedClan"`
 
 	//Information cached from api.kag2d.com
 	OldGold    bool   `json:"oldGold"`
@@ -102,7 +103,20 @@ type ClanInfo struct {
 	ID int64 `json:"id" db:"ID"`
 	Name string `json:"name" db:"name"`
 	LowerName string `json:"-" db:"lowerName"`
-	CreateAt int64 `json:"createdAt" db:"createdAt"`
+	CreatedAt int64 `json:"createdAt" db:"createdAt"`
 	LeaderID int64 `json:"leaderID" db:"leaderID"`
 	Banned bool `json:"-" db:"banned"`
+
+	Player `json:"leader" db:"leader,prefix=leader."`
+}
+
+type Leader Player
+type ClanInvite struct {
+	ClanID int64 `json:"clanID" db:"clanID"`
+	PlayerID string `json:"playerID" db:"playerID"`
+	SentAt int64 `json:"sentAt" db:"sentAt"`
+
+	ClanInfo `json:"clan" db:"clan,prefix=clan."`
+	Player `json:"player" db:"player,prefix=player."`
+	Leader `json:"leader" db:"leader,prefix=leader."`
 }

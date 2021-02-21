@@ -74,7 +74,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		claims.ClanID = &player.ClanID.Int64
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims)
 	signed, err := token.SignedString([]byte(AUTH_SECRET))
 	if err != nil {
 		log.Printf("error signing jwt: %s\n", err)
@@ -86,8 +86,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Name:       "KAGSTATS_TOKEN",
 		Value:      signed,
 		Expires:    expiration,
-		Secure:     true,
-		HttpOnly:   true,
 	})
 
 	JSONResponse(w, struct{
@@ -125,11 +123,11 @@ func Verify(next http.Handler) http.Handler {
 
 func Validate(w http.ResponseWriter, r *http.Request) {
 	// refresh the token as well as validate
-	claims, _ := GetClaims(r);
+	oldClaims, _ := GetClaims(r);
 
 	// get player by id
 	var player models.Player
-	err := db.Get(&player, "SELECT * FROM players WHERE ID=?", claims.PlayerID)
+	err := db.Get(&player, "SELECT * FROM players WHERE ID=?", oldClaims.PlayerID)
 	if err != nil {
 		log.Printf("player not in database: %s\n", err)
 		http.Error(w, "unauthorized", http.StatusUnauthorized)
@@ -137,7 +135,7 @@ func Validate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	expiration := time.Now().Add(24 * time.Hour * 365)
-	claims = &PlayerClaims{
+	claims := PlayerClaims{
 		PlayerID: player.ID,
 		Username: player.Username,
 		Avatar: player.Avatar,
@@ -151,7 +149,7 @@ func Validate(w http.ResponseWriter, r *http.Request) {
 		claims.ClanID = &player.ClanID.Int64
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims)
 	signed, err := token.SignedString([]byte(AUTH_SECRET))
 	if err != nil {
 		log.Printf("error signing jwt: %s\n", err)
@@ -163,8 +161,8 @@ func Validate(w http.ResponseWriter, r *http.Request) {
 		Name:       "KAGSTATS_TOKEN",
 		Value:      signed,
 		Expires:    expiration,
-		Secure:     true,
-		HttpOnly:   true,
+		//Secure:     true,
+		//HttpOnly:   true,
 	})
 
 	JSONResponse(w, struct{
