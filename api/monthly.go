@@ -26,6 +26,8 @@ func MonthlyStatsRoutes(r *mux.Router) {
 	r.HandleFunc("/leaderboard/monthly/archer", GetMonthlyArcherLeaderBoard).Methods("GET")
 	r.HandleFunc("/leaderboard/monthly/builder", GetMonthlyBuilderLeaderBoard).Methods("GET")
 	r.HandleFunc("/leaderboard/monthly/knight", GetMonthlyKnightLeaderBoard).Methods("GET")
+
+	r.HandleFunc("/players/{id:[0-9]+}/monthly", GetMonthlyStats).Methods("GET")
 }
 
 func getYearMonth(r *http.Request) (int, int) {
@@ -124,4 +126,21 @@ func GetMonthlyKnightLeaderBoard(w http.ResponseWriter, r *http.Request) {
 		Month:       month,
 		LeaderBoard: stats,
 	})
+}
+
+func GetMonthlyStats(w http.ResponseWriter, r *http.Request) {
+	playerID, err := GetIntURLArg("id", r)
+	if err != nil {
+		http.Error(w, "could not get id", http.StatusBadRequest)
+		return
+	}
+
+	var stats []MonthlyStats
+	err = db.Select(&stats, monthlyQuery +`WHERE p.ID=?`, playerID)
+	if err != nil {
+		playerNotFoundError(w, err)
+		return
+	}
+
+	JSONResponse(w, &stats)
 }
