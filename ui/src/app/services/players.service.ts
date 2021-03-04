@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { PagedResult, Player, BasicStats, APIPlayerStatus } from '../models';
+import {PagedResult, Player, BasicStats, APIPlayerStatus, MonthlyStats} from '../models';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
@@ -42,5 +42,9 @@ export class PlayersService {
       return status.playerStatus;
     })
   );
+  }
+
+  getMonthlyStatus(playerID: number): Observable<MonthlyStats[]> {
+    return this.http.get<MonthlyStats[]>(`${environment.apiUrl}/players/${playerID}/monthly`);
   }
 }

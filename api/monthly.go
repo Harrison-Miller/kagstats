@@ -136,7 +136,7 @@ func GetMonthlyStats(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var stats []MonthlyStats
-	err = db.Select(&stats, monthlyQuery +`WHERE p.ID=?`, playerID)
+	err = db.Select(&stats, monthlyQuery +`WHERE p.ID=? ORDER BY monthly_stats.year DESC LIMIT 12`, playerID)
 	if err != nil {
 		playerNotFoundError(w, err)
 		return

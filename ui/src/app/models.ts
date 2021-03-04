@@ -14,6 +14,11 @@ export interface BasicStats {
   totalDeaths: number;
 }
 
+export interface MonthlyStats extends BasicStats {
+  year: number;
+  month: number;
+}
+
 export interface Status {
   players: number;
   kills: number;

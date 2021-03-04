@@ -40,6 +40,7 @@ import { ClanManagementComponent } from './pages/clan-management/clan-management
 import { ClanDetailComponent } from './pages/clan-detail/clan-detail.component';
 import { ClansComponent } from './pages/clans/clans.component';
 import { StatsHistoryComponent } from './shared/stats-history/stats-history.component';
+import {NgApexchartsModule} from "ng-apexcharts";
 
 @NgModule({
   declarations: [
@@ -76,6 +77,7 @@ import { StatsHistoryComponent } from './shared/stats-history/stats-history.comp
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
+    NgApexchartsModule,
     NgbModule,
   ],
   providers: [LeaderboardService, PlayersService, ServersService, KillsService, StatusService, CapturesService, MapsService, AuthService],
