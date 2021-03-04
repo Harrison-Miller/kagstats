@@ -36,7 +36,7 @@ steps:
       sed -i "s/latest/$TAG_NAME/g" docker-compose.yaml
       sudo docker-compose -p release down --remove-orphans
 
-      . /backup.sh
+      . /backup.sh &
 
       . /release-env.sh
       sudo -E docker-compose -f docker-compose.yaml -f release-compose.yaml pull

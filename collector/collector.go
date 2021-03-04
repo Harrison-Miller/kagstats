@@ -110,9 +110,9 @@ func (c *Collector) OnPlayerJoined(m rcon.Message, r *rcon.Client) error {
 
 		updater.incoming <- player
 
-		if player.StatsBan || isNewPlayer(&player) {
+		/*if player.StatsBan || isNewPlayer(&player) {
 			return nil
-		}
+		}*/
 
 		/*
 			err = UpdateJoinTime(player.ID, c.server.ID)
@@ -144,9 +144,9 @@ func (c *Collector) OnPlayerLeave(m rcon.Message, r *rcon.Client) error {
 			return err
 		}
 
-		if player.StatsBan || isNewPlayer(&player) {
+		/*if player.StatsBan || isNewPlayer(&player) {
 			return nil
-		}
+		}*/
 
 		/*
 			err = UpdateLeaveTime(player.ID, c.server.ID)
