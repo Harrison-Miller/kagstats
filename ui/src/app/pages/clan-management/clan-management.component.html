@@ -167,7 +167,7 @@
   </thead>
   <tbody>
   <tr *ngFor="let invite of myInvites">
-    <td><strong>{{ invite.clan.name }}</strong></td>
+    <td><a routerLink="/clans/{{invite.clan.id}}"><strong>{{ invite.clan.name }}</strong></a></td>
     <td><app-player-banner [status]="false" [player]="invite.leader"></app-player-banner></td>
     <td>{{ invite.sentAt | date:'short'}}</td>
     <td><button type="button" class="btn btn-success" (click)="acceptInvite(invite.clanID)">Accept</button></td>

@@ -32,7 +32,12 @@
 
   <div class="row">
     <div class="col">
-        <span class="float-left {{ player.role | kagRoleColor }}"> {{player.clanTag}} {{player.characterName}}</span>
+      <ng-container *ngIf="player.clanID">
+        <a routerLink="/clans/{{player.clanID}}">
+          <span class="float-left text-primary font-weight-bold mr-2">{{ player.clanInfo.name }}</span>
+        </a>
+      </ng-container>
+      <span class="float-left {{ player.role | kagRoleColor }}"> <ng-container *ngIf="!similarClanTag">{{player.clanTag}}</ng-container> {{player.characterName}}</span>
     </div>
   </div>
 </div>

@@ -1,7 +1,6 @@
 package models
 
 import (
-	"database/sql"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -11,7 +10,11 @@ type Player struct {
 	Charactername string `json:"characterName"`
 	Clantag       string `json:"clanTag"`
 	ServerID      int64  // used for tracking in the collector
-	ClanID sql.NullInt64 `json:"clanID" db:"clanID"`
+	ClanID *int64 `json:"clanID" db:"clanID"`
+	ClanInfo struct {
+		ClanName *string `json:"name" db:"name"`
+	} `json:"clanInfo" db:"clan_info,prefix=clan_info."`
+	ClanName  *string `json:"clanInfo.name" db:"clan_info.name"`
 	JoinedClan int64 `json:"joinedClan" db:"joinedClan"`
 
 	//Information cached from api.kag2d.com

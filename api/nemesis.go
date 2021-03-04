@@ -41,8 +41,10 @@ func GetNemesis(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var n Nemesis
-	err = db.Get(&n, `SELECT * FROM nemesis AS n INNER JOIN players 
-		ON n.nemesisID=players.ID WHERE n.playerID=? AND n.deaths >= ? ORDER BY n.deaths DESC LIMIT 1`, playerID, config.API.NemesisGate)
+	err = db.Get(&n, `SELECT players.*, clan_info.name "clan_info.name" FROM nemesis AS n 
+		INNER JOIN players ON n.nemesisID=players.ID 
+		LEFT JOIN clan_info ON players.clanID=clan_info.ID
+		WHERE n.playerID=? AND n.deaths >= ? ORDER BY n.deaths DESC LIMIT 1`, playerID, config.API.NemesisGate)
 	if err != nil {
 		JSONResponse(w, NemesisResp{
 			Deaths: 0,
@@ -74,9 +76,10 @@ func GetBullied(w http.ResponseWriter, r *http.Request) {
 	}
 
 	b := []Nemesis{}
-	err = db.Select(&b, `SELECT players.*, n1.playerID as playerID, n1.nemesisID as nemesisID, n1.deaths as deaths 
-		FROM nemesis as n1 INNER JOIN (SELECT playerID, MAX(deaths) as deaths FROM nemesis GROUP BY playerID) AS n2 
-		ON n1.playerID = n2.playerID AND n1.deaths = n2.deaths AND n1.deaths >= ? AND n1.nemesisID = ? INNER JOIN players ON n1.playerID=players.ID
+	err = db.Select(&b, `SELECT players.*, clan_info.name "clan_info.name", n1.playerID as playerID, n1.nemesisID as nemesisID, n1.deaths as deaths FROM nemesis as n1
+		INNER JOIN (SELECT playerID, MAX(deaths) as deaths FROM nemesis GROUP BY playerID) AS n2 ON n1.playerID = n2.playerID AND n1.deaths = n2.deaths AND n1.deaths >= ? AND n1.nemesisID = ?
+		INNER JOIN players ON n1.playerID=players.ID
+		LEFT JOIN clan_info ON players.clanID=clan_info.ID
 	`, config.API.NemesisGate, playerID)
 	if err != nil {
 		log.Printf("Could not find bullied players for player: %v\n", err)

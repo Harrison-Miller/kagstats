@@ -10,18 +10,21 @@ import (
 )
 
 const killsQuery = `SELECT kills.*,
-	victim.ID "victim.ID", victim.username "victim.username", victim.charactername "victim.charactername", victim.clantag "victim.clantag", victim.clanID "victim.clanID", victim.joinedClan "victim.joinedClan",
+	victim.ID "victim.ID", victim.username "victim.username", victim.charactername "victim.charactername", victim.clantag "victim.clantag", vc.name "victim.clan_info.name", victim.clanID "victim.clanID", victim.joinedClan "victim.joinedClan",
 	victim.avatar "victim.avatar", victim.oldgold "victim.oldgold", victim.registered "victim.registered", victim.role "victim.role", victim.tier "victim.tier",
 	victim.gold "victim.gold", victim.silver "victim.silver", victim.gold "victim.gold", victim.participation "victim.participation",
 	victim.github "victim.github", victim.community "victim.community", victim.mapmaker "victim.mapmaker", victim.moderation "victim.moderation", victim.leaderboardBan "victim.leaderboardBan", victim.statsBan "victim.statsBan",
-	killer.ID "killer.ID", killer.username "killer.username", killer.charactername "killer.charactername", killer.clantag "killer.clantag", killer.clanID "killer.clanID", killer.joinedClan "killer.joinedClan",
+	killer.ID "killer.ID", killer.username "killer.username", killer.charactername "killer.charactername", killer.clantag "killer.clantag", kc.name "killer.clan_info.name", killer.clanID "killer.clanID", killer.joinedClan "killer.joinedClan",
 	killer.avatar "killer.avatar", killer.oldgold "killer.oldgold", killer.registered "killer.registered", killer.role "killer.role", killer.tier "killer.tier",
 	killer.gold "killer.gold", killer.silver "killer.silver", killer.gold "killer.gold", killer.participation "killer.participation",
 	killer.github "killer.github", killer.community "killer.community", killer.mapmaker "killer.mapmaker", killer.moderation "killer.moderation", killer.leaderboardBan "killer.leaderboardBan", killer.statsBan "killer.statsBan",
 	server.ID "server.ID", server.name "server.name" FROM kills
 	INNER JOIN players as victim ON kills.victimID=victim.ID
 	INNER JOIN players as killer ON kills.killerID=killer.ID
-	INNER JOIN servers as server ON kills.serverID=server.ID `
+	INNER JOIN servers as server ON kills.serverID=server.ID 
+	LEFT JOIN clan_info as vc ON victim.clanID=vc.ID
+	LEFT JOIN clan_info as kc ON killer.clanID=kc.ID
+`
 
 func killsError(w http.ResponseWriter, err error) {
 	log.Printf("Error getting kills: %v\n", err)
@@ -63,11 +66,11 @@ func GetKills(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err := db.Select(&kills, `SELECT kills.*,
-		victim.ID "victim.ID", victim.username "victim.username", victim.charactername "victim.charactername", victim.clantag "victim.clantag",
+		victim.ID "victim.ID", victim.username "victim.username", victim.charactername "victim.charactername", victim.clantag "victim.clantag", victim.clanID "victim.clanID", vc.name "victim.clan_info.name",
 		victim.avatar "victim.avatar", victim.oldgold "victim.oldgold", victim.registered "victim.registered", victim.role "victim.role", victim.tier "victim.tier",
 		victim.gold "victim.gold", victim.silver "victim.silver", victim.gold "victim.gold", victim.participation "victim.participation",
 		victim.github "victim.github", victim.community "victim.community", victim.mapmaker "victim.mapmaker", victim.moderation "victim.moderation", victim.leaderboardBan "victim.leaderboardBan", victim.statsBan "victim.statsBan",
-		killer.ID "killer.ID", killer.username "killer.username", killer.charactername "killer.charactername", killer.clantag "killer.clantag",
+		killer.ID "killer.ID", killer.username "killer.username", killer.charactername "killer.charactername", killer.clantag "killer.clantag", killer.clanID "killer.clanID", kc.name "killer.clan_info.name",
 		killer.avatar "killer.avatar", killer.oldgold "killer.oldgold", killer.registered "killer.registered", killer.role "killer.role", killer.tier "killer.tier",
 		killer.gold "killer.gold", killer.silver "killer.silver", killer.gold "killer.gold", killer.participation "killer.participation",
 		killer.github "killer.github", killer.community "killer.community", killer.mapmaker "killer.mapmaker", killer.moderation "killer.moderation", killer.leaderboardBan "killer.leaderboardBan", killer.statsBan "killer.statsBan",
@@ -76,6 +79,8 @@ func GetKills(w http.ResponseWriter, r *http.Request) {
 		INNER JOIN players AS victim ON kills.victimID=victim.ID
 		INNER JOIN players AS killer ON kills.killerID=killer.ID
 		INNER JOIN servers AS server ON kills.serverID=server.ID
+		LEFT JOIN clan_info as vc ON victim.clanID=vc.ID
+		LEFT JOIN clan_info as kc ON killer.clanID=kc.ID
 		WHERE NOT victim.statsBan AND NOT killer.statsBan`, start, limit)
 	if err != nil {
 		killsError(w, err)

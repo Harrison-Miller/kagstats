@@ -20,7 +20,7 @@ type InviteMemberReq struct {
 
 const clansAs = ` c.ID "clan.ID", c.name "clan.name", c.createdAt "clan.createdAt", c.leaderID "clan.leaderID" `
 const leadersAs = ` l.ID "leader.ID", l.username "leader.username",
-l.charactername "leader.charactername", l.clantag "leader.clantag", l.clanID "leader.clanID", l.joinedClan "leader.joinedClan", l.oldgold "leader.oldgold",
+l.charactername "leader.charactername", l.clantag "leader.clantag", l.clanID "leader.clanID", c.name "leader.clan_info.name", l.joinedClan "leader.joinedClan", l.oldgold "leader.oldgold",
 l.registered "leader.registered", l.role "leader.role", l.avatar "leader.avatar", l.tier "leader.tier",
 l.gold "leader.gold", l.silver "leader.silver", l.bronze "leader.bronze", l.participation "leader.participation",
 l.github "leader.github", l.community "leader.community", l.mapmaker "leader.mapmaker", l.moderation "leader.moderation",
@@ -104,7 +104,7 @@ func GetClan(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var clan models.ClanInfo
-	err = db.Get(&clan, "SELECT clan_info.*, " + leadersAs + " FROM clan_info INNER JOIN players as l ON leaderID=l.ID WHERE clan_info.ID=? AND clan_info.banned=false", clanID)
+	err = db.Get(&clan, "SELECT c.*, " + leadersAs + " FROM clan_info as c INNER JOIN players as l ON leaderID=l.ID WHERE c.ID=? AND c.banned=false", clanID)
 	if err != nil {
 		clanError(w, err)
 		return
@@ -199,7 +199,7 @@ func InviteMember(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if player.ClanID.Valid {
+	if player.ClanID != nil {
 		log.Printf("player is already in a clan\n")
 		http.Error(w, "player is already in a clan", http.StatusBadRequest)
 		return
@@ -306,7 +306,7 @@ func DeclineInvite(w http.ResponseWriter, r *http.Request) {
 	_, err = db.Exec("DELETE FROM clan_invites WHERE clanID=? AND playerID=?", clanID, claims.PlayerID)
 	if err != nil {
 		log.Printf("error declining clan invite: %s\n", err)
-		http.Error(w, "error declinig clan invite", http.StatusInternalServerError)
+		http.Error(w, "error declining clan invite", http.StatusInternalServerError)
 		return
 	}
 }
@@ -423,7 +423,7 @@ func LeaveClan(w http.ResponseWriter, r *http.Request) {
 
 func GetClans(w http.ResponseWriter, r *http.Request) {
 	clans := []models.ClanInfo{}
-	err := db.Select(&clans, "SELECT (SELECT COUNT(id) FROM players WHERE clanID=clan_info.ID) as membersCount, clan_info.*, " + leadersAs + " FROM clan_info JOIN players AS l ON clan_info.leaderID=l.ID")
+	err := db.Select(&clans, "SELECT (SELECT COUNT(id) FROM players WHERE clanID=c.ID) as membersCount, c.*, " + leadersAs + " FROM clan_info as c JOIN players AS l ON c.leaderID=l.ID")
 	if err != nil {
 		clanError(w, err)
 		return

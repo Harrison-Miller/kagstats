@@ -13,9 +13,10 @@ p.charactername "player.charactername", p.clantag "player.clantag", p.clanID "pl
 p.registered "player.registered", p.role "player.role", p.avatar "player.avatar", p.tier "player.tier",
 p.gold "player.gold", p.silver "player.silver", p.bronze "player.bronze", p.participation "player.participation",
 p.github "player.github", p.community "player.community", p.mapmaker "player.mapmaker", p.moderation "player.moderation",
-p.leaderboardBan "player.leaderboardBan", p.statsBan "player.statsBan"
+p.leaderboardBan "player.leaderboardBan", p.statsBan "player.statsBan", c.name "player.clan_info.name"
  FROM basic_stats 
- INNER JOIN players as p ON basic_stats.playerID=p.ID `
+ INNER JOIN players as p ON basic_stats.playerID=p.ID 
+ LEFT JOIN clan_info as c ON p.clanID=c.ID `
 
 type BasicStats struct {
 	models.Player `json:"player" db:"player,prefix=player."`

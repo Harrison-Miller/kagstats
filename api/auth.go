@@ -70,8 +70,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	if player.ClanID.Valid {
-		claims.ClanID = &player.ClanID.Int64
+	if player.ClanID != nil {
+		claims.ClanID = player.ClanID
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims)
@@ -145,8 +145,8 @@ func Validate(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	if player.ClanID.Valid {
-		claims.ClanID = &player.ClanID.Int64
+	if player.ClanID != nil {
+		claims.ClanID = player.ClanID
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims)

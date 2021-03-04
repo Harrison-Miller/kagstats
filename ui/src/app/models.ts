@@ -60,6 +60,7 @@ export interface Player {
   characterName: string;
   clanTag: string;
   clanID: number;
+  clanInfo: ClanInfo;
   joinedClan: number;
 
   //kag2d.com api

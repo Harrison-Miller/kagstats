@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Player } from '../../models';
+import {Router} from "@angular/router";
 
 export const REGISTERED_TOOLTIP = {
   "r10yBadge": "playing for over 10 years",
@@ -37,14 +38,19 @@ export class PlayerBannerComponent implements OnInit {
 
   // optional inputs for changing the style of the player banner
   @Input() avatar: boolean = true; // show the avatar
-  @Input() status: boolean =  true; //show the status icon
+  @Input() status: boolean =  true; // show the status icon
   @Input() accolades: boolean = true; // show accolade list
 
-  constructor() { 
+  similarClanTag: boolean = false;
+
+  constructor(private router: Router) {
 
   }
 
   ngOnInit() {
+    if (this.player.clanID && this.player.clanTag !== '' && this.player.clanTag.toLowerCase().includes(this.player.clanInfo.name.toLowerCase())) {
+      this.similarClanTag = true;
+    }
   }
 
 }

@@ -48,6 +48,8 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
 
   today: number = Date.now();
 
+  similarClanTag: boolean = false;
+
   @ViewChild('t') t;
 
   constructor(
@@ -73,7 +75,7 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
       if(this.t) {
         this.t.select('overview');
       }
-      
+
       this.getPlayer();
       this.nemesisService.getNemesis(this.playerId)
         .subscribe( nemesis => {
@@ -84,7 +86,7 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
       this.nemesisService.getBullied(this.playerId)
         .subscribe( bullied => {
           if(bullied) {
-            
+
             this.bullied = bullied.sort((a,b) => b.deaths - a.deaths);
           }
         });
@@ -100,12 +102,12 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
           if(c) {
             this.captures = c.captures;
           }
-        })
+        });
     });
   }
 
   ngOnDestroy() {
-    this.titleService.setTitle("KAG Stats");
+    this.titleService.setTitle('KAG Stats');
   }
 
   getPlayer(): void {
@@ -114,14 +116,18 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
         this.basicStats = b;
         this.player = this.basicStats.player;
         this.getStatus(this.player.username);
-        this.titleService.setTitle("KAG Stats - " + this.player.characterName);
+        this.titleService.setTitle('KAG Stats - ' + this.player.characterName);
+
+        if (this.player.clanID && this.player.clanTag !== '' && this.player.clanTag.toLowerCase().includes(this.player.clanInfo.name.toLowerCase())) {
+            this.similarClanTag = true;
+        }
       },
       error => {
         this.playersService.getPlayerName(this.playerId)
           .subscribe( a => {
             this.player = a;
             this.getStatus(this.player.username);
-            this.titleService.setTitle("KAG Stats - " + this.player.characterName);
+            this.titleService.setTitle('KAG Stats - ' + this.player.characterName);
           })
       });
   }

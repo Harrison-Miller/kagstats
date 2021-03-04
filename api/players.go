@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const playersQuery = `SELECT * FROM players `
+const playersQuery = `SELECT players.*, clan_info.name AS "clan_info.name" FROM players LEFT JOIN clan_info ON players.clanID=clan_info.ID `
 
 func getBasicPlayerInfoInstead(player *models.Player, w http.ResponseWriter, playerID int) error {
 	err := db.Get(player, "SELECT * FROM players WHERE players.ID=?", int64(playerID))
@@ -154,7 +154,7 @@ type Captures struct {
 func GetCaptures(w http.ResponseWriter, r *http.Request) {
 	playerID, err := GetIntURLArg("id", r)
 	if err != nil {
-		http.Error(w, "coud not get id", http.StatusBadRequest)
+		http.Error(w, "could not get id", http.StatusBadRequest)
 		return
 	}
 
