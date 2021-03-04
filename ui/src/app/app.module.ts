@@ -39,6 +39,7 @@ import { SafePipe } from './pipes/safe.pipe';
 import { ClanManagementComponent } from './pages/clan-management/clan-management.component';
 import { ClanDetailComponent } from './pages/clan-detail/clan-detail.component';
 import { ClansComponent } from './pages/clans/clans.component';
+import { StatsHistoryComponent } from './shared/stats-history/stats-history.component';
 
 @NgModule({
   declarations: [
@@ -68,6 +69,7 @@ import { ClansComponent } from './pages/clans/clans.component';
     ClanManagementComponent,
     ClanDetailComponent,
     ClansComponent,
+    StatsHistoryComponent,
   ],
   imports: [
     BrowserModule,
