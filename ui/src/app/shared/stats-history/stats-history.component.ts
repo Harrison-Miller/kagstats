@@ -2,6 +2,8 @@ import {Component, Input, OnInit, ViewChild} from '@angular/core';
 
 import {
   ChartComponent,
+  ApexAxisChartSeries,
+  ApexXAxis
 } from 'ng-apexcharts';
 import {PlayersService} from '../../services/players.service';
 import {MonthlyStats} from '../../models';
@@ -12,21 +14,24 @@ import {MonthlyStats} from '../../models';
   styleUrls: ['./stats-history.component.scss']
 })
 export class StatsHistoryComponent implements OnInit {
+  @ViewChild('chart') chart;
+  @ViewChild('kdrChart') kdrChart;
   public chartOptions;
   public kdrChartOptions;
 
   @Input() playerID: number;
 
   stats: MonthlyStats[];
-  categories = [];
   archerKills = {
     name: 'Archer Kills',
     color: '#2E93fA',
+    type: 'area',
     data: [],
   };
   archerDeaths = {
     name: 'Archer Deaths',
     color: '#1b5896',
+    type: 'line',
     enabled: false,
     data: [],
   };
@@ -38,6 +43,7 @@ export class StatsHistoryComponent implements OnInit {
   builderKills = {
     name: 'Builder Kills',
     color: '#66DA26',
+    type: 'area',
     data: []
   };
   builderDeaths = {
@@ -48,16 +54,19 @@ export class StatsHistoryComponent implements OnInit {
   builderKDR = {
     name: 'Builder KDR',
     color: '#66DA26',
+    type: 'line',
     data: []
   };
   knightKills = {
     name: 'Knight Kills',
     color: '#FF9800',
+    type: 'area',
     data: [],
   };
   knightDeaths = {
     name: 'Knight Deaths',
     color: '#995b00',
+    type: 'line',
     data: [],
   };
   knightKDR = {
@@ -73,17 +82,10 @@ export class StatsHistoryComponent implements OnInit {
   ngOnInit() {
     this.chartOptions = {
       series: [
-        this.archerKills,
-        this.archerDeaths,
-        this.builderKills,
-        this.builderDeaths,
-        this.knightKills,
-        this.knightDeaths
       ],
       chart: {
         height: 400,
-        type: 'area',
-        stacked: true,
+        type: 'line',
         animations: {
           enabled: false,
         },
@@ -97,22 +99,29 @@ export class StatsHistoryComponent implements OnInit {
           enabled: false,
         }
       },
+      stroke: {
+        dashArray: [0, 10, 0, 10, 0, 10]
+      },
+      fill: {
+        opacity: [0.25, 1, 0.25, 1, 0.25],
+      },
       dataLabels: {
-        enabled: false,
+        enabled: true,
       },
       title: {
         text: 'Monthly Kills and Deaths'
       },
       xaxis: {
-        categories: this.categories,
+        type: 'category',
+        labels: {
+          rotate: -45,
+          rotateAlways: true,
+        },
       },
     };
 
     this.kdrChartOptions = {
       series: [
-        this.archerKDR,
-        this.builderKDR,
-        this.knightKDR
       ],
       chart: {
         height: 400,
@@ -124,9 +133,6 @@ export class StatsHistoryComponent implements OnInit {
           show: false,
         },
       },
-      dataLabels: {
-        enabled: true,
-      },
       markers: {
         size: 8,
         shape: 'circle',
@@ -135,21 +141,26 @@ export class StatsHistoryComponent implements OnInit {
         text: 'Monthly KDR'
       },
       xaxis: {
-        categories: this.categories,
+        type: 'category',
+        labels: {
+          rotate: -45,
+          rotateAlways: true,
+        },
       },
       yaxis: {
-        logarithmic: true,
+        min: 0,
+        max: 5,
       }
     };
 
 
-    this.playersService.getMonthlyStatus(this.playerID).subscribe( monthlyStats => {
+    this.playersService.getMonthlyStatus(this.playerID).subscribe(monthlyStats => {
       this.stats = monthlyStats;
       this.stats.sort((a, b) => {
         if (a.year === b.year) {
-          return b.month - a.month;
+          return a.month - b.month;
         }
-        return b.year - a.year;
+        return a.year - b.year;
       });
       this.stats.slice(0, 11);
       this.updateStats();
@@ -192,24 +203,33 @@ export class StatsHistoryComponent implements OnInit {
 
   updateStats() {
     for (const stat of this.stats) {
-      this.categories.push(this.categoryName(stat));
-      this.archerKills.data.push(stat.archerKills);
-      this.archerDeaths.data.push(stat.archerDeaths);
-      this.archerKDR.data.push(this.getKDR(stat.archerKills, stat.archerDeaths));
-      this.builderKills.data.push(stat.builderKills);
-      this.builderDeaths.data.push(stat.builderDeaths);
-      this.builderKDR.data.push(this.getKDR(stat.builderKills, stat.builderDeaths));
-      this.knightKills.data.push(stat.knightKills);
-      this.knightDeaths.data.push(stat.knightDeaths);
-      this.knightKDR.data.push(this.getKDR(stat.knightKills, stat.knightDeaths));
-
+      const category = this.categoryName(stat);
+      this.archerKills.data.push({x: category, y: stat.archerKills});
+      this.archerDeaths.data.push({x: category, y: stat.archerDeaths});
+      this.archerKDR.data.push({x: category, y: this.getKDR(stat.archerKills, stat.archerDeaths)});
+      this.builderKills.data.push({x: category, y: stat.builderKills});
+      this.builderDeaths.data.push({x: category, y: stat.builderDeaths});
+      this.builderKDR.data.push({x: category, y: this.getKDR(stat.builderKills, stat.builderDeaths)});
+      this.knightKills.data.push({x: category, y: stat.knightKills});
+      this.knightDeaths.data.push({x: category, y: stat.knightDeaths});
+      this.knightKDR.data.push({x: category, y: this.getKDR(stat.knightKills, stat.knightDeaths)});
     }
 
-    this.chartOptions.series = [this.archerKills, this.archerDeaths, this.builderKills, this.builderDeaths, this.knightKills, this.knightDeaths];
-    this.chartOptions.xaxis = { categories: this.categories };
+    this.chart.appendSeries(this.knightKills);
+    this.chart.appendSeries(this.knightDeaths);
+    this.chart.appendSeries(this.archerKills);
+    this.chart.appendSeries(this.archerDeaths);
+    this.chart.appendSeries(this.builderKills);
+    this.chart.appendSeries(this.builderDeaths);
 
-    this.kdrChartOptions.series = [this.archerKDR, this.builderKDR, this.knightKDR];
-    this.kdrChartOptions.xaxis = { categories: this.categories };
+
+    this.chart.toggleSeries('Archer Deaths');
+    this.chart.toggleSeries('Builder Deaths');
+    this.chart.toggleSeries('Knight Deaths');
+
+    this.kdrChart.appendSeries(this.knightKDR);
+    this.kdrChart.appendSeries(this.archerKDR);
+    this.kdrChart.appendSeries(this.builderKDR);
+
   }
-
 }
