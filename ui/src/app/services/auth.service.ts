@@ -15,7 +15,9 @@ export class AuthService {
 
   playerClaims = new BehaviorSubject<PlayerClaims>(null);
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    this.getClaims();
+  }
 
   login(username: string, token: string): Observable<LoginResp> {
     const path = `${environment.apiUrl}/login`;

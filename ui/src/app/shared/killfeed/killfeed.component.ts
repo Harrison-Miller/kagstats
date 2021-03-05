@@ -1,15 +1,15 @@
-import { Component, OnInit, Input, OnChanges } from '@angular/core';
+import {Component, OnInit, Input, OnChanges, OnDestroy} from '@angular/core';
 import { KillsService } from 'src/app/services/kills.service';
 import { Kill } from '../../models';
 import { Observable, Subject, timer } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import {map, take, takeUntil} from 'rxjs/operators';
 import { HITTER_DESCRIPTION } from '../../hitters';
 
 /**
  * The KillfeedComponent periodically queries for new kills,
  * and displays a list detailing the recent most kills.
- *  
- * 
+ *
+ *
  * @todo Consider modularizing component by having it accept an array of kills, and performing the query elsewhere.
  */
 @Component({
@@ -17,25 +17,32 @@ import { HITTER_DESCRIPTION } from '../../hitters';
   templateUrl: './killfeed.component.html',
   styleUrls: ['./killfeed.component.scss']
 })
-export class KillfeedComponent implements OnInit, OnChanges {
-  @Input() limit: number = 100;
-  @Input() url: string = '/kills';
-  kills$: Observable<Kill[]>;
+export class KillfeedComponent implements OnInit, OnDestroy {
+  @Input() limit = 100;
+  @Input() url = '/kills';
+  kills: Kill[];
   descriptions: string[] = HITTER_DESCRIPTION;
+
+  componentDestroyed$ = new Subject();
+  loading = true;
 
   constructor(private killsService: KillsService) {}
 
   ngOnInit() {
-    this.kills$ = this.killsService.kills$.pipe(
-      map(kills => {
-        if(kills) {
-          return kills.slice(0, this.limit);
+    this.killsService.kills.next(null);
+    this.killsService.kills.pipe(takeUntil(this.componentDestroyed$))
+      .subscribe( value => {
+        if (value) {
+          this.loading = false;
+          this.kills = value;
         }
-      })
-    );
+    });
+    this.loading = true;
+    this.killsService.getKills(this.url, 0, this.limit);
   }
 
-  ngOnChanges() {
-    this.killsService.url$.next(this.url);
+  ngOnDestroy(): void {
+    this.componentDestroyed$.next();
+    this.killsService.nextGetKills$.next(null);
   }
 }

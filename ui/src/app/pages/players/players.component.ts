@@ -12,8 +12,8 @@ export class PlayersComponent implements OnInit {
 
   search = new FormControl('')
 
-  players: Player[]
-  loading: boolean
+  players: Player[];
+  loading: boolean;
 
   constructor(private playersService: PlayersService) { }
 
@@ -21,7 +21,7 @@ export class PlayersComponent implements OnInit {
     this.search.valueChanges
       .subscribe(value => {
         this.playersService.searchText = value;
-        if(value == '') {
+        if (value === '') {
           this.getPlayers();
         } else {
           this.searchPlayers(value);
@@ -49,7 +49,7 @@ export class PlayersComponent implements OnInit {
   }
 
   public clearSearch(): void {
-    this.search.patchValue("");
+    this.search.patchValue('');
   }
 
 }

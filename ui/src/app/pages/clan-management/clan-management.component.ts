@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {AuthService} from "../../services/auth.service";
 import {FormBuilder} from "@angular/forms";
 import {ClansService} from "../../services/clans.service";
@@ -12,7 +12,7 @@ import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
   templateUrl: './clan-management.component.html',
   styleUrls: ['./clan-management.component.sass']
 })
-export class ClanManagementComponent implements OnInit {
+export class ClanManagementComponent implements OnInit, OnDestroy {
 
   @ViewChild('registerCongrats') private registerCongrats;
   @ViewChild('leaveSure') private leaveSure;

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import { Router } from '@angular/router';
 import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder } from '@angular/forms';
@@ -13,7 +13,7 @@ import { takeUntil } from 'rxjs/operators';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnDestroy, OnInit{
 
   componentDestroyed$ = new Subject();
 
@@ -40,7 +40,6 @@ export class AppComponent {
       .subscribe( value => {
         this.playerClaims = value;
       });
-    this.authService.getClaims();
   }
 
   ngOnDestroy(): void {

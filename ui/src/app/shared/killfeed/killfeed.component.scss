@@ -121,3 +121,12 @@
     background-image: url(/assets/KillfeedIcons.png);
     background-position: -96px -32px;
 }
+
+.spinner {
+    display: block;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 100px;
+    height: 100px;
+}

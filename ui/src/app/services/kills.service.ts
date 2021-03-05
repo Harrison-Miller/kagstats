@@ -1,48 +1,43 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { PagedResult, Kill } from '../models';
-import { BehaviorSubject, Observable, timer } from 'rxjs';
+import {BehaviorSubject, Observable, Subject, timer} from 'rxjs';
 import { environment } from '../../environments/environment';
+import {takeUntil} from "rxjs/operators";
 
 @Injectable({
   providedIn: 'root'
 })
 export class KillsService {
-  kills$ = new BehaviorSubject<Kill[]>([]);
-
-  url$ = new BehaviorSubject<string>(null);
-  url: string;
+  kills = new BehaviorSubject<Kill[]>(null);
 
   constructor(private http: HttpClient) {
-    this.url$.subscribe(newUrl => {
-      if (!!newUrl) {
-        this.url = newUrl;
-        this.getKills();
-      }
-    });
-
-    // timer(0, 5000).subscribe(() => {
-    //   this.getKills();
-    // });
   }
 
-  /**
-   * Perform GET request at our kills endpoint.
-   * We can optionally provide a start parameter in our request,
-   * change the starting point of
-   *
-   * @param start Optional starting point for paged results.
-   *
-   * @todo Ask for clarification about whether optional params are okay or not.
-   */
-  getKills(start?: number) {
-    // Only create a parameter object if passed a start value.
-    const options = start
-      ? { params: new HttpParams().set('start', start.toString()) }
-      : {};
+  nextGetKills$ = new Subject();
 
-    this.http.get<PagedResult<Kill>>(environment.apiUrl + this.url, options).subscribe(result => {
-      this.kills$.next(result.values);
+  getKills(url: string, start?: number, limit?: number) {
+    this.nextGetKills$.next(null);
+
+    // Only create a parameter object if passed a start value.
+    const options = { params: new HttpParams() };
+    if (start) {
+      options.params = options.params.append('start', start.toString());
+    }
+
+    if (limit) {
+      options.params = options.params.append('limit', limit.toString());
+    }
+
+    this.http.get<PagedResult<Kill>>(environment.apiUrl + url, options).subscribe(result => {
+      this.kills.next(result.values);
+    });
+
+    timer(0, 10000).pipe(takeUntil(this.nextGetKills$))
+      .subscribe(x => {
+        this.http.get<PagedResult<Kill>>(environment.apiUrl + url, options).subscribe(result => {
+          this.kills.next(result.values);
+        });
     });
   }
 }
