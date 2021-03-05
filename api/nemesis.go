@@ -41,7 +41,7 @@ func GetNemesis(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var n Nemesis
-	err = db.Get(&n, `SELECT players.*, clan_info.name "clan_info.name" FROM nemesis AS n 
+	err = db.Get(&n, `SELECT n.*, players.*, clan_info.name "clan_info.name" FROM nemesis AS n 
 		INNER JOIN players ON n.nemesisID=players.ID 
 		LEFT JOIN clan_info ON players.clanID=clan_info.ID
 		WHERE n.playerID=? AND n.deaths >= ? ORDER BY n.deaths DESC LIMIT 1`, playerID, config.API.NemesisGate)
