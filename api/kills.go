@@ -74,7 +74,7 @@ func GetKills(w http.ResponseWriter, r *http.Request) {
 		INNER JOIN servers AS server ON kills.serverID=server.ID
 		LEFT JOIN clan_info as vc ON victim.clanID=vc.ID
 		LEFT JOIN clan_info as kc ON killer.clanID=kc.ID
-		WHERE NOT victim.statsBan AND NOT killer.statsBan ORDER BY ID DESC`, start, limit)
+		WHERE NOT victim.statsBan AND NOT killer.statsBan ORDER BY kills.ID DESC`, start, limit)
 	if err != nil {
 		killsError(w, err)
 		return
@@ -135,20 +135,20 @@ func GetPlayerKills(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var showBanned = "NOT victim.statsBan AND NOT killer.statsBan"
+	var showBanned = ` WHERE NOT victim.statsBan AND NOT killer.statsBan `
 	if v := r.URL.Query().Get("showbanned"); v == "true" {
-		showBanned = ""
+		showBanned = ``
 	}
 
 	var kills []models.Kill
 	err = db.Select(&kills, `SELECT ` + asKills + `
-		FROM (SELECT * FROM kills WHERE (killerID=? OR victimID=?) ORDER by ID DESC LIMIT ?,?) AS kills
-		INNER JOIN players AS victim ON kills.victimID=victim.ID
-		INNER JOIN players AS killer ON kills.killerID=killer.ID
-		INNER JOIN servers AS server ON kills.serverID=server.ID
-		LEFT JOIN clan_info as vc ON victim.clanID=vc.ID
+		FROM (SELECT * FROM kills WHERE (killerID=? OR victimID=?) ORDER by ID DESC LIMIT ?,?) AS kills 
+		INNER JOIN players AS victim ON kills.victimID=victim.ID 
+		INNER JOIN players AS killer ON kills.killerID=killer.ID 
+		INNER JOIN servers AS server ON kills.serverID=server.ID 
+		LEFT JOIN clan_info as vc ON victim.clanID=vc.ID 
 		LEFT JOIN clan_info as kc ON killer.clanID=kc.ID
-		WHERE ` + showBanned + ` ORDER BY ID DESC`, playerID, playerID, start, limit)
+		`  + showBanned + ` ORDER BY kills.ID DESC`, playerID, playerID, start, limit)
 
 	//err = db.Select(&kills, killsQuery+"WHERE "+showBanned+" (killerID=? OR victimID=?) ORDER BY kills.ID DESC LIMIT ?,?", playerID, playerID, start, limit)
 	if err != nil {

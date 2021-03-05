@@ -112,6 +112,10 @@
                     elem += `<span class="badge badge-pill badge-warning">Leaderboard Ban</span>`;
                 }
 
+                if(player.monthlyLeaderboardBan) {
+                    elem += `<span class="badge badge-pill badge-warning">Monthly Leaderboard Ban</span>`;
+                }
+
                 if(player.statsBan) {
                     elem += `<span class="badge badge-pill badge-danger">Stats Ban</span>`;
                 }
