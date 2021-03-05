@@ -27,7 +27,7 @@ steps:
 
       EOF
       gcloud compute ssh cloudbuild@staging --zone=us-central1-a --strict-host-key-checking=no -- -T << EOF
-      . /backup.sh &
+      . /backup.sh
       
       sudo rm -rf /release
       sudo mkdir -p /release
