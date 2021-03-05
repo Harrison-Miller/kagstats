@@ -168,7 +168,7 @@ func (c *Collector) OnPlayerDie(m rcon.Message, r *rcon.Client) error {
 		return nil
 	}
 
-	if (c.server.Gamemode == "CTF" || c.server.Gamemode == "WAR") && c.playerCount < CTF_MINIMUM_PLAYERS {
+	if (c.server.Gamemode == "CTF" || c.server.Gamemode == "WAR" || c.server.Gamemode == "SmallCTF") && c.playerCount < CTF_MINIMUM_PLAYERS {
 		c.logger.Println("not enough players, not adding kill to db")
 		return nil
 	}
@@ -298,7 +298,7 @@ func (c *Collector) FlagCaptured(m rcon.Message, r *rcon.Client) error {
 		return nil
 	}
 
-	if (c.server.Gamemode == "CTF") && c.playerCount < CTF_MINIMUM_PLAYERS {
+	if (c.server.Gamemode == "CTF" || c.server.Gamemode == "SmallCTF") && c.playerCount < CTF_MINIMUM_PLAYERS {
 		c.logger.Println("not enough players, not flag capture to db")
 		return nil
 	}
@@ -349,7 +349,7 @@ func (c *Collector) MapStats(m rcon.Message, r *rcon.Client) error {
 	// 	return nil
 	// }
 
-	if (c.server.Gamemode == "CTF" || c.server.Gamemode == "WAR") && c.playerCount < CTF_MINIMUM_PLAYERS {
+	if (c.server.Gamemode == "CTF" || c.server.Gamemode == "WAR" || c.server.Gamemode == "SmallCTF") && c.playerCount < CTF_MINIMUM_PLAYERS {
 		c.logger.Println("not enough players, not adding kill to db")
 		return nil
 	}
@@ -374,7 +374,7 @@ func (c *Collector) MapVotes(m rcon.Message, r *rcon.Client) error {
 	votes.Map2Votes, _ = strconv.ParseInt(m.Args["map2_votes"], 10, 64)
 	votes.RandomVotes, _ = strconv.ParseInt(m.Args["random_votes"], 10, 64)
 
-	if (c.server.Gamemode == "CTF" || c.server.Gamemode == "WAR") && c.playerCount < CTF_MINIMUM_PLAYERS {
+	if (c.server.Gamemode == "CTF" || c.server.Gamemode == "WAR" || c.server.Gamemode == "SmallCTF") && c.playerCount < CTF_MINIMUM_PLAYERS {
 		c.logger.Println("not enough players, not adding kill to db")
 		return nil
 	}

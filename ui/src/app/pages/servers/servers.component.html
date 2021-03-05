@@ -6,7 +6,7 @@
         <h3>Not Collecting</h3>
       </div>
       <div class="card-header">
-        {{server.name}} 
+        {{server.name}}
         <ng-container *ngIf="server.APIStatus; else statusElse">
             <span class="dot float-right {{ server.APIStatus.lastUpdate | statusClass }}"></span>
         </ng-container>
@@ -24,7 +24,7 @@
           <div *ngIf="server.gameMode=='TDM' && server.APIStatus.currentPlayers<4">
             Not enough players to collect stats.
           </div>
-          <div *ngIf="server.gameMode=='CTF' && server.APIStatus.currentPlayers<8">
+          <div *ngIf="(server.gameMode=='CTF' || server.gameMode=='SmallCTF') && server.APIStatus.currentPlayers<8">
               Not enough players to collect stats.
           </div>
           <div *ngIf="server.gameMode=='WAR' && server.APIStatus.currentPlayers<8">
