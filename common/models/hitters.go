@@ -1,6 +1,6 @@
 package models
 
-var hitter_names = []string{
+var HitterNames = []string{
 	"Died", // 0
 	"Crushing",
 	"Fall",
@@ -38,8 +38,8 @@ var hitter_names = []string{
 }
 
 func HitterName(id int64) string {
-	if id >= int64(len(hitter_names)) {
-		return hitter_names[0]
+	if id >= int64(len(HitterNames)) {
+		return HitterNames[0]
 	}
-	return hitter_names[id]
+	return HitterNames[id]
 }

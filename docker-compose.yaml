@@ -92,6 +92,17 @@ services:
     links:
       - mysql
     restart: always
+  monthly-hitters-indexer:
+      build:
+        context: .
+        dockerfile: Dockerfile-indexer
+        args:
+          indexer: monthly_hitters
+          VERSION: ${TAG:-latest}
+      image: gcr.io/kagstats/monthly-hitters-indexer:${TAG:-latest}
+      links:
+        - mysql
+      restart: always
   monthly-indexer:
     build:
       context: .
