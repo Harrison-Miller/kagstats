@@ -20,6 +20,9 @@ services:
   hitters-indexer:
     environment:
       - INDEXER_BATCHSIZE=10000
+  monthly-hitters-indexer:
+    environment:
+      - INDEXER_BATCHSIZE=10000
   monthly-indexer:
     environment:
       - INDEXER_BATCHSIZE=10000
