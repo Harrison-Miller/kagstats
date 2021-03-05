@@ -6,8 +6,8 @@
     </a>
   </ng-container>
 <h2 class="{{ player.role | kagRoleColor }} buffer">
-  <ng-container *ngIf="!similarClanTag">{{player.clanTag}}</ng-container> {{player.characterName}}
-    <ng-container *ngIf="player.characterName != player.username">
+  <ng-container *ngIf="!similarClanTag">{{player.clantag}}</ng-container> {{player.charactername}}
+    <ng-container *ngIf="player.charactername != player.username">
         ({{player.username}})
     </ng-container>
 </h2>
@@ -172,10 +172,10 @@
                         <app-player-banner [player]="nemesis.nemesis" [status]="false"></app-player-banner>
                     </div>
                 </div>
-                <div class="margin-top text-center">Has killed {{player.clanTag}} {{player.characterName}} <b>{{nemesis.deaths}}</b> times!</div>
+                <div class="margin-top text-center">Has killed {{player.clantag}} {{player.charactername}} <b>{{nemesis.deaths}}</b> times!</div>
                 </ng-container>
                 <ng-template #noNemesis>
-                    <div class="text-center">{{player.clanTag}} {{player.characterName}} doesn't have a nemesis</div>
+                    <div class="text-center">{{player.clantag}} {{player.charactername}} doesn't have a nemesis</div>
                 </ng-template>
             </div>
             <div class="shadow-sm col text-center">
@@ -192,7 +192,7 @@
             <div class="shadow-sm col text-center">
                 <h3>Bullied</h3>
                 <ng-container *ngIf="bullied; else noBully">
-                <div class="buffer">{{player.clanTag}} {{player.characterName}} has bullied <b>{{bullied.length}}</b> player(s)</div>
+                <div class="buffer">{{player.clantag}} {{player.charactername}} has bullied <b>{{bullied.length}}</b> player(s)</div>
                 <small style="color:grey">showing {{bullied.slice(0,5).length}} of those players</small>
                 <table class="table">
                     <thead>
@@ -212,7 +212,7 @@
                 </table>
                 </ng-container>
                 <ng-template #noBully>
-                    <div class="text-center">{{player.clanTag}} {{player.characterName}} hasn't bullied anyone hard enough</div>
+                    <div class="text-center">{{player.clantag}} {{player.charactername}} hasn't bullied anyone hard enough</div>
                 </ng-template>
             </div>
             <div class="shadow-sm col text-center">

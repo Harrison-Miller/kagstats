@@ -116,9 +116,9 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
         this.basicStats = b;
         this.player = this.basicStats.player;
         this.getStatus(this.player.username);
-        this.titleService.setTitle('KAG Stats - ' + this.player.characterName);
+        this.titleService.setTitle('KAG Stats - ' + this.player.charactername);
 
-        if (this.player.clanID && this.player.clanTag !== '' && this.player.clanTag.toLowerCase().includes(this.player.clanInfo.name.toLowerCase())) {
+        if (this.player.clanID && this.player.clantag !== '' && this.player.clantag.toLowerCase().includes(this.player.clanInfo.name.toLowerCase())) {
             this.similarClanTag = true;
         }
       },
@@ -127,7 +127,7 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
           .subscribe( a => {
             this.player = a;
             this.getStatus(this.player.username);
-            this.titleService.setTitle('KAG Stats - ' + this.player.characterName);
+            this.titleService.setTitle('KAG Stats - ' + this.player.charactername);
           })
       });
   }

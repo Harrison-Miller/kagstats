@@ -57,8 +57,8 @@ export interface Kill {
 export interface Player {
   id: number;
   username: string;
-  characterName: string;
-  clanTag: string;
+  charactername: string;
+  clantag: string;
   clanID: number;
   clanInfo: ClanInfo;
   joinedClan: number;

@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-8">
     <h2>Players</h2>
-    
+
   </div>
   <div class="input-group input-group-sm col-4">
       <input type="text" [formControl]="search" class="form-control float-left buffer" style="margin-top: 10px" placeholder="search...">
@@ -21,7 +21,7 @@
         </div>
         <div class="card-body">
           <div>Username: {{player.username}}</div>
-          <div *ngIf="player.clanTag!=''">Clan: {{player.clanTag}}</div>
+          <div *ngIf="player.clantag!=''">Clan: {{player.clantag}}</div>
         </div>
       </div>
     </div>

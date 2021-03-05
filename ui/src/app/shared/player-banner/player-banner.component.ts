@@ -48,7 +48,7 @@ export class PlayerBannerComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.player.clanID && this.player.clanTag !== '' && this.player.clanTag.toLowerCase().includes(this.player.clanInfo.name.toLowerCase())) {
+    if (this.player.clanID && this.player.clantag !== '' && this.player.clantag.toLowerCase().includes(this.player.clanInfo.name.toLowerCase())) {
       this.similarClanTag = true;
     }
   }

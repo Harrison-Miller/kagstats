@@ -194,13 +194,13 @@
             return
         }
 
-        $("#fullname").text(data.clanTag + " " + data.characterName + " (" + data.username + ")");
+        $("#fullname").text(data.clantag + " " + data.charactername + " (" + data.username + ")");
 
         $("#avatar").attr("src", data.avatar);
 
         $("#username").val(data.username);
-        $("#clantag").text(data.clanTag);
-        $("#charactername").text(data.characterName);
+        $("#clantag").text(data.clantag);
+        $("#charactername").text(data.charactername);
         $("#registered").text(data.registered);
     
         $("#leaderboardban").prop("checked", data.leaderboardBan);

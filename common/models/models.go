@@ -7,8 +7,9 @@ import (
 type Player struct {
 	ID            int64  `json:"id" db:"ID"`
 	Username      string `json:"username"`
-	Charactername string `json:"characterName"`
-	Clantag       string `json:"clanTag"`
+	Charactername string `json:"charactername"`
+	Clantag       string `json:"clantag"`
+
 	ServerID      int64  // used for tracking in the collector
 	ClanID *int64 `json:"clanID" db:"clanID"`
 	ClanInfo struct {
