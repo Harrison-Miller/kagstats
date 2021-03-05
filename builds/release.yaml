@@ -27,6 +27,8 @@ steps:
 
       EOF
       gcloud compute ssh cloudbuild@staging --zone=us-central1-a --strict-host-key-checking=no -- -T << EOF
+      . /backup.sh &
+      
       sudo rm -rf /release
       sudo mkdir -p /release
       sudo chown cloudbuild /release
@@ -35,8 +37,6 @@ steps:
       curl https://raw.githubusercontent.com/Harrison-Miller/kagstats/$TAG_NAME/builds/release-compose.yaml --output release-compose.yaml
       sed -i "s/latest/$TAG_NAME/g" docker-compose.yaml
       sudo docker-compose -p release down --remove-orphans
-
-      . /backup.sh &
 
       . /release-env.sh
       sudo -E docker-compose -f docker-compose.yaml -f release-compose.yaml pull
