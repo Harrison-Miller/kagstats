@@ -58,7 +58,7 @@ func GetMonthlyArcherLeaderBoard(w http.ResponseWriter, r *http.Request) {
 
 	year, month := getYearMonth(r)
 
-	err := db.Select(&stats, monthlyQuery+`WHERE NOT p.leaderboardBan AND NOT p.statsBan AND monthly_stats.year=? AND monthly_stats.month=? AND monthly_stats.archer_kills >= ? AND monthly_stats.archer_deaths >= ? 
+	err := db.Select(&stats, monthlyQuery+`WHERE NOT p.monthlyLeaderboardBan AND NOT p.statsBan AND monthly_stats.year=? AND monthly_stats.month=? AND monthly_stats.archer_kills >= ? AND monthly_stats.archer_deaths >= ? 
 		ORDER BY (monthly_stats.archer_kills / monthly_stats.archer_deaths) DESC LIMIT 20`, year, month, config.API.ArcherGate, config.API.ArcherGate)
 	if err != nil {
 		leaderboardError(w, err)
@@ -86,7 +86,7 @@ func GetMonthlyBuilderLeaderBoard(w http.ResponseWriter, r *http.Request) {
 
 	year, month := getYearMonth(r)
 
-	err := db.Select(&stats, monthlyQuery+`WHERE NOT p.leaderboardBan AND NOT p.statsBan AND monthly_stats.year=? AND monthly_stats.month=? AND monthly_stats.builder_kills >= ? AND monthly_stats.builder_deaths >= ? 
+	err := db.Select(&stats, monthlyQuery+`WHERE NOT p.monthlyLeaderboardBan AND NOT p.statsBan AND monthly_stats.year=? AND monthly_stats.month=? AND monthly_stats.builder_kills >= ? AND monthly_stats.builder_deaths >= ? 
 		ORDER BY (monthly_stats.builder_kills / monthly_stats.builder_deaths) DESC LIMIT 20`, year, month, config.API.BuilderGate, config.API.BuilderGate)
 	if err != nil {
 		leaderboardError(w, err)

@@ -109,6 +109,12 @@ func RunMigrations(db *sqlx.DB) error {
 		return err
 	}
 
+	err = RunMigration(21, AddMonthlyLeaderboardBan, db)
+	if err != nil {
+		return err
+	}
+
+
 	return nil
 }
 
@@ -515,6 +521,15 @@ func AddClanInvites(db *sqlx.DB) error {
     	FOREIGN KEY (playerID) REFERENCES players(ID) ON DELETE CASCADE,
     	PRIMARY KEY (clanID, playerID)
 	)`)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func AddMonthlyLeaderboardBan(db *sqlx.DB) error {
+	err := AddColumn("players", "monthlyLeaderboardBan", "BOOLEAN NOT NULL", "FALSE", db)
 	if err != nil {
 		return err
 	}

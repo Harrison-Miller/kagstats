@@ -36,6 +36,7 @@ type Player struct {
 
 	//Moderation
 	LeaderboardBan bool   `json:"leaderboardBan" db:"leaderboardBan"`
+	MonthlyLeaderboardBan bool `json:"monthlyLeaderboardBan" db:"monthlyLeaderboardBan"`
 	StatsBan       bool   `json:"statsBan" db:"statsBan"`
 	Notes          string `json:"-" db:"notes"`
 

@@ -95,6 +95,7 @@ type SaveParam struct {
 	ID             int64  `json:"id"`
 	Username       string `json:"username"`
 	LeaderboardBan bool   `json:"leaderboardBan"`
+	MonthlyLeaderboardBan bool `json:"monthlyLeaderboardBan"`
 	StatsBan       bool   `json:"statsBan"`
 	Notes          string `json:"notes"`
 }
@@ -115,7 +116,7 @@ func save(w http.ResponseWriter, r *http.Request) {
 	}
 	defer tx.Rollback()
 
-	_, err = tx.Exec("UPDATE players SET username=?,leaderboardBan=?,statsBan=?,notes=? WHERE ID=?", params.Username, params.LeaderboardBan, params.StatsBan, params.Notes, params.ID)
+	_, err = tx.Exec("UPDATE players SET username=?,leaderboardBan=?,monthlyLeaderboardBan=?,statsBan=?,notes=? WHERE ID=?", params.Username, params.LeaderboardBan, params.MonthlyLeaderboardBan, params.StatsBan, params.Notes, params.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

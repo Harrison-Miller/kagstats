@@ -62,6 +62,14 @@
             </td>
         </tr>
         <tr>
+            <td>Monthly Leaderboard Ban</td>
+            <td>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="monthlyleaderboardban">
+                </div>
+            </td>
+        </tr>
+        <tr>
             <td>Stats Ban</td>
             <td>
                 <div class="form-check">
@@ -196,6 +204,7 @@
         $("#registered").text(data.registered);
     
         $("#leaderboardban").prop("checked", data.leaderboardBan);
+        $("#monthlyleaderboardban").prop("checked", data.monthlyLeaderboardBan);
         $("#statsban").prop("checked", data.statsBan);
     });
 
@@ -283,6 +292,7 @@
             id: playerId,
             username: $("#username").val(),
             leaderboardBan: $("#leaderboardban").is(":checked"),
+            monthlyLeaderboardBan: $("#monthlyleaderboardban").is(":checked"),
             statsBan: $("#statsban").is(":checked"),
             notes: $("#notes").val()
         };
