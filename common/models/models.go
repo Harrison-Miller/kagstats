@@ -4,11 +4,19 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+type ScriptPlayer struct {
+	Username string `json:"username"`
+	CharacterName string `json:"charactername"`
+	ClanTag string `json:"clantag"`
+	IP string `json:"ip"`
+}
+
 type Player struct {
 	ID            int64  `json:"id" db:"ID"`
 	Username      string `json:"username"`
 	Charactername string `json:"charactername"`
 	Clantag       string `json:"clantag"`
+	IP string `json:"-" db:"lastIP"`
 
 	ServerID      int64  // used for tracking in the collector
 	ClanID *int64 `json:"clanID" db:"clanID"`

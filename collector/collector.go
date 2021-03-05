@@ -29,6 +29,24 @@ func isClientAlt(username string) bool {
 	return false
 }
 
+func PlayerFromScriptPlayer(s models.ScriptPlayer) models.Player {
+	return models.Player{
+		Username:      s.Username,
+		Charactername: s.CharacterName,
+		Clantag:       s.ClanTag,
+		IP:            s.IP,
+	}
+}
+
+func PlayersFromScriptPlayers(s []models.ScriptPlayer) []models.Player {
+	players := []models.Player{}
+	for _, player := range s {
+		players = append(players, PlayerFromScriptPlayer(player))
+	}
+	return players
+}
+
+
 func isNewPlayer(player *models.Player) bool {
 	layout := "2006-01-02 15:04:05"
 	t, err := time.Parse(layout, player.Registered)
@@ -63,9 +81,10 @@ func UpdatePlayer(p *models.Player) error {
 		cache.ServerID = p.ServerID
 		p.Registered = cache.Registered
 
-		if p.Charactername != cache.Charactername || p.Clantag != cache.Clantag {
+		if p.Charactername != cache.Charactername || p.Clantag != cache.Clantag || p.IP != cache.IP {
 			cache.Charactername = p.Charactername
 			cache.Clantag = p.Clantag
+			cache.IP = p.IP
 
 			err := UpdatePlayerInfo(p)
 			if err != nil {
@@ -90,12 +109,13 @@ func UpdatePlayer(p *models.Player) error {
 }
 
 func (c *Collector) OnPlayerJoined(m rcon.Message, r *rcon.Client) error {
-	var player models.Player
-	err := json.Unmarshal([]byte(m.Args["object"]), &player)
+	var splayer models.ScriptPlayer
+	err := json.Unmarshal([]byte(m.Args["object"]), &splayer)
 	if err != nil {
 		c.logger.Println(err)
 		return nil
 	}
+	player := PlayerFromScriptPlayer(splayer)
 
 	if isClientAlt(player.Username) {
 		return nil
@@ -110,16 +130,6 @@ func (c *Collector) OnPlayerJoined(m rcon.Message, r *rcon.Client) error {
 
 		updater.incoming <- player
 
-		/*if player.StatsBan || isNewPlayer(&player) {
-			return nil
-		}*/
-
-		/*
-			err = UpdateJoinTime(player.ID, c.server.ID)
-			if err != nil {
-				return err
-			}
-		*/
 		c.logger.Printf("%s (%d) joined the game", player.Username, player.ID)
 		c.playerCount++
 	}
@@ -127,12 +137,14 @@ func (c *Collector) OnPlayerJoined(m rcon.Message, r *rcon.Client) error {
 }
 
 func (c *Collector) OnPlayerLeave(m rcon.Message, r *rcon.Client) error {
-	var player models.Player
-	err := json.Unmarshal([]byte(m.Args["object"]), &player)
+	var splayer models.ScriptPlayer
+	err := json.Unmarshal([]byte(m.Args["object"]), &splayer)
 	if err != nil {
 		c.logger.Println(err)
 		return nil
 	}
+
+	player := PlayerFromScriptPlayer(splayer)
 
 	if isClientAlt(player.Username) {
 		return nil
@@ -144,16 +156,6 @@ func (c *Collector) OnPlayerLeave(m rcon.Message, r *rcon.Client) error {
 			return err
 		}
 
-		/*if player.StatsBan || isNewPlayer(&player) {
-			return nil
-		}*/
-
-		/*
-			err = UpdateLeaveTime(player.ID, c.server.ID)
-			if err != nil {
-				return err
-			}
-		*/
 		c.logger.Printf("%s (%d) left the game", player.Username, player.ID)
 		if c.playerCount > 0 {
 			c.playerCount--
@@ -218,20 +220,21 @@ func (c *Collector) OnPlayerDie(m rcon.Message, r *rcon.Client) error {
 }
 
 func (c *Collector) PlayerList(m rcon.Message, r *rcon.Client) error {
-	var players []models.Player
-	err := json.Unmarshal([]byte(m.Args["object"]), &players)
+	var splayers []models.ScriptPlayer
+	err := json.Unmarshal([]byte(m.Args["object"]), &splayers)
 	if err != nil {
 		c.logger.Println(err)
 		return nil
 	}
 
+	players := PlayersFromScriptPlayers(splayers)
+
 	if len(players) > 0 {
-		altPlayers := 0
+		playerCount := 0
 		for _, p := range players {
 			p.ServerID = c.server.ID
 
 			if isClientAlt(p.Username) {
-				altPlayers++
 				continue
 			}
 
@@ -240,20 +243,11 @@ func (c *Collector) PlayerList(m rcon.Message, r *rcon.Client) error {
 				return err
 			}
 
-			if p.StatsBan || isNewPlayer(&p) {
-				altPlayers++
-				continue
-			}
+			playerCount++
 
-			/*
-				err = UpdateJoinTime(p.ID, c.server.ID)
-				if err != nil {
-					return err
-				}
-			*/
 			c.logger.Printf("%s (%d) was in the game", p.Username, p.ID)
 		}
-		c.playerCount = len(players) - altPlayers
+		c.playerCount = playerCount
 	}
 
 	r.RemoveHandler("^PlayerList (?P<object>.*)")

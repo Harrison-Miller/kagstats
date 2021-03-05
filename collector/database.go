@@ -19,8 +19,8 @@ func UpdatePlayerInfo(player *models.Player) error {
 	}
 	defer tx.Rollback()
 
-	_, err = tx.Exec("INSERT INTO players (username, charactername, clantag) VALUES (?,?,?) ON DUPLICATE KEY UPDATE username=?,charactername=?,clantag=?",
-		player.Username, player.Charactername, player.Clantag, player.Username, player.Charactername, player.Clantag)
+	_, err = tx.Exec("INSERT INTO players (username, charactername, clantag, lastIP) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE username=?,charactername=?,clantag=?,lastIP=?",
+		player.Username, player.Charactername, player.Clantag, player.IP, player.Username, player.Charactername, player.Clantag, player.IP)
 	if err != nil {
 		return errors.Wrap(err, "error updating/creating player")
 	}

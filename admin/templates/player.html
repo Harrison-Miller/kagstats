@@ -131,6 +131,20 @@
     </div>
 </div>
 
+<h2>Alts</h2>
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <td>Avatar</td>
+        <td>Name</td>
+        <td>IP</td>
+        <td>Flags</td>
+    </tr>
+    </thead>
+    <tbody id="altlist">
+    </tbody>
+</table>
+
 <h2>Stats</h2>
 
 <table class="table table-striped">
@@ -230,6 +244,51 @@
 
     killsStart=0;
     currentHistory=null;
+
+    function getAlts() {
+        altList = $("#altlist");
+
+        $.getJSON("{{ .Prefix }}/alts/{{ .PlayerId }}", function(data) {
+            if (!data) {
+                return;
+            }
+
+            for (var i = 0; i < data.length; i++) {
+                player = data[i];
+                console.log(player);
+
+                elem = `<tr onclick="gotoPlayer('${player.id}');">
+                <td>
+                <img src="${player.avatar}" width="64px;" height="64px;">
+                </td>
+                <td>
+                ${player.clantag} ${player.charactername} (${player.username})
+                </td>
+                <td>
+                    ${player.ip}
+                </td>
+                <td>`
+
+                if(player.leaderboardBan) {
+                    elem += `<span class="badge badge-pill badge-warning">Leaderboard Ban</span>`;
+                }
+
+                if(player.monthlyLeaderboardBan) {
+                    elem += `<span class="badge badge-pill badge-warning">Monthly Leaderboard Ban</span>`;
+                }
+
+                if(player.statsBan) {
+                    elem += `<span class="badge badge-pill badge-danger">Stats Ban</span>`;
+                }
+
+                elem += `</td></tr>`;
+
+                altList.append(elem);
+            }
+        })
+    }
+
+    getAlts();
 
     function getKillHistory() {
         $.getJSON(apiEndpoint + "players/" + playerId + "/kills?showbanned=true&start=" + killsStart, function(data){

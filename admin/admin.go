@@ -223,6 +223,49 @@ func getNotes(w http.ResponseWriter, r *http.Request) {
 	JSONResponse(w, &n)
 }
 
+type AltInfo struct {
+	Avatar string `json:"avatar"`
+	IP string `json:"ip" db:"lastIP"`
+	ClanTag string `json:"clantag" db:"clantag"`
+	CharacterName string `json:"charactername"`
+	Username string `json:"username" db:"username"`
+	PlayerID int64 `json:"id" db:"ID"`
+	LeaderboardBan bool   `json:"leaderboardBan" db:"leaderboardBan"`
+	MonthlyLeaderboardBan bool `json:"monthlyLeaderboardBan" db:"monthlyLeaderboardBan"`
+	StatsBan       bool   `json:"statsBan" db:"statsBan"`
+}
+
+type LastIP struct {
+	IP string `json:"ip" db:"lastIP"`
+}
+
+func getAlts(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	playerID := vars["id"]
+
+	var ip LastIP
+	err := db.Get(&ip, `SELECT lastIP FROM players WHERE players.ID=?`, playerID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	alts := []AltInfo{}
+	if ip.IP == "" {
+		JSONResponse(w, &alts)
+		return
+	}
+
+	err = db.Select(&alts, `SELECT avatar,lastIP,clantag,charactername,username,ID,leaderboardBan,monthlyLeaderboardBan,statsBan
+		FROM players WHERE players.lastIP=? AND players.ID!=?`, ip.IP, playerID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	JSONResponse(w, &alts)
+}
+
 func main() {
 	config, _ = configs.Get()
 	if value, ok := os.LookupEnv("ADMIN_DB"); ok {
@@ -269,6 +312,7 @@ func main() {
 	r.HandleFunc("/delete", BasicAuth(delete)).Methods("POST")
 	r.HandleFunc("/recalculate", BasicAuth(recalculate)).Methods("POST")
 	r.HandleFunc("/notes/{id:[0-9]+}", BasicAuth(getNotes)).Methods("GET")
+	r.HandleFunc("/alts/{id:[0-9]+}", BasicAuth(getAlts)).Methods("GET")
 
 	r.Use(LogHandler)
 
