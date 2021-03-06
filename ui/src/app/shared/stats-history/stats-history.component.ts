@@ -1,4 +1,13 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+  ViewChild,
+  ViewChildren
+} from '@angular/core';
 
 import {
   ChartComponent,
@@ -9,26 +18,29 @@ import {
 import {PlayersService} from '../../services/players.service';
 import {MonthlyHittersStats, MonthlyStats} from '../../models';
 import {HittersService} from '../../services/hitters.service';
+import {first, takeUntil} from "rxjs/operators";
 
 @Component({
   selector: 'app-stats-history',
   templateUrl: './stats-history.component.html',
   styleUrls: ['./stats-history.component.scss', '../../shared/killfeed/killfeed.component.scss']
 })
-export class StatsHistoryComponent implements OnInit {
+export class StatsHistoryComponent implements OnInit, AfterViewInit {
 
   constructor(private playersService: PlayersService,
               private hittersService: HittersService) {
 
   }
-  @ViewChild('chart') chart;
-  @ViewChild('kdrChart') kdrChart;
-  @ViewChild('hittersChart') hittersChart;
+  @ViewChildren('chart') chart;
+  @ViewChildren('kdrChart') kdrChart;
+  @ViewChildren('hittersChart') hittersChart;
   public chartOptions;
   public kdrChartOptions;
   public hittersChartOptions;
 
   @Input() playerID: number;
+
+  loading = 2;
 
   stats: MonthlyStats[];
   hitterStats: MonthlyHittersStats[];
@@ -236,7 +248,32 @@ export class StatsHistoryComponent implements OnInit {
     },
   };
 
+  ngAfterViewInit() {
+    this.chart.changes.pipe(first()).subscribe(result => {
+      const chart = result.first;
+      setTimeout(() => {
+        chart.toggleSeries('Archer Deaths');
+        chart.toggleSeries('Builder Deaths');
+        chart.toggleSeries('Knight Deaths');
+      }, 50);
+    });
+
+    this.hittersChart.changes.pipe(first()).subscribe( result => {
+      const chart = result.first;
+      setTimeout(() => {
+        chart.toggleSeries('Drowning');
+        chart.toggleSeries('Shark');
+        chart.toggleSeries('Splatter');
+        chart.toggleSeries('Water');
+        chart.toggleSeries('Shield');
+        chart.toggleSeries('Scroll Of Carnage');
+      }, 50);
+    });
+  }
+
   ngOnInit() {
+
+
     this.chartOptions = {
       series: [
       ],
@@ -334,6 +371,7 @@ export class StatsHistoryComponent implements OnInit {
         },
       },
       xaxis: {
+        type: 'category',
         categories: [],
         labels: {
           rotate: -45,
@@ -419,22 +457,31 @@ export class StatsHistoryComponent implements OnInit {
       this.knightKDR.data.push({x: category, y: this.getKDR(stat.knightKills, stat.knightDeaths)});
     }
 
+    this.chartOptions.series = [this.knightKills,
+      this.knightDeaths,
+      this.archerKills,
+      this.archerDeaths,
+      this.builderKills,
+      this.builderDeaths];
+
+    /*
     this.chart.appendSeries(this.knightKills);
     this.chart.appendSeries(this.knightDeaths);
     this.chart.appendSeries(this.archerKills);
     this.chart.appendSeries(this.archerDeaths);
     this.chart.appendSeries(this.builderKills);
     this.chart.appendSeries(this.builderDeaths);
+     */
 
+    this.kdrChartOptions.series = [this.knightKDR, this.archerKDR, this.builderKDR];
 
-    this.chart.toggleSeries('Archer Deaths');
-    this.chart.toggleSeries('Builder Deaths');
-    this.chart.toggleSeries('Knight Deaths');
-
+    /*
     this.kdrChart.appendSeries(this.knightKDR);
     this.kdrChart.appendSeries(this.archerKDR);
     this.kdrChart.appendSeries(this.builderKDR);
+     */
 
+    this.loading -= 1;
   }
 
   hitterDescription(name: string): string {
@@ -522,7 +569,6 @@ export class StatsHistoryComponent implements OnInit {
       // use counts list to populate series
       for (const key in counts) {
         if (!(key in series)) {
-          console.log(key);
           series[key] = {
             key,
             name: this.hitterDescription(key),
@@ -546,16 +592,11 @@ export class StatsHistoryComponent implements OnInit {
     });
 
     for (const s of sortedSeries) {
-      this.hittersChart.appendSeries(s);
+      this.hittersChartOptions.series.push(s);
+      // this.hittersChart.appendSeries(s);
     }
 
-    this.hittersChart.toggleSeries('Drowning');
-    this.hittersChart.toggleSeries('Shark');
-    this.hittersChart.toggleSeries('Splatter');
-    this.hittersChart.toggleSeries('Water');
-    this.hittersChart.toggleSeries('Shield');
-    this.hittersChart.toggleSeries('Scroll Of Carnage');
+    this.loading -= 1;
   }
-
 
 }

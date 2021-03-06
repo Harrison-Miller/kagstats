@@ -1,34 +1,41 @@
-<div style="text-align:center">
-  <apx-chart #chart
-          [series]="chartOptions.series"
-          [chart]="chartOptions.chart"
-          [xaxis]="chartOptions.xaxis"
-          [title]="chartOptions.title"
-          [stroke]="chartOptions.stroke"
-          [fill]="chartOptions.fill"
-          [dataLabels]="chartOptions.dataLabels"
-  ></apx-chart>
-</div>
+<ng-container *ngIf="loading != 0; else notLoading">
+  <div class="spinner spinner-border text-primary" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+</ng-container>
+<ng-template #notLoading>
+  <div style="text-align:center">
+    <apx-chart #chart
+               [series]="chartOptions.series"
+               [chart]="chartOptions.chart"
+               [xaxis]="chartOptions.xaxis"
+               [title]="chartOptions.title"
+               [stroke]="chartOptions.stroke"
+               [fill]="chartOptions.fill"
+               [dataLabels]="chartOptions.dataLabels"
+    ></apx-chart>
+  </div>
 
 
-<div style="text-align:center">
-  <apx-chart #kdrChart
-          [series]="kdrChartOptions.series"
-          [chart]="kdrChartOptions.chart"
-          [markers]="kdrChartOptions.markers"
-          [xaxis]="kdrChartOptions.xaxis"
-          [title]="kdrChartOptions.title"
-          [yaxis]="kdrChartOptions.yaxis"
-  ></apx-chart>
-</div>
+  <div style="text-align:center">
+    <apx-chart #kdrChart
+               [series]="kdrChartOptions.series"
+               [chart]="kdrChartOptions.chart"
+               [markers]="kdrChartOptions.markers"
+               [xaxis]="kdrChartOptions.xaxis"
+               [title]="kdrChartOptions.title"
+               [yaxis]="kdrChartOptions.yaxis"
+    ></apx-chart>
+  </div>
 
-<div style="text-align:center">
-  <apx-chart #hittersChart
-             [series]="hittersChartOptions.series"
-             [chart]="hittersChartOptions.chart"
-             [xaxis]="hittersChartOptions.xaxis"
-             [title]="hittersChartOptions.title"
-             [plotOptions]="hittersChartOptions.plotOptions"
-             [yaxis]="hittersChartOptions.yaxis"
-  ></apx-chart>
-</div>
+  <div style="text-align:center">
+    <apx-chart #hittersChart
+               [series]="hittersChartOptions.series"
+               [chart]="hittersChartOptions.chart"
+               [xaxis]="hittersChartOptions.xaxis"
+               [title]="hittersChartOptions.title"
+               [plotOptions]="hittersChartOptions.plotOptions"
+               [yaxis]="hittersChartOptions.yaxis"
+    ></apx-chart>
+  </div>
+</ng-template>
