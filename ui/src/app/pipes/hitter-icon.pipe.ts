@@ -22,7 +22,6 @@ export class HitterIconPipe implements PipeTransform {
       case Hitters.fire:
       case Hitters.burn:
         return Hitters[Hitters.fire];
-      case Hitters.bomb_arrow:
       case Hitters.explosion:
         return Hitters[Hitters.bomb];
       case Hitters.mine_special:
@@ -30,6 +29,10 @@ export class HitterIconPipe implements PipeTransform {
       case Hitters.cata_boulder:
       case Hitters.cata_stones:
         return Hitters[Hitters.cata_stones];
+      case Hitters.water:
+      case Hitters.water_stun:
+      case Hitters.water_stun_force:
+        return Hitters[Hitters.water];
     }
 
     return Hitters[hitter];

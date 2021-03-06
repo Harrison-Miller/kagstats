@@ -225,7 +225,7 @@
     </ng-template>
     </ngb-tab>
     <ngb-tab>
-    <ng-template ngbTabTitle><h3>Kill History</h3></ng-template>
+    <ng-template ngbTabTitle><h3>Kill Feed</h3></ng-template>
     <ng-template ngbTabContent>
         <div class="top-margin">
             <app-killfeed [url]="'/players/' + player.id + '/kills'" [limit]="20"></app-killfeed>
@@ -233,7 +233,7 @@
     </ng-template>
     </ngb-tab>
     <ngb-tab>
-      <ng-template ngbTabTitle><h3>Historical Stats</h3></ng-template>
+      <ng-template ngbTabTitle><h3>Monthly Stats</h3></ng-template>
       <ng-template ngbTabContent>
           <app-stats-history [playerID]="player.id"></app-stats-history>
       </ng-template>

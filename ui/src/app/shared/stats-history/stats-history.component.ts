@@ -3,25 +3,35 @@ import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {
   ChartComponent,
   ApexAxisChartSeries,
-  ApexXAxis
+  ApexXAxis,
+  ApexLegend
 } from 'ng-apexcharts';
 import {PlayersService} from '../../services/players.service';
-import {MonthlyStats} from '../../models';
+import {MonthlyHittersStats, MonthlyStats} from '../../models';
+import {HittersService} from '../../services/hitters.service';
 
 @Component({
   selector: 'app-stats-history',
   templateUrl: './stats-history.component.html',
-  styleUrls: ['./stats-history.component.scss']
+  styleUrls: ['./stats-history.component.scss', '../../shared/killfeed/killfeed.component.scss']
 })
 export class StatsHistoryComponent implements OnInit {
+
+  constructor(private playersService: PlayersService,
+              private hittersService: HittersService) {
+
+  }
   @ViewChild('chart') chart;
   @ViewChild('kdrChart') kdrChart;
+  @ViewChild('hittersChart') hittersChart;
   public chartOptions;
   public kdrChartOptions;
+  public hittersChartOptions;
 
   @Input() playerID: number;
 
   stats: MonthlyStats[];
+  hitterStats: MonthlyHittersStats[];
   archerKills = {
     name: 'Archer Kills',
     color: '#2E93fA',
@@ -32,7 +42,6 @@ export class StatsHistoryComponent implements OnInit {
     name: 'Archer Deaths',
     color: '#1b5896',
     type: 'line',
-    enabled: false,
     data: [],
   };
   archerKDR = {
@@ -75,9 +84,157 @@ export class StatsHistoryComponent implements OnInit {
     data: []
   };
 
-  constructor(private playersService: PlayersService) {
+  hitterInfo = {
+    // distinct hitters
 
-  }
+    // knight
+    sword: {
+      color: '#FF9800FF',
+      rank: 0,
+    },
+    bomb: {
+      color: '#FF9800C0',
+      rank: 3,
+    },
+    shield: {
+      color: '#FF980080',
+      rank: 27,
+    },
+
+    // archer
+    arrow: {
+      color: '#2E93fAFF',
+      rank: 1,
+    },
+    bomb_arrow: {
+      color: '#2E93fAC0',
+      rank: 10,
+    },
+
+    // builder
+    spikes: {
+      color: '#66DA26FF',
+      rank: 6,
+    },
+    pickaxe: {
+      color: '#66DA26C0',
+      rank: 9,
+    },
+    drill: {
+      color: '#66DA2680',
+      rank: 11,
+    },
+    saw: {
+      color: '#66DA2640',
+      rank: 15,
+    },
+
+    // misc
+    stomp: {
+      color: '#6E7F80FF',
+      rank: 5,
+    },
+    fall: {
+      color: '#6E7F80C0',
+      rank: 7,
+    },
+    keg: {
+      color: '#9370DBFF',
+      rank: 4,
+    },
+    mine: {
+      color: '#9370DBC0',
+      rank: 14,
+    },
+    bite: {
+      color: '#7FFFD4FF',
+      rank: 20,
+    },
+    fire: {
+      color: '#DC143CFF',
+      rank: 17,
+    },
+    catapult_stones: {
+      color: '#CB6843FF',
+      rank: 16,
+    },
+    ballista_bolt: {
+      color: '#CB6843C0',
+      rank: 22,
+    },
+    flying: {
+      color: '#CB684380',
+      rank: 25,
+    },
+    boulder: {
+      color: '#A0522DFF',
+      rank: 23,
+    },
+    drowning: {
+      color: '#20B2AAFF',
+      rank: 18,
+    },
+    water: {
+      color: '#20B2AAC0',
+      rank: 31,
+    },
+    sudden_gib: {
+      color: '#9370DB80',
+      rank: 30,
+    },
+
+    // non-distinct hitters
+    died: {
+      color: '#2e222f',
+      rank: 12,
+    },
+    crushing: {
+      color: '#453347',
+      rank: 13,
+    },
+    suicide: {
+      color: '#2e222f',
+      rank: 19,
+    },
+    water_stun: {
+      color: '#4d65b4',
+      rank: 29,
+    },
+    water_stun_force: {
+      color: '#4d65b4',
+      rank: 26,
+    },
+    burn: {
+      color: '#b33831',
+      rank: 17,
+    },
+    explosion: {
+      color: '#e968dc',
+      rank: 24,
+    },
+    mine_special: {
+      color: '#b553ab',
+      rank: 8,
+    },
+    catapult_boulder: {
+      color: '#434341',
+      rank: 28,
+    },
+
+    // unused
+    ram: {
+      color: '#f9c22b',
+      rank: 40
+    },
+    stab: {
+      color: '#2E93fA',
+      rank: 41,
+    },
+    muscles: {
+      color: '#f9c22b',
+      rank: 42,
+    },
+  };
 
   ngOnInit() {
     this.chartOptions = {
@@ -153,6 +310,41 @@ export class StatsHistoryComponent implements OnInit {
       }
     };
 
+    this.hittersChartOptions = {
+      series: [
+      ],
+      chart: {
+        height: 800,
+        type: 'bar',
+        stacked: true,
+        stackType: '100%',
+        animations: {
+          enabled: false,
+        },
+        toolbar: {
+          show: false,
+        },
+      },
+      title: {
+        text: 'Monthly Weapons'
+      },
+      plotOptions: {
+        bar: {
+          columnWidth: '90%',
+        },
+      },
+      xaxis: {
+        categories: [],
+        labels: {
+          rotate: -45,
+          rotateAlways: true,
+        },
+      },
+      yaxis: {
+        show: false,
+      }
+    };
+
 
     this.playersService.getMonthlyStatus(this.playerID).subscribe(monthlyStats => {
       this.stats = monthlyStats;
@@ -165,36 +357,48 @@ export class StatsHistoryComponent implements OnInit {
       this.stats.slice(0, 11);
       this.updateStats();
     });
+
+    this.hittersService.getMonthlyHitters(this.playerID).subscribe( hitterStats => {
+      this.hitterStats = hitterStats;
+      this.hitterStats.sort((a, b) => {
+        if (a.year === b.year) {
+          return a.month - b.month;
+        }
+        return a.year - b.year;
+      });
+      this.hitterStats.slice(0, 11);
+      this.updateHitterStats();
+    });
   }
 
-  categoryName(stat: MonthlyStats): string {
-    switch (stat.month) {
+  categoryName(month: number, year: number): string {
+    switch (month) {
       case 1:
-        return 'Jan ' + stat.year;
+        return 'Jan ' + year;
       case 2:
-        return 'Feb ' + stat.year;
+        return 'Feb ' + year;
       case 3:
-        return 'Mar ' + stat.year;
+        return 'Mar ' + year;
       case 4:
-        return 'Apr ' + stat.year;
+        return 'Apr ' + year;
       case 5:
-        return 'May ' + stat.year;
+        return 'May ' + year;
       case 6:
-        return 'Jun ' + stat.year;
+        return 'Jun ' + year;
       case 7:
-        return 'Jul ' + stat.year;
+        return 'Jul ' + year;
       case 8:
-        return 'Aug ' + stat.year;
+        return 'Aug ' + year;
       case 9:
-        return 'Sep ' + stat.year;
+        return 'Sep ' + year;
       case 10:
-        return 'Oct ' + stat.year;
+        return 'Oct ' + year;
       case 11:
-        return 'Nov ' + stat.year;
+        return 'Nov ' + year;
       case 12:
-        return 'Dec ' + stat.year;
+        return 'Dec ' + year;
     }
-    return '' + stat.year;
+    return '' + year;
   }
 
   getKDR(kills: number, deaths: number): string {
@@ -203,7 +407,7 @@ export class StatsHistoryComponent implements OnInit {
 
   updateStats() {
     for (const stat of this.stats) {
-      const category = this.categoryName(stat);
+      const category = this.categoryName(stat.month, stat.year);
       this.archerKills.data.push({x: category, y: stat.archerKills});
       this.archerDeaths.data.push({x: category, y: stat.archerDeaths});
       this.archerKDR.data.push({x: category, y: this.getKDR(stat.archerKills, stat.archerDeaths)});
@@ -232,4 +436,126 @@ export class StatsHistoryComponent implements OnInit {
     this.kdrChart.appendSeries(this.builderKDR);
 
   }
+
+  hitterDescription(name: string): string {
+    switch (name) {
+      case 'catapult_stones':
+        return 'Catapult';
+      case 'bite':
+        return 'Shark';
+      case 'flying':
+        return 'Splatter';
+      case 'ballista_bolt':
+        return 'Ballista';
+      case 'sudden_gib':
+        return 'Scroll Of Carnage';
+      case 'fall':
+        return 'Pushed Off A Cliff';
+    }
+
+    let description = '';
+    const parts = name.split('_');
+    for (const i in parts) {
+      if (i !== '0') {
+        description += ' ';
+      }
+      description += parts[i].charAt(0).toUpperCase() + parts[i].slice(1);
+    }
+    return description;
+  }
+
+  combineHitter(name: string): string {
+    switch (name) {
+      case 'died':
+      case 'suicide':
+      case 'crushing':
+        return 'fall';
+      case 'fire':
+      case 'burn':
+        return 'fire';
+      case 'explosion':
+        return 'bomb';
+      case 'mine_special':
+        return 'mine';
+      case 'catapult_boulder':
+      case 'catapult_stones':
+        return 'catapult_stones';
+      case 'water':
+      case 'water_stun':
+      case 'water_stun_force':
+        return 'water';
+    }
+    return name;
+  }
+
+  updateHitterStats() {
+    const series = {};
+    for (const stat of this.hitterStats) {
+      this.hittersChartOptions.xaxis.categories.push(this.categoryName(stat.month, stat.year));
+    }
+
+    for (const stat of this.hitterStats) {
+      // create counts list combining duplicate hitter types
+      const counts = {};
+      for (const key in stat) {
+        if (key !== 'player' && key !== 'month' && key !== 'year' && key !== 'ram' && key !== 'muscles' && key != 'stab') {
+          const hitterName = this.combineHitter(key);
+          // if hitterName doesn't exist create it
+          if (!(hitterName in counts)) {
+            // if 0 null
+            if (stat[key] === 0) {
+              counts[hitterName] = null;
+            } else {
+              counts[hitterName] = stat[key];
+            }
+          } else {
+            // if hitterName in counts
+            // if previously set to null override it
+            if (counts[hitterName] == null) {
+              counts[hitterName] = 0;
+            }
+            counts[hitterName] += stat[key];
+          }
+        }
+      }
+
+      // use counts list to populate series
+      for (const key in counts) {
+        if (!(key in series)) {
+          console.log(key);
+          series[key] = {
+            key,
+            name: this.hitterDescription(key),
+            data: [],
+            color: this.hitterInfo[key].color,
+          };
+        }
+        series[key].data.push(counts[key]);
+      }
+    }
+
+    const sortedSeries = [];
+    for (const key in series) {
+      sortedSeries.push(series[key]);
+    }
+
+    sortedSeries.sort((a, b) => {
+      const rankA = this.hitterInfo[a.key].rank;
+      const rankB = this.hitterInfo[b.key].rank;
+      return rankA - rankB;
+    });
+
+    for (const s of sortedSeries) {
+      this.hittersChart.appendSeries(s);
+    }
+
+    this.hittersChart.toggleSeries('Drowning');
+    this.hittersChart.toggleSeries('Shark');
+    this.hittersChart.toggleSeries('Splatter');
+    this.hittersChart.toggleSeries('Water');
+    this.hittersChart.toggleSeries('Shield');
+    this.hittersChart.toggleSeries('Scroll Of Carnage');
+  }
+
+
 }

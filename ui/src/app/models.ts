@@ -36,6 +36,50 @@ export interface Hitter {
   kills: number;
 }
 
+export interface HittersStats {
+  player: Player;
+
+  died: number;
+  crushing: number;
+  fall: number;
+  water: number;
+  water_stun: number;
+  water_stun_force: number;
+  drowning: number;
+  fire: number;
+  burn: number;
+  flying: number;
+  stomp: number;
+  suicide: number;
+  bite: number;
+  pickaxe: number;
+  sword: number;
+  shield: number;
+  bomb: number;
+  stab: number;
+  arrow: number;
+  bomb_arrow: number;
+  ballista_bolt: number;
+  catapult_stones: number;
+  catapult_boulder: number;
+  boulder: number;
+  ram: number;
+  explosion: number;
+  keg: number;
+  mine: number;
+  mine_special: number;
+  spikes: number;
+  saw: number;
+  drill: number;
+  muscles: number;
+  sudden_gib: number;
+}
+
+export interface MonthlyHittersStats extends HittersStats {
+  year: number;
+  month: number;
+}
+
 export interface Captures {
   playerID: number;
   captures: number;

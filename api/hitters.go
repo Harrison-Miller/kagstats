@@ -123,7 +123,7 @@ func GetMonthlyHitters(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var stats []MonthlyHittersStats
-	err = db.Select(&stats, `SELECT * FROM monthly_hitters WHERE playerID=?`, playerID)
+	err = db.Select(&stats, `SELECT * FROM monthly_hitters WHERE playerID=? ORDER BY monthly_hitters.year DESC LIMIT 12`, playerID)
 	if err != nil {
 		log.Printf("Could not find hitters for player: %v\n", err)
 		http.Error(w, "Could not find hitters for player", http.StatusInternalServerError)
