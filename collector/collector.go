@@ -81,7 +81,7 @@ func UpdatePlayer(p *models.Player) error {
 		cache.ServerID = p.ServerID
 		p.Registered = cache.Registered
 
-		if p.Charactername != cache.Charactername || p.Clantag != cache.Clantag || p.IP != cache.IP {
+		if p.Charactername != cache.Charactername || p.Clantag != cache.Clantag || (p.IP != cache.IP && p.IP != "") {
 			cache.Charactername = p.Charactername
 			cache.Clantag = p.Clantag
 			cache.IP = p.IP
