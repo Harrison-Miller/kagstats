@@ -266,6 +266,101 @@ func getAlts(w http.ResponseWriter, r *http.Request) {
 	JSONResponse(w, &alts)
 }
 
+type AltCountInfo struct {
+	Avatar string `json:"avatar"`
+	ClanTag string `json:"clantag" db:"clantag"`
+	IP string `json:"ip" db:"lastIP"`
+	CharacterName string `json:"charactername"`
+	Username string `json:"username" db:"username"`
+	PlayerID int64 `json:"id" db:"ID"`
+	Alts int64 `json:"altsCount"`
+}
+
+func getTopAlts(w http.ResponseWriter, r *http.Request) {
+	ArcherGate := 40
+	BuilderGate := 20
+	KnightGate := 75
+
+	archerAlts := []AltCountInfo{}
+	err := db.Select(&archerAlts, 	`SELECT p.avatar,p.clantag,p.lastIP,p.charactername,p.username,p.ID FROM basic_stats 
+	INNER JOIN players as p ON basic_stats.playerID=p.ID 
+	WHERE NOT p.leaderboardBan AND NOT p.statsBan 
+	AND basic_stats.archer_kills >= ? AND basic_stats.archer_deaths >= ? 
+	ORDER BY (basic_stats.archer_kills / basic_stats.archer_deaths) DESC LIMIT 20`, ArcherGate, ArcherGate)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	for i, alt := range archerAlts {
+		if alt.IP != "" {
+			var count int64
+			db.Get(&count, `SELECT COUNT(ID) FROM players WHERE players.lastIP=? AND players.ID!=?`, alt.IP, alt.PlayerID)
+			archerAlts[i].Alts = count
+		}
+	}
+
+	builderAlts := []AltCountInfo{}
+	err = db.Select(&builderAlts, 	`SELECT p.avatar,p.clantag,p.lastIP,p.charactername,p.username,p.ID FROM basic_stats 
+	INNER JOIN players as p ON basic_stats.playerID=p.ID 
+	WHERE NOT p.leaderboardBan AND NOT p.statsBan 
+	AND basic_stats.builder_kills >= ? AND basic_stats.builder_deaths >= ? 
+	ORDER BY (basic_stats.builder_kills / basic_stats.builder_deaths) DESC LIMIT 20`, BuilderGate, BuilderGate)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	for i, alt := range builderAlts {
+		if alt.IP != "" {
+			var count int64
+			db.Get(&count, `SELECT COUNT(ID) FROM players WHERE players.lastIP=? AND players.ID!=?`, alt.IP, alt.PlayerID)
+			builderAlts[i].Alts = count
+		}
+	}
+
+	knightAlts := []AltCountInfo{}
+	err = db.Select(&knightAlts, 	`SELECT p.avatar,p.clantag,p.lastIP,p.charactername,p.username,p.ID FROM basic_stats 
+	INNER JOIN players as p ON basic_stats.playerID=p.ID 
+	WHERE NOT p.leaderboardBan AND NOT p.statsBan 
+	AND basic_stats.knight_kills >= ? AND basic_stats.knight_deaths >= ? 
+	ORDER BY (basic_stats.knight_kills / basic_stats.knight_deaths) DESC LIMIT 20`, KnightGate, KnightGate)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	for i, alt := range knightAlts {
+		if alt.IP != "" {
+			var count int64
+			db.Get(&count, `SELECT COUNT(ID) FROM players WHERE players.lastIP=? AND players.ID!=?`, alt.IP, alt.PlayerID)
+			knightAlts[i].Alts = count
+		}
+	}
+
+	alts := []AltCountInfo{}
+	for _, alt := range archerAlts {
+		if alt.Alts > 0 {
+			alts = append(alts, alt)
+		}
+	}
+
+	for _, alt := range knightAlts {
+		if alt.Alts > 0 {
+			alts = append(alts, alt)
+		}
+	}
+
+	for _, alt := range builderAlts {
+		if alt.Alts > 0 {
+			alts = append(alts, alt)
+		}
+	}
+
+	JSONResponse(w, &alts)
+
+}
+
 func main() {
 	config, _ = configs.Get()
 	if value, ok := os.LookupEnv("ADMIN_DB"); ok {
@@ -313,6 +408,7 @@ func main() {
 	r.HandleFunc("/recalculate", BasicAuth(recalculate)).Methods("POST")
 	r.HandleFunc("/notes/{id:[0-9]+}", BasicAuth(getNotes)).Methods("GET")
 	r.HandleFunc("/alts/{id:[0-9]+}", BasicAuth(getAlts)).Methods("GET")
+	r.HandleFunc("/leaderboardalts", BasicAuth(getTopAlts)).Methods("GET")
 
 	r.Use(LogHandler)
 

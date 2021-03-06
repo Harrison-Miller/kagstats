@@ -23,6 +23,26 @@
 <div class="row top-buffer">
     <div class="col-md"></div>
     <div class="col-md">
+        <h2>Possible Leaderboard Alts</h2>
+    </div>
+    <div class="col-md"></div>
+</div>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <td>Avatar</td>
+        <td>Name</td>
+        <td>Alts Count</td>
+    </tr>
+    </thead>
+    <tbody id="altslist">
+    </tbody>
+</table>
+
+<div class="row top-buffer">
+    <div class="col-md"></div>
+    <div class="col-md">
         <div class="form-group">
             <label for="search">Player Search</label>
             <input type="text" class="form-control bottom-buffer input-md" id="search">
@@ -50,7 +70,6 @@
         </div>
         <div class="col-md"></div>
 </div>
-
 
 <div class="modal fade" id="recalcModal" tabindex="-1" role="dialog" aria-labelledby="saveModal" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -86,8 +105,6 @@
     })
 
     function searchPlayers(text) {
-        console.log(text);
-
         playerList = $("#playerlist");
         playerList.empty();
 
@@ -138,5 +155,35 @@
             alert("failed request");
         });
     }
+
+    function getAlts() {
+        altsList = $("#altslist");
+        altsList.empty();
+
+        $.getJSON("{{ .Prefix }}/leaderboardalts", function(data) {
+            if(!data) {
+                return
+            }
+
+            for (var i = 0; i < data.length; i++) {
+                player = data[i];
+
+                elem = `<tr onclick="gotoPlayer('${player.id}');">
+                <td>
+                <img src="${player.avatar}" width="64px;" height="64px;">
+                </td>
+                <td>
+                ${player.clantag} ${player.charactername} (${player.username})
+                </td>
+                <td>
+                ${player.altsCount}
+                </td>`
+
+                altsList.append(elem);
+            }
+        });
+    }
+
+    getAlts();
 </script>
 </html>
