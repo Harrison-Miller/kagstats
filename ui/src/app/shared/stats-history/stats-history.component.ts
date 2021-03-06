@@ -263,7 +263,7 @@ export class StatsHistoryComponent implements OnInit, AfterViewInit {
       setTimeout(() => {
         chart.toggleSeries('Drowning');
         chart.toggleSeries('Shark');
-        chart.toggleSeries('Splatter');
+        chart.toggleSeries('Run Over');
         chart.toggleSeries('Water');
         chart.toggleSeries('Shield');
         chart.toggleSeries('Scroll Of Carnage');
@@ -491,7 +491,7 @@ export class StatsHistoryComponent implements OnInit, AfterViewInit {
       case 'bite':
         return 'Shark';
       case 'flying':
-        return 'Splatter';
+        return 'Run Over';
       case 'ballista_bolt':
         return 'Ballista';
       case 'sudden_gib':
