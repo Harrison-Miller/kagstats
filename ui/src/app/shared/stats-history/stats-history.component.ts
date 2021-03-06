@@ -133,11 +133,11 @@ export class StatsHistoryComponent implements OnInit, AfterViewInit {
       rank: 9,
     },
     drill: {
-      color: '#66DA2680',
+      color: '#FFD500FF',
       rank: 11,
     },
     saw: {
-      color: '#66DA2640',
+      color: '#FFD500C0',
       rank: 15,
     },
 
