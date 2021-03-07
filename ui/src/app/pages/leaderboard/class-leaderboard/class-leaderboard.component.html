@@ -1,6 +1,6 @@
-<h1>{{boardTitle()}} Leaderboard {{boardDate()}}</h1>
+<h1 style="text-align: center">{{boardTitle()}} Leaderboard {{boardDate()}}</h1>
 
-<table class="table">
+<table class="table table-striped">
   <thead>
   <tr>
     <th>Rank</th>
@@ -11,16 +11,18 @@
   </tr>
   </thead>
   <tbody *ngIf="leaderboard$ | async as leaderboard">
-  <tr *ngFor="let leader of leaderboard; let i = index" [attr.data-index]="i">
-    <td><b>#{{i + 1}}</b></td>
-    <td>
-      <div style="width: 300px">
-        <app-player-banner [player]="leader.player"></app-player-banner>
-      </div>
-    </td>
-    <td>{{totalKills(leader)}}</td>
-    <td>{{totalDeaths(leader)}}</td>
-    <td>{{kd(leader)}}</td>
-  </tr>
+  <ng-container *ngFor="let leader of leaderboard; let i = index">
+    <tr [attr.data-index]="i" [ngClass]="{'bg-info': playerClaims && leader.player.id==playerClaims.playerID}">
+      <td><b>#{{i + 1}}</b></td>
+      <td>
+        <div style="width: 300px">
+          <app-player-banner [player]="leader.player"></app-player-banner>
+        </div>
+      </td>
+      <td>{{totalKills(leader)}}</td>
+      <td>{{totalDeaths(leader)}}</td>
+      <td>{{kd(leader)}}</td>
+    </tr>
+  </ng-container>
   </tbody>
 </table>

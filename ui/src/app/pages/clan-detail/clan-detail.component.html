@@ -16,15 +16,17 @@
           <th>Total</th>
         </tr>
       </thead>
-      <tbody *ngFor="let stats of members">
-        <tr>
-          <td><app-player-banner [status]="false" [player]="stats.player"></app-player-banner></td>
-          <td>{{ stats.player.joinedClan | date:'short' }}</td>
-          <td>{{getKD(stats.archerKills, stats.archerDeaths)}}</td>
-          <td>{{getKD(stats.builderKills, stats.builderDeaths)}}</td>
-          <td>{{getKD(stats.knightKills, stats.knightDeaths)}}</td>
-          <td>{{getKD(stats.totalKills, stats.totalDeaths)}}</td>
-        </tr>
+      <tbody>
+        <ng-container *ngFor="let stats of members">
+          <tr>
+            <td><app-player-banner [status]="false" [player]="stats.player"></app-player-banner></td>
+            <td>{{ stats.player.joinedClan | date:'short' }}</td>
+            <td>{{getKD(stats.archerKills, stats.archerDeaths)}}</td>
+            <td>{{getKD(stats.builderKills, stats.builderDeaths)}}</td>
+            <td>{{getKD(stats.knightKills, stats.knightDeaths)}}</td>
+            <td>{{getKD(stats.totalKills, stats.totalDeaths)}}</td>
+          </tr>
+        </ng-container>
       </tbody>
     </table>
   </ng-container>

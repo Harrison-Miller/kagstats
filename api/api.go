@@ -132,6 +132,7 @@ func main() {
 	protected.Use(Verify)
 	ClanRoutes(r, protected)
 	AuthRoutes(r, protected)
+	FollowingRoutes(r, protected)
 
 	r.Use(LogHandler)
 

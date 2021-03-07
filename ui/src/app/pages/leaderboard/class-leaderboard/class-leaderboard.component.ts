@@ -1,9 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { LeaderboardService } from '../../../services/leaderboard.service';
 import { Subject } from 'rxjs';
-import { BasicStats } from '../../../models';
+import {BasicStats, PlayerClaims} from '../../../models';
 import { takeUntil } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
+import {AuthService} from "../../../services/auth.service";
 
 const availableClasses = ['Archer', 'Builder', 'Knight', 'Kills', 'MonthlyArcher', 'MonthlyBuilder', 'MonthlyKnight'];
 const boardTitle = {
@@ -28,13 +29,21 @@ export class ClassLeaderboardComponent implements OnInit, OnDestroy {
   componentDestroyed$ = new Subject();
   leaderboard$ = new Subject<BasicStats[]>();
 
+  playerClaims: PlayerClaims = null;
+
   constructor(
     private leaderboardService: LeaderboardService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
+    this.authService.playerClaims.pipe(takeUntil(this.componentDestroyed$))
+      .subscribe( value => {
+        this.playerClaims = value;
+    });
+
     this.route.paramMap
       .pipe(takeUntil(this.componentDestroyed$))
       .subscribe(params => {
@@ -87,7 +96,7 @@ export class ClassLeaderboardComponent implements OnInit, OnDestroy {
     }
     return leader[`${this.class.toLowerCase().replace("monthly", "")}Deaths`]
   }
-  
+
   kd(leader: BasicStats): string {
     const deaths = this.totalDeaths(leader);
     return (this.totalKills(leader) / (deaths === 0 ? 1 : deaths)).toFixed(2);

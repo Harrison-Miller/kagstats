@@ -70,13 +70,33 @@
             </div>
         </div>
     </div>
-
     <div *ngIf="status && status.apiServer" class="row">
         <div class="col">
             <span class="float-left">Last seen on: <b>{{ status.apiServer.serverName }}</b> {{ status.lastUpdateDate | timeAgo }}</span>
         </div>
     </div>
     </div>
+
+    <div class="col">
+      <div class="row">
+        <ng-container *ngIf="playerClaims && showFollowing">
+          <ng-container *ngIf="following; else notFavorited">
+            <div ngbTooltip="unfollow {{player.clantag}} {{player.charactername}}">
+              <div class="sprite2x star my-auto" (click)="toggleStar()"></div>
+            </div>
+          </ng-container>
+          <ng-template #notFavorited>
+            <div  ngbTooltip="follow {{player.clantag}} {{player.charactername}}">
+              <div class="sprite2x blankstar my-auto" (click)="toggleStar()"></div>
+            </div>
+          </ng-template>
+        </ng-container>
+        <ng-container *ngIf="followerCount > 0">
+          <div class="ml-4 my-auto"><strong>{{followerCount}}</strong> player(s) follow {{player.clantag}} {{player.charactername}}</div>
+        </ng-container>
+      </div>
+    </div>
+
 </div>
 </div>
 

@@ -41,6 +41,7 @@ import { ClanDetailComponent } from './pages/clan-detail/clan-detail.component';
 import { ClansComponent } from './pages/clans/clans.component';
 import { StatsHistoryComponent } from './shared/stats-history/stats-history.component';
 import {NgApexchartsModule} from "ng-apexcharts";
+import { FollowingComponent } from './pages/following/following.component';
 
 @NgModule({
   declarations: [
@@ -71,6 +72,7 @@ import {NgApexchartsModule} from "ng-apexcharts";
     ClanDetailComponent,
     ClansComponent,
     StatsHistoryComponent,
+    FollowingComponent,
   ],
   imports: [
     BrowserModule,

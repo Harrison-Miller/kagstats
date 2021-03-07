@@ -7,11 +7,13 @@
       <th>Members</th>
     </tr>
   </thead>
-  <tbody *ngFor="let clan of clans">
-    <tr>
-      <th routerLink="/clans/{{clan.id}}"><strong>{{clan.name}}</strong></th>
-      <th><app-player-banner [status]="false" [player]="clan.leader"></app-player-banner></th>
-      <th>{{clan.membersCount}}</th>
-    </tr>
+  <tbody>
+    <ng-container *ngFor="let clan of clans">
+      <tr>
+        <th routerLink="/clans/{{clan.id}}"><strong>{{clan.name}}</strong></th>
+        <th><app-player-banner [status]="false" [player]="clan.leader"></app-player-banner></th>
+        <th>{{clan.membersCount}}</th>
+      </tr>
+    </ng-container>
   </tbody>
 </table>

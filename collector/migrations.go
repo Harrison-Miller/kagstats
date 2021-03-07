@@ -119,6 +119,11 @@ func RunMigrations(db *sqlx.DB) error {
 		return err
 	}
 
+	err = RunMigration(23, AddFollowing, db)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -543,6 +548,21 @@ func AddMonthlyLeaderboardBan(db *sqlx.DB) error {
 
 func AddLastIP(db *sqlx.DB) error {
 	err := AddColumn("players", "lastIP", "VARCHAR(60) NOT NULL", "''", db)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func AddFollowing(db *sqlx.DB) error {
+	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS followers (
+    	playerID INT NOT NULL,
+    	followedID INT NOT NULL,
+    	FOREIGN KEY (playerID) REFERENCES players(ID) ON DELETE CASCADE,
+    	FOREIGN KEY (followedID) REFERENCES players(ID) ON DELETE CASCADE,
+    	PRIMARY KEY (playerID, followedID)
+	)`)
 	if err != nil {
 		return err
 	}

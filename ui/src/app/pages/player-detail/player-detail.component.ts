@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PlayersService } from '../../services/players.service';
-import { Player, BasicStats, Nemesis, Hitter, Server, APIPlayerStatus } from '../../models';
+import {Player, BasicStats, Nemesis, Hitter, Server, APIPlayerStatus, PlayerClaims} from '../../models';
 import { NemesisService } from '../../services/nemesis.service';
 import { takeUntil } from 'rxjs/operators';
 import { HITTER_DESCRIPTION } from '../../hitters';
@@ -10,6 +10,9 @@ import { HittersService } from '../../services/hitters.service';
 import { ServersService } from '../../services/servers.service';
 import { Title } from '@angular/platform-browser';
 import { CapturesService } from '../../services/captures.service';
+import {AuthService} from "../../services/auth.service";
+import {Subject} from "rxjs";
+import {FollowersService} from "../../services/followers.service";
 
 @Component({
   selector: 'app-player-detail',
@@ -48,7 +51,14 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
 
   today: number = Date.now();
 
-  similarClanTag: boolean = false;
+  similarClanTag = false;
+  followerCount = 0;
+
+  playerClaims: PlayerClaims;
+  componentDestroyed$ = new Subject();
+
+  showFollowing = false;
+  following = false;
 
   @ViewChild('t') t;
 
@@ -59,12 +69,29 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
     private hittersService: HittersService,
     private serversService: ServersService,
     private titleService: Title,
-    private capturesService: CapturesService) { }
+    private capturesService: CapturesService,
+    private authService: AuthService,
+    private followersService: FollowersService) { }
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
       this.playerId = +params.get('id');
       window.scrollTo(0, 0);
+
+      this.authService.playerClaims.pipe(takeUntil(this.componentDestroyed$))
+        .subscribe( value => {
+          this.playerClaims = value;
+          if (this.playerClaims && this.playerClaims.playerID !== this.playerId) {
+            this.followersService.isFollowingPlayer(this.playerId).subscribe( res => {
+              this.showFollowing = true;
+              this.following = res.followingCount > 0;
+            });
+          }
+      });
+
+      this.followersService.getFollowersCount(this.playerId).subscribe( res => {
+        this.followerCount = res.followingCount;
+      });
 
       this.nemesis = null;
       this.bullied = null;
@@ -108,6 +135,7 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.titleService.setTitle('KAG Stats');
+    this.componentDestroyed$.next();
   }
 
   getPlayer(): void {
@@ -169,6 +197,20 @@ export class PlayerDetailComponent implements OnInit, OnDestroy {
     let kills = this.basicStats.knightKills;
     let deaths = this.basicStats.knightDeaths;
     return (kills / (deaths === 0 ? 1 : deaths)).toFixed(2);
+  }
+
+  toggleStar(): void {
+    if (this.following) {
+      this.followersService.unfollowPlayer(this.playerId).subscribe( res => {
+        this.following = false;
+        this.followerCount--;
+      });
+    } else {
+      this.followersService.followPlayer(this.playerId).subscribe( res => {
+        this.following = true;
+        this.followerCount++;
+      });
+    }
   }
 
 }

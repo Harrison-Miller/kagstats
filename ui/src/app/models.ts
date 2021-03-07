@@ -227,3 +227,7 @@ export interface ClanInvite {
   clan: ClanInfo;
   leader: Player;
 }
+
+export interface FollowingCount {
+  followingCount: number;
+}

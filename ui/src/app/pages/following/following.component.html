@@ -1,0 +1,46 @@
+<ng-container *ngIf="following && following.length > 1; else notFollowing">
+  <h2>Players You Follow</h2>
+  <div style="text-align: center">
+    <div class="btn-group">
+      <button class="btn btn-primary" (click)="archerLeaderboard()">Archer</button>
+      <button class="btn btn-primary" (click)="builderLeaderboard()">Builder</button>
+      <button class="btn btn-primary" (click)="knightLeaderboard()">Knight</button>
+    </div>
+  </div>
+
+  <h3 style="text-align: center">{{ leaderboardClass }} Leaderboard</h3>
+
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>Rank</th>
+      <th>Player</th>
+      <th>Kills</th>
+      <th>Deaths</th>
+      <th>Ratio</th>
+      <th>Status</th>
+    </tr>
+    </thead>
+    <tbody>
+    <ng-container *ngFor="let stats of leaderboard">
+      <tr [ngClass]="{ 'bg-info': stats.player.id==playerClaims.playerID }" >
+        <td>#1</td>
+        <td><app-player-banner [status]="false" [player]="stats.player"></app-player-banner></td>
+        <td>{{getKills(stats)}}</td>
+        <td>{{getDeaths(stats)}}</td>
+        <td>{{getLeaderboardKDR(stats)}}</td>
+        <td>
+          <ng-container *ngIf="stats.status && stats.status.apiServer">
+            <span class="float-left">Last seen on: <b>{{ stats.status.apiServer.serverName }}</b> {{ stats.status.lastUpdateDate | timeAgo }}</span>
+          </ng-container>
+        </td>
+        <td>TODO</td>
+      </tr>
+    </ng-container>
+    </tbody>
+  </table>
+</ng-container>
+<ng-template #notFollowing>
+  <h2 style="text-align: center">Follow some people</h2>
+</ng-template>
+

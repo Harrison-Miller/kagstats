@@ -14,6 +14,7 @@ import {ClanManagementComponent} from "./pages/clan-management/clan-management.c
 import {AuthenticatedGuard} from "./guard/authenticated.guard";
 import {ClanDetailComponent} from "./pages/clan-detail/clan-detail.component";
 import {ClansComponent} from "./pages/clans/clans.component";
+import {FollowingComponent} from "./pages/following/following.component";
 
 const routes: Routes = [{
   path: '',
@@ -56,6 +57,10 @@ const routes: Routes = [{
 },{
   path: 'clan-management',
   component: ClanManagementComponent,
+  canActivate: [AuthenticatedGuard]
+},{
+  path: 'following',
+  component: FollowingComponent,
   canActivate: [AuthenticatedGuard]
 }];
 
