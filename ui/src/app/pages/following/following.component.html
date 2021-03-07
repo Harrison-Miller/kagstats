@@ -22,9 +22,9 @@
     </tr>
     </thead>
     <tbody>
-    <ng-container *ngFor="let stats of leaderboard">
+    <ng-container *ngFor="let stats of leaderboard; let i = index">
       <tr [ngClass]="{ 'bg-info': stats.player.id==playerClaims.playerID }" >
-        <td>#1</td>
+        <td><b>#{{i + 1}}</b></td>
         <td><app-player-banner [status]="false" [player]="stats.player"></app-player-banner></td>
         <td>{{getKills(stats)}}</td>
         <td>{{getDeaths(stats)}}</td>
@@ -34,7 +34,6 @@
             <span class="float-left">Last seen on: <b>{{ stats.status.apiServer.serverName }}</b> {{ stats.status.lastUpdateDate | timeAgo }}</span>
           </ng-container>
         </td>
-        <td>TODO</td>
       </tr>
     </ng-container>
     </tbody>
