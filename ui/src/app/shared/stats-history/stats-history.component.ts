@@ -2,23 +2,14 @@ import {
   AfterViewInit,
   Component,
   Input,
-  OnChanges,
   OnInit,
-  SimpleChanges,
-  ViewChild,
   ViewChildren
 } from '@angular/core';
 
-import {
-  ChartComponent,
-  ApexAxisChartSeries,
-  ApexXAxis,
-  ApexLegend
-} from 'ng-apexcharts';
 import {PlayersService} from '../../services/players.service';
 import {MonthlyHittersStats, MonthlyStats} from '../../models';
 import {HittersService} from '../../services/hitters.service';
-import {first, takeUntil} from "rxjs/operators";
+import {first, takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-stats-history',
@@ -261,12 +252,14 @@ export class StatsHistoryComponent implements OnInit, AfterViewInit {
     this.hittersChart.changes.pipe(first()).subscribe( result => {
       const chart = result.first;
       setTimeout(() => {
+        /*
         chart.toggleSeries('Drowning');
         chart.toggleSeries('Shark');
         chart.toggleSeries('Run Over');
         chart.toggleSeries('Water');
         chart.toggleSeries('Shield');
         chart.toggleSeries('Scroll Of Carnage');
+        */
       }, 50);
     });
   }
@@ -370,6 +363,10 @@ export class StatsHistoryComponent implements OnInit, AfterViewInit {
           columnWidth: '90%',
         },
       },
+      legend: {
+        showForNullSeries: false,
+        showForZeroSeries: false,
+      },
       xaxis: {
         type: 'category',
         categories: [],
@@ -464,22 +461,7 @@ export class StatsHistoryComponent implements OnInit, AfterViewInit {
       this.builderKills,
       this.builderDeaths];
 
-    /*
-    this.chart.appendSeries(this.knightKills);
-    this.chart.appendSeries(this.knightDeaths);
-    this.chart.appendSeries(this.archerKills);
-    this.chart.appendSeries(this.archerDeaths);
-    this.chart.appendSeries(this.builderKills);
-    this.chart.appendSeries(this.builderDeaths);
-     */
-
     this.kdrChartOptions.series = [this.knightKDR, this.archerKDR, this.builderKDR];
-
-    /*
-    this.kdrChart.appendSeries(this.knightKDR);
-    this.kdrChart.appendSeries(this.archerKDR);
-    this.kdrChart.appendSeries(this.builderKDR);
-     */
 
     this.loading -= 1;
   }
