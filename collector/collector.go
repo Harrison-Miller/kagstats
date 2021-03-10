@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/md5"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -30,11 +31,14 @@ func isClientAlt(username string) bool {
 }
 
 func PlayerFromScriptPlayer(s models.ScriptPlayer) models.Player {
+	h := md5.New()
+	h.Write([]byte(s.IP))
+
 	return models.Player{
 		Username:      s.Username,
 		Charactername: s.CharacterName,
 		Clantag:       s.ClanTag,
-		IP:            s.IP,
+		IP:            string(h.Sum(nil)),
 	}
 }
 

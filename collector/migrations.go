@@ -124,6 +124,11 @@ func RunMigrations(db *sqlx.DB) error {
 		return err
 	}
 
+	err = RunMigration(24, ChangeLastIPToHash, db)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -563,6 +568,15 @@ func AddFollowing(db *sqlx.DB) error {
     	FOREIGN KEY (followedID) REFERENCES players(ID) ON DELETE CASCADE,
     	PRIMARY KEY (playerID, followedID)
 	)`)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ChangeLastIPToHash(db *sqlx.DB) error {
+	_, err := db.Exec(`UPDATE players SET lastIP=MD5(lastIP) WHERE lastIP!=''`)
 	if err != nil {
 		return err
 	}
