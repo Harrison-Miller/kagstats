@@ -17,7 +17,7 @@ const boardTitle = {
   'Kills': 'Kills'
 }
 
-const monthNames =["January", "February", "March", "April", "May", "June", "July", "August", "September", "November", "December"];
+const monthNames =["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 @Component({
   selector: 'app-class-leaderboard',
