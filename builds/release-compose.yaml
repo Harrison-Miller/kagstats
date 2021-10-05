@@ -4,6 +4,11 @@ version: "3.7"
 services:
   mysql:
     image: mysql:5.7
+  kag-propagate-bans:
+    image: Harrison-Miller/kag-propagate-bans:latest
+    restart: always
+    volumes:
+      - ${BANS_SETTINGS:-./index.json}:/kag-propagate-bans/index.json
   api:
     environment:
       - KD_GATE=75

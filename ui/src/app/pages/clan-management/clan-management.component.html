@@ -7,74 +7,142 @@
 
   <ng-container *ngIf="clan.leaderID == playerClaims.playerID; else notLeader">
     <h4>Welcome Clan Leader, {{ playerClaims.username }}</h4>
-    <hr>
-    <button type="button" class="btn btn-danger" (click)="openDisband(disband)">Disband</button>
-    <hr>
 
-    <h5>Invite New Member</h5>
-    <form [formGroup]="inviteMemberForm" (ngSubmit)="onInviteMember()">
-      <div class="form-group">
-        <label for="playername">Player Name</label>
-        <input type="text" class="form-control" id="playername" placeholder="..." formControlName="playername">
-      </div>
-      <button type="submit" class="btn btn-primary">Invite</button>
-    </form>
-    <div [hidden]="hideInviteError" class="alert alert-danger" role="alert">Failed to invite {{inviteMemberForm.value.playername}}</div>
+    <ngb-tabset [justify]="center" #t="ngbTabset">
 
-    <hr>
-    <h5>Pending Invites</h5>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Player</th>
-          <th>Sent</th>
-          <th>Cancel</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let invite of clanInvites">
-          <td><app-player-banner [status]="false" [player]="invite.player"></app-player-banner></td>
-          <td>{{ invite.sentAt | date:'short'}}</td>
-          <td><button type="button" class="btn btn-danger" (click)="cancelInvite(invite.playerID)">X</button></td>
-        </tr>
-      </tbody>
-    </table>
-    <hr>
 
-    <h5>Members</h5>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Player</th>
-          <th>Joined</th>
-          <th>Kick</th>
-        </tr>
-      </thead>
-      <tbody>
-        <ng-container *ngFor="let stats of members">
-          <tr *ngIf="stats.player.id != playerClaims.playerID">
-            <td><app-player-banner [status]="false" [player]="stats.player"></app-player-banner></td>
-            <td>{{stats.player.joinedClan | date:'short'}}</td>
-            <td><button type="button" class="btn btn-danger" (click)="openKick(stats.player)">Kick</button></td>
-          </tr>
-        </ng-container>
-      </tbody>
-    </table>
+      <!------ MEMBERS ---->
 
-    <ng-template #kickSure let-modal>
-      <div class="modal-header alert-danger">
-        <h4 class="modal-title" id="modal-basic-title">Leave Clan</h4>
-        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        Are you sure you want to kick {{kickSurePlayer.username}}?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger btn-lg m-auto" (click)="kickPlayer(kickSurePlayer.id)">Kick</button>
-      </div>
-    </ng-template>
+      <ngb-tab id="members">
+        <ng-template ngbTabTitle><h5>Members</h5></ng-template>
+        <ng-template ngbTabContent>
+          <div class="container my-4">
+            <h5>Invite New Member</h5>
+            <form [formGroup]="inviteMemberForm" (ngSubmit)="onInviteMember()">
+              <div class="form-group">
+                <label for="playername">Player Name</label>
+                <input type="text" class="form-control" id="playername" placeholder="..." formControlName="playername">
+              </div>
+              <button type="submit" class="btn btn-primary">Invite</button>
+            </form>
+            <div [hidden]="hideInviteError" class="alert alert-danger" role="alert">Failed to invite {{inviteMemberForm.value.playername}}</div>
+
+            <hr>
+            <h5>Pending Invites</h5>
+            <table class="table table-striped">
+              <thead>
+              <tr>
+                <th>Player</th>
+                <th>Sent</th>
+                <th>Cancel</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let invite of clanInvites">
+                <td><app-player-banner [status]="false" [player]="invite.player"></app-player-banner></td>
+                <td>{{ invite.sentAt | date:'short'}}</td>
+                <td><button type="button" class="btn btn-danger" (click)="cancelInvite(invite.playerID)">X</button></td>
+              </tr>
+              </tbody>
+            </table>
+            <hr>
+
+            <h5>Members</h5>
+            <table class="table table-striped">
+              <thead>
+              <tr>
+                <th>Player</th>
+                <th>Joined</th>
+                <th>Kick</th>
+              </tr>
+              </thead>
+              <tbody>
+              <ng-container *ngFor="let stats of members">
+                <tr *ngIf="stats.player.id != playerClaims.playerID">
+                  <td><app-player-banner [status]="false" [player]="stats.player"></app-player-banner></td>
+                  <td>{{stats.player.joinedClan | date:'short'}}</td>
+                  <td><button type="button" class="btn btn-danger" (click)="openKick(stats.player)">Kick</button></td>
+                </tr>
+              </ng-container>
+              </tbody>
+            </table>
+
+            <ng-template #kickSure let-modal>
+              <div class="modal-header alert-danger">
+                <h4 class="modal-title" id="modal-basic-title">Leave Clan</h4>
+                <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                Are you sure you want to kick {{kickSurePlayer.username}}?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-danger btn-lg m-auto" (click)="kickPlayer(kickSurePlayer.id)">Kick</button>
+              </div>
+            </ng-template>
+          </div>
+        </ng-template>
+      </ngb-tab>
+
+      <!------ CLAN WARS ----->
+
+      <ngb-tab id="clanwars">
+        <ng-template ngbTabTitle><h5>Clan Wars</h5></ng-template>
+        <ng-template ngbTabContent>
+          <div class="container my-4">
+            <h5>Clan Wars</h5>
+            <button type="button" class="btn btn-primary btn-lg m-auto" (click)="openSubmitClanWar()">Submit Clan War</button>
+            <hr>
+
+            <h5>Submitted Clan Wars</h5>
+            <table class="table table-striped">
+              <thead>
+              <tr>
+                <th>Clan</th>
+                <th>Date</th>
+                <th>Score</th>
+                <th>Link</th>
+                <th>Participants</th>
+                <th>Other Leader Accepted</th>
+                <th>Super Admin Accepted</th>
+                <th>Cancel</th> <!-- are you sure -->
+              </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+        </ng-template>
+      </ngb-tab>
+
+
+      <!------- MANAGEMENT ----->
+
+
+      <ngb-tab id="management">
+        <ng-template ngbTabTitle><h5>Management</h5></ng-template>
+        <ng-template ngbTabContent>
+          <div class="container my-4">
+            <button type="button" class="btn btn-danger" (click)="openDisband(disband)">Disband</button>
+            <ng-template #disband let-modal>
+              <div class="modal-header alert-danger">
+                <h4 class="modal-title" id="modal-basic-title">Disband Clan</h4>
+                <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                Are you sure you want to disband <strong>{{clan.name}}</strong>?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-danger btn-lg m-auto" (click)="disbandClan()">Disband</button>
+              </div>
+            </ng-template>
+          </div>
+        </ng-template>
+      </ngb-tab>
+    </ngb-tabset>
 
   </ng-container>
   <ng-template #notLeader>
@@ -118,23 +186,6 @@
       </tbody>
     </table>
   </ng-template>
-
-
-  <ng-template #disband let-modal>
-    <div class="modal-header alert-danger">
-      <h4 class="modal-title" id="modal-basic-title">Disband Clan</h4>
-      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      Are you sure you want to disband <strong>{{clan.name}}</strong>?
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-danger btn-lg m-auto" (click)="disbandClan()">Disband</button>
-    </div>
-  </ng-template>
-
 </ng-container>
 <ng-template #noClan>
 
@@ -184,5 +235,20 @@
   </div>
   <div class="modal-body">
     Congrats on registering your clan: <strong>{{ clan.name }}</strong>!
+  </div>
+</ng-template>
+
+<ng-template #clanwar let-modal>
+  <div class="modal-header alert-danger">
+    <h4 class="modal-title" id="modal-basic-title">Leave Clan</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    Are you sure you want to kick {{kickSurePlayer.username}}?
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger btn-lg m-auto" (click)="kickPlayer(kickSurePlayer.id)">Kick</button>
   </div>
 </ng-template>

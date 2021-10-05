@@ -50,6 +50,16 @@ func ClanRoutes(public *mux.Router, protected *mux.Router) {
 	protected.HandleFunc("/clans/{id:[0-9]+}/kick/{playerID:[0-9]+}", KickMember).Methods("POSt")
 	protected.HandleFunc("/clans/leave", LeaveClan).Methods("POST")
 	public.HandleFunc("/clans", GetClans).Methods("GET")
+
+	// create clan war request
+	// leader cancel clan war request
+	// list clan war requests
+	// other leader decline clan war request
+	// other leader accept clan war request
+	// super admin accept clan war request
+	// super admin decline clan war request
+	// super admin list clan war requests
+	// list clan wars
 }
 
 func RegisterClan(w http.ResponseWriter, r *http.Request) {

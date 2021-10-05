@@ -17,6 +17,8 @@ export class ClanManagementComponent implements OnInit, OnDestroy {
   @ViewChild('registerCongrats') private registerCongrats;
   @ViewChild('leaveSure') private leaveSure;
   @ViewChild('kickSure') private kickSure;
+  @ViewChild('leaveSure') private leaveSure;
+  @ViewChild('clanwar') private clanwarModal;
 
   componentDestroyed$ = new Subject();
 
@@ -68,6 +70,10 @@ export class ClanManagementComponent implements OnInit, OnDestroy {
 
   openDisband(content): void {
     this.disbandModal = this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'});
+  }
+
+  openSubmitClanWar(): void {
+    this.modalService.open(this.clanwarModal, {ariaLabelledBy: 'modal-basic-title'});
   }
 
   openCongrats(content): void {
