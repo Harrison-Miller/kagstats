@@ -129,6 +129,16 @@ func RunMigrations(db *sqlx.DB) error {
 		return err
 	}
 
+	err = RunMigration(25, AddPermissions, db)
+	if err != nil {
+		return err
+	}
+
+	err = RunMigration(26, AddPolls, db)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -577,6 +587,60 @@ func AddFollowing(db *sqlx.DB) error {
 
 func ChangeLastIPToHash(db *sqlx.DB) error {
 	_, err := db.Exec(`UPDATE players SET lastIP=MD5(lastIP) WHERE lastIP!=''`)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func AddPermissions(db *sqlx.DB) error {
+	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS  permissions (
+    	playerID INT NOT NULL,
+    	permission VARCHAR(64) NOT NULL,
+    	FOREIGN KEY (playerID) REFERENCES players(ID) ON DELETE CASCADE,
+    	PRIMARY KEY (playerID, permission)
+	)`)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func AddPolls(db *sqlx.DB) error {
+	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS polls (
+    	ID INTEGER PRIMARY KEY AUTO_INCREMENT, 
+    	name VARCHAR(256) NOT NULL,
+    	description TEXT NOT NULL,
+    	startAt BIGINT NOT NULL,
+    	endAt BIGINT NOT NULL
+	)`)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS poll_questions (
+    	questionID INTEGER PRIMARY KEY AUTO_INCREMENT,
+    	pollID INT NOT NULL,
+    	question TEXT NOT NULL,
+    	options TEXT NOT NULL,
+    	FOREIGN KEY (pollID) REFERENCES polls(ID) ON DELETE CASCADE,
+	)`)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS poll_answers (
+    	pollID INT NOT NULL,
+    	playerID INT NOT NULL,
+    	questionID INT NOT NULL,
+    	answer TEXT NOT NULL,
+    	FOREIGN KEY (pollID) REFERENCES polls(ID) ON DELETE CASCADE,
+    	FOREIGN KEY (playerID) REFERENCES players(ID) ON DELETE CASCADE,
+    	FOREIGN KEY (questionID) REFERENCES poll_questions(questionID) ON DELETE CASCADE,
+    	PRIMARY KEY (pollID, playerID, questionID)
+	)`)
 	if err != nil {
 		return err
 	}
