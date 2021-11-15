@@ -36,16 +36,20 @@ func TestCollector(t *testing.T) {
 	c := Collector{
 		logger: log.Default(),
 	}
-	db = &fixtures.DatabaseMock{
-		UpdatePlayerInfoFunc: func(player *models.Player) error {
-			player.ID = 1
-			return nil
-		},
-	}
 	players = make(map[string]models.Player)
 	updater = NewPlayerInfoUpdater(db)
 
 	t.Run("player join and leave", func(t *testing.T) {
+		dbMock := fixtures.DatabaseMock{
+			UpdatePlayerInfoFunc: func(player *models.Player) error {
+				require.NotNil(t, player)
+				require.Equal(t, "Foo", player.Username)
+				require.Equal(t, "Foo", player.Charactername)
+				player.ID = 1
+				return nil
+			},
+		}
+		db = &dbMock
 		c.OnPlayerJoined(rcon.Message{
 			Text: "",
 			Args: map[string]string{
@@ -63,9 +67,20 @@ func TestCollector(t *testing.T) {
 		}, nil)
 		require.Equal(t, c.playerCount, 0)
 		require.NotNil(t, players["Foo"])
+		require.Len(t, dbMock.UpdatePlayerInfoCalls(), 1)
 	})
 
 	t.Run("joining with new charactername updates the cache", func(t *testing.T) {
+		dbMock := fixtures.DatabaseMock{
+			UpdatePlayerInfoFunc: func(player *models.Player) error {
+				require.NotNil(t, player)
+				require.Equal(t, "Foo", player.Username)
+				require.Equal(t, "bar", player.Charactername)
+				player.ID = 1
+				return nil
+			},
+		}
+		db = &dbMock
 		c.OnPlayerJoined(rcon.Message{
 			Text: "",
 			Args: map[string]string{
@@ -76,6 +91,7 @@ func TestCollector(t *testing.T) {
 		require.NotNil(t, players["Foo"])
 		require.Equal(t, "Foo", players["Foo"].Username)
 		require.Equal(t, "bar", players["Foo"].Charactername)
+		require.Len(t, dbMock.UpdatePlayerInfoCalls(), 1)
 	})
 
 }
