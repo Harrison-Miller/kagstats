@@ -1,14 +1,40 @@
-package main
+package database
 
 import (
 	"fmt"
-	"github.com/Harrison-Miller/kagstats/common/models"
+	"github.com/pkg/errors"
+	"log"
 
 	"github.com/jmoiron/sqlx"
 )
 
+func RunMigration(version int64, migrations func(db *sqlx.DB) error, db *sqlx.DB) error {
+	db.Exec("INSERT INTO stats_info (key_name, value) VALUES(?,?)", "database_version", version)
+	row := db.QueryRow("SELECT value FROM stats_info WHERE key_name=?", "database_version")
+	var currentVersion int64
+	err := row.Scan(&currentVersion)
+	if err != nil {
+		return errors.Wrap(err, "error getting current database version")
+	}
+
+	if currentVersion < version {
+		log.Printf("Running migrations for version %d", version)
+		err = migrations(db)
+		if err != nil {
+			return errors.Wrap(err, fmt.Sprintf("error running migrations for version %d", version))
+		}
+
+		_, err = db.Exec("UPDATE stats_info SET value=? WHERE key_name=?", version, "database_version")
+	} else {
+		log.Printf("Skipping migrations for version %d", version)
+	}
+
+	return nil
+}
+
 // add database migrations here
-func RunMigrations(db *sqlx.DB) error {
+func (d *SQLDatabase) RunMigrations() error {
+	db := d.db
 	err := RunMigration(1, APICacheChanges, db)
 	if err != nil {
 		return err
@@ -484,6 +510,7 @@ func RemoveEvents(db *sqlx.DB) error {
 }
 
 func RefreshPlayerInfo(db *sqlx.DB) error {
+	/*
 	players := []*models.Player{}
 	err := db.Select(&players, "SELECT * FROM players")
 	if err != nil {
@@ -492,7 +519,7 @@ func RefreshPlayerInfo(db *sqlx.DB) error {
 
 	for _, player := range players {
 		updater.incoming <- *player
-	}
+	}*/
 	return nil
 }
 

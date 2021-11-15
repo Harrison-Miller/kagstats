@@ -1,8 +1,7 @@
-package main
+package database
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/Harrison-Miller/kagstats/common/models"
@@ -12,8 +11,29 @@ import (
 
 var nextID = 1
 
-func UpdatePlayerInfo(player *models.Player) error {
-	tx, err := db.Beginx()
+//go:generate moq -pkg fixtures -out ../fixtures/database.go . Database
+type Database interface {
+	InitDB() error
+	UpdatePlayerInfo(player *models.Player) error
+	UpdateServerInfo(server *models.Server) error
+	UpdateServerStatus(server models.Server, status bool) error
+	Commit(kills []models.Kill) error
+	CommitFlagCapture(capture models.FlagCapture) error
+	CommitMapStats(stats models.MapStats) error
+	CommitMapVotes(votes models.MapVotes) error
+	CommitPlayer(player *models.Player) error
+}
+
+type SQLDatabase struct {
+	db *sqlx.DB
+}
+
+func NewSQLDatabase(db *sqlx.DB) *SQLDatabase {
+	return &SQLDatabase{db: db}
+}
+
+func (d *SQLDatabase) UpdatePlayerInfo(player *models.Player) error {
+	tx, err := d.db.Beginx()
 	if err != nil {
 		return err
 	}
@@ -37,8 +57,8 @@ func UpdatePlayerInfo(player *models.Player) error {
 	return nil
 }
 
-func UpdateServerInfo(server *models.Server) error {
-	tx, err := db.Begin()
+func (d *SQLDatabase) UpdateServerInfo(server *models.Server) error {
+	tx, err := d.db.Begin()
 	if err != nil {
 		return err
 	}
@@ -64,8 +84,8 @@ func UpdateServerInfo(server *models.Server) error {
 	return nil
 }
 
-func UpdateServerStatus(server models.Server, status bool) error {
-	tx, err := db.Begin()
+func (d *SQLDatabase) UpdateServerStatus(server models.Server, status bool) error {
+	tx, err := d.db.Begin()
 	if err != nil {
 		return err
 	}
@@ -82,8 +102,8 @@ func UpdateServerStatus(server models.Server, status bool) error {
 	return nil
 }
 
-func InitDB() error {
-	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS players (
+func (d *SQLDatabase) InitDB() error {
+	_, err := d.db.Exec(`CREATE TABLE IF NOT EXISTS players (
 		ID INT PRIMARY KEY AUTO_INCREMENT,
 		username varchar(30) NOT NULL UNIQUE,
 		charactername varchar(30) NOT NULL,
@@ -93,7 +113,7 @@ func InitDB() error {
 		return errors.Wrap(err, "error creating player table")
 	}
 
-	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS servers (
+	_, err = d.db.Exec(`CREATE TABLE IF NOT EXISTS servers (
 		ID INTEGER PRIMARY KEY AUTO_INCREMENT,
 		name varchar(255) NOT NULL UNIQUE,
 		description varchar(255) NOT NULL,
@@ -106,7 +126,7 @@ func InitDB() error {
 		return errors.Wrap(err, "error creating servers table")
 	}
 
-	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS kills (
+	_, err = d.db.Exec(`CREATE TABLE IF NOT EXISTS kills (
 		ID INTEGER PRIMARY KEY AUTO_INCREMENT,
 		killerID INT NOT NULL,
 		victimID INT NOT NULL,
@@ -124,7 +144,7 @@ func InitDB() error {
 		return errors.Wrap(err, "error creating kills table")
 	}
 
-	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS stats_info (
+	_, err = d.db.Exec(`CREATE TABLE IF NOT EXISTS stats_info (
 		key_name VARCHAR(30) PRIMARY KEY,
 		value INT NOT NULL	
 	)`)
@@ -132,17 +152,17 @@ func InitDB() error {
 		return err
 	}
 
-	db.Exec("INSERT INTO stats_info (key_name, value) VALUES(?,?)", "database_version", 0)
+	d.db.Exec("INSERT INTO stats_info (key_name, value) VALUES(?,?)", "database_version", 0)
 
-	err = RunMigrations(db)
+	err = d.RunMigrations()
 	if err != nil {
 		return errors.Wrap(err, "error running migrations")
 	}
 	return nil
 }
 
-func Commit() error {
-	tx, err := db.Begin()
+func (d *SQLDatabase) Commit(kills []models.Kill) error {
+	tx, err := d.db.Begin()
 	if err != nil {
 		return err
 	}
@@ -151,7 +171,7 @@ func Commit() error {
 	//https://stackoverflow.com/questions/21108084/how-to-insert-multiple-data-at-once
 	values := []interface{}{}
 	sqlStr := "INSERT INTO kagstats.kills (killerID, victimID, killerClass, victimClass, hitter, epoch, serverID, teamKill) VALUES "
-	for _, v := range uncommitted {
+	for _, v := range kills {
 		sqlStr += "(?,?,?,?,?,?,?,?),"
 		values = append(values, v.KillerID, v.VictimID,
 			v.KillerClass, v.VictimClass, v.Hitter,
@@ -173,13 +193,11 @@ func Commit() error {
 	if err = tx.Commit(); err != nil {
 		return errors.Wrap(err, "error commiting bulk load")
 	}
-
-	uncommitted = make([]models.Kill, 0, 100)
 	return nil
 }
 
-func CommitFlagCapture(capture models.FlagCapture) error {
-	tx, err := db.Begin()
+func (d *SQLDatabase) CommitFlagCapture(capture models.FlagCapture) error {
+	tx, err := d.db.Begin()
 	if err != nil {
 		return err
 	}
@@ -199,8 +217,8 @@ func CommitFlagCapture(capture models.FlagCapture) error {
 	return nil
 }
 
-func CommitMapStats(stats models.MapStats) error {
-	tx, err := db.Begin()
+func (d *SQLDatabase) CommitMapStats(stats models.MapStats) error {
+	tx, err := d.db.Begin()
 	if err != nil {
 		return err
 	}
@@ -220,8 +238,8 @@ func CommitMapStats(stats models.MapStats) error {
 	return nil
 }
 
-func CommitMapVotes(votes models.MapVotes) error {
-	tx, err := db.Begin()
+func (d *SQLDatabase) CommitMapVotes(votes models.MapVotes) error {
+	tx, err := d.db.Begin()
 	if err != nil {
 		return err
 	}
@@ -241,26 +259,22 @@ func CommitMapVotes(votes models.MapVotes) error {
 	return nil
 }
 
-func RunMigration(version int64, migrations func(db *sqlx.DB) error, db *sqlx.DB) error {
-	db.Exec("INSERT INTO stats_info (key_name, value) VALUES(?,?)", "database_version", version)
-	row := db.QueryRow("SELECT value FROM stats_info WHERE key_name=?", "database_version")
-	var currentVersion int64
-	err := row.Scan(&currentVersion)
+func (d *SQLDatabase) CommitPlayer(player *models.Player) error {
+	tx, err := d.db.Begin()
 	if err != nil {
-		return errors.Wrap(err, "error getting current database version")
+		return errors.Wrap(err, "error starting transaction")
+	}
+	defer tx.Rollback()
+
+
+	_, err = tx.Exec("UPDATE players SET oldgold=?,registered=?,role=?,avatar=?,tier=? WHERE ID=?",
+		player.OldGold, player.Registered, player.Role, player.Avatar, player.Tier, player.ID)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("error updating player %s with api info", player.Username))
 	}
 
-	if currentVersion < version {
-		log.Printf("Running migrations for version %d", version)
-		err = migrations(db)
-		if err != nil {
-			return errors.Wrap(err, fmt.Sprintf("error running migrations for version %d", version))
-		}
-
-		_, err = db.Exec("UPDATE stats_info SET value=? WHERE key_name=?", version, "database_version")
-	} else {
-		log.Printf("Skipping migrations for version %d", version)
+	if err := tx.Commit(); err != nil {
+		return errors.Wrap(err, "error commiting updated player info")
 	}
-
 	return nil
 }

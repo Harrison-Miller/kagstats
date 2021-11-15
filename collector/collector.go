@@ -87,17 +87,15 @@ func UpdatePlayer(p *models.Player) error {
 		p.Registered = cache.Registered
 
 		if p.Charactername != cache.Charactername || p.Clantag != cache.Clantag || (p.IP != cache.IP && p.IP != "") {
-			cache.Charactername = p.Charactername
-			cache.Clantag = p.Clantag
-			cache.IP = p.IP
-
-			err := UpdatePlayerInfo(p)
+			err := db.UpdatePlayerInfo(p)
 			if err != nil {
 				return errors.Wrap(err, "error updating player info")
 			}
+
+			players[p.Username] = *p
 		}
 	} else {
-		err := UpdatePlayerInfo(p)
+		err := db.UpdatePlayerInfo(p)
 		if err != nil {
 			return errors.Wrap(err, "error creating player")
 		}
@@ -270,7 +268,7 @@ func (c *Collector) ServerInfo(m rcon.Message, r *rcon.Client) error {
 	server.Port = c.config.Port
 	server.Tags = c.config.TagsString()
 
-	err = UpdateServerInfo(&server)
+	err = db.UpdateServerInfo(&server)
 	if err != nil {
 		return errors.Wrap(err, "can't start collector without server info")
 	}
@@ -320,7 +318,7 @@ func (c *Collector) FlagCaptured(m rcon.Message, r *rcon.Client) error {
 
 		capture.PlayerID = player.ID
 
-		err = CommitFlagCapture(capture)
+		err = db.CommitFlagCapture(capture)
 		if err != nil {
 			return errors.Wrap(err, "can't commit flag capture")
 		}
@@ -356,7 +354,7 @@ func (c *Collector) MapStats(m rcon.Message, r *rcon.Client) error {
 	c.logger.Printf("%+v", stats)
 
 	if (stats != models.MapStats{}) {
-		err = CommitMapStats(stats)
+		err = db.CommitMapStats(stats)
 		if err != nil {
 			return errors.Wrap(err, "can't commit map stats")
 		}
@@ -378,7 +376,7 @@ func (c *Collector) MapVotes(m rcon.Message, r *rcon.Client) error {
 		return nil
 	}
 
-	err := CommitMapVotes(votes)
+	err := db.CommitMapVotes(votes)
 	if err != nil {
 		return errors.Wrap(err, "can't commit map votes")
 	}
@@ -478,7 +476,7 @@ func Collect(sconfig configs.ServerConfig) {
 			}
 		}
 
-		UpdateServerStatus(collector.server, false)
+		db.UpdateServerStatus(collector.server, false)
 
 		logger.Println("Waiting 1 minute before attempting to connect again")
 		time.Sleep(1 * time.Minute)
