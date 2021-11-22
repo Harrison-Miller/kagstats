@@ -17,8 +17,8 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 
-	"github.com/swaggo/http-swagger"
 	_ "github.com/Harrison-Miller/kagstats/api/docs"
+	"github.com/swaggo/http-swagger"
 )
 
 var db *sqlx.DB
@@ -133,6 +133,7 @@ func main() {
 	ClanRoutes(r, protected)
 	AuthRoutes(r, protected)
 	FollowingRoutes(r, protected)
+	PollRoutes(r, protected)
 
 	r.Use(LogHandler)
 

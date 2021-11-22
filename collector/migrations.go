@@ -625,7 +625,8 @@ func AddPolls(db *sqlx.DB) error {
     	pollID INT NOT NULL,
     	question TEXT NOT NULL,
     	options TEXT NOT NULL,
-    	FOREIGN KEY (pollID) REFERENCES polls(ID) ON DELETE CASCADE,
+    	required BOOLEAN NOT NULL,
+    	FOREIGN KEY (pollID) REFERENCES polls(ID) ON DELETE CASCADE
 	)`)
 	if err != nil {
 		return err
