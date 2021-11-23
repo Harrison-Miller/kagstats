@@ -44,7 +44,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	// get player by id
 	var player models.Player
-	err = db.Get(&player, "SELECT * FROM players WHERE username=?", login.Username)
+	err = db.Get(&player, "SELECT * FROM players WHERE LOWER(username)=LOWER(?)", login.Username)
 	if err != nil {
 		log.Printf("player not in database: %s\n", err)
 		http.Error(w, "unauthorized", http.StatusUnauthorized)
