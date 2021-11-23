@@ -1,6 +1,10 @@
 <ng-container *ngIf="poll; else noPoll">
   <h2 class="text-center">{{poll.name}}</h2>
   <p class="text-center">{{poll.description}}</p>
+  <ng-container *ngIf="!playerClaims; else showPoll">
+    <div class="alert alert-danger" role="alert">Login to participate in the survey</div>
+  </ng-container>
+  <ng-template #showPoll>
   <ng-container *ngFor="let question of poll.questions; index as i">
     <br>
     <div class="card">
@@ -23,7 +27,7 @@
               <label class="form-check-label" for="{{option}}">
                 {{option}}
               </label>
-              <ng-container *ngIf="option == 'Other'">
+              <ng-container *ngIf="option.includes('Other')">
                 <input type="text" class="form-control" placeholder="">
               </ng-container>
             </div>
@@ -32,6 +36,7 @@
       </div>
     </div>
   </ng-container>
+  </ng-template>
 </ng-container>
 <ng-template #noPoll>
   <h2 class="text-center">No poll currently available</h2>

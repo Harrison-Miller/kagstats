@@ -79,6 +79,6 @@ export class AppComponent implements OnDestroy, OnInit{
 
   logout(): void {
     this.authService.logout();
-    this.router.navigate(['/leaderboards/MonthlyArcher']);
+    //this.router.navigate(['/leaderboards/MonthlyArcher']);
   }
 }

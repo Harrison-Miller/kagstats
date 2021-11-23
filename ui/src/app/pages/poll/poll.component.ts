@@ -1,16 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {PollService} from "../../services/poll.service";
-import {Poll} from "../../models";
+import {PlayerClaims, Poll} from "../../models";
+import {AuthService} from "../../services/auth.service";
+import {takeUntil} from "rxjs/operators";
+import {Subject} from "rxjs";
 
 @Component({
   selector: 'app-poll',
   templateUrl: './poll.component.html',
   styleUrls: ['./poll.component.sass']
 })
-export class PollComponent implements OnInit {
+export class PollComponent implements OnInit, OnDestroy {
   poll: Poll;
+  playerClaims: PlayerClaims;
+  componentDestroyed$ = new Subject();
 
-  constructor(private pollService: PollService) { }
+  constructor(private pollService: PollService,
+              private authService: AuthService) { }
 
   ngOnInit() {
     this.pollService.getCurrentPoll().subscribe(
@@ -21,6 +27,15 @@ export class PollComponent implements OnInit {
         }
       }
     );
+
+    this.authService.playerClaims.pipe(takeUntil(this.componentDestroyed$))
+      .subscribe( value => {
+        this.playerClaims = value;
+      });
+  }
+
+  ngOnDestroy() {
+    this.componentDestroyed$.next();
   }
 
 }
