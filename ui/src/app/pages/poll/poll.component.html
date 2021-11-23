@@ -1,0 +1,38 @@
+<ng-container *ngIf="poll; else noPoll">
+  <h2 class="text-center">{{poll.name}}</h2>
+  <p class="text-center">{{poll.description}}</p>
+  <ng-container *ngFor="let question of poll.questions; index as i">
+    <br>
+    <div class="card">
+      <div class="card-header">
+        <b>{{i+1}}.</b> {{question.question}}
+        <ng-container *ngIf="question.required">
+          <span class="text-danger">*</span>
+        </ng-container>
+      </div>
+      <div class="card-body">
+        <ng-container *ngIf="question.options_split.length < 2; else hasOptions">
+          <div class="form-group">
+            <textarea class="form-control" rows="3" placeholder="{{question.options}}"></textarea>
+          </div>
+        </ng-container>
+        <ng-template #hasOptions>
+          <ng-container *ngFor="let option of question.options_split">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="{{question.question}}" value="{{option}}">
+              <label class="form-check-label" for="{{option}}">
+                {{option}}
+              </label>
+              <ng-container *ngIf="option == 'Other'">
+                <input type="text" class="form-control" placeholder="">
+              </ng-container>
+            </div>
+          </ng-container>
+        </ng-template>
+      </div>
+    </div>
+  </ng-container>
+</ng-container>
+<ng-template #noPoll>
+  <h2 class="text-center">No poll currently available</h2>
+</ng-template>

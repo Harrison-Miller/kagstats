@@ -231,3 +231,18 @@ export interface ClanInvite {
 export interface FollowingCount {
   followingCount: number;
 }
+
+export interface PollQuestion {
+  questionID: number;
+  question: string;
+  options: string;
+  options_split: string[];
+  required: boolean;
+}
+
+export interface Poll {
+  pollID: number;
+  name: string;
+  description: string;
+  questions: PollQuestion[];
+}
