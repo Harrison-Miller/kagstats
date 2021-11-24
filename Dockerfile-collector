@@ -11,9 +11,10 @@ ADD collector/ ./collector
 
 WORKDIR $GOPATH/src/github.com/Harrison-Miller/kagstats/collector
 
-RUN GO111MODULE=on GOARCH=386 CGO_ENABLED=0 GOOS=linux go build -o collector -mod=vendor ./...
+RUN mkdir build/
+RUN GO111MODULE=on GOARCH=386 CGO_ENABLED=0 GOOS=linux go build -o build/ -mod=vendor ./...
 
-RUN cp collector / && cp -r templates / && cp -r scripts /
+RUN cp build/collector / && cp -r templates / && cp -r scripts /
 
 FROM alpine
 

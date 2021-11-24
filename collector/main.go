@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Harrison-Miller/kagstats/collector/database"
 	"log"
 	"os"
 	"time"
@@ -9,15 +10,14 @@ import (
 	"github.com/Harrison-Miller/kagstats/common/models"
 	"github.com/Harrison-Miller/kagstats/common/utils"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jmoiron/sqlx"
 )
 
 var config configs.Config
-var db *sqlx.DB
 var players map[string]models.Player
 var kills chan models.Kill
 var uncommitted []models.Kill
 var updater *PlayerInfoUpdater
+var db database.Database
 
 func commitTimer(notify chan bool) {
 	for {
@@ -45,15 +45,17 @@ func main() {
 	version, _ := os.LookupEnv("VERSION")
 	log.Printf("KAG Stats  %s\n", version)
 
-	db, err = utils.ConnectToDatabase(config.DatabaseConnection, 10)
+	sqlDB, err := utils.ConnectToDatabase(config.DatabaseConnection, 10)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	db = database.NewSQLDatabase(sqlDB)
+
 	updater = NewPlayerInfoUpdater(db)
 
 	log.Println("Connected to the database!")
-	err = InitDB()
+	err = db.InitDB()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -76,21 +78,23 @@ func main() {
 			uncommitted = append(uncommitted, kill)
 			size := len(uncommitted)
 			if size >= config.BatchSize {
-				err := Commit()
+				err := db.Commit(uncommitted)
 				if err != nil {
 					log.Println(err)
 				} else {
 					log.Printf("Committed %d new kills\n", size)
+					uncommitted = make([]models.Kill, 0, 100)
 				}
 			}
 		case <-notify:
 			size := len(uncommitted)
 			if size > 0 {
-				err := Commit()
+				err := db.Commit(uncommitted)
 				if err != nil {
 					log.Println(err)
 				} else {
 					log.Printf("Committed %d new kills\n", size)
+					uncommitted = make([]models.Kill, 0, 100)
 				}
 			}
 		}

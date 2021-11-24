@@ -2,23 +2,21 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"github.com/Harrison-Miller/kagstats/collector/database"
 	"github.com/Harrison-Miller/kagstats/common/models"
 	"github.com/Harrison-Miller/kagstats/common/utils"
-	"github.com/jmoiron/sqlx"
-	"github.com/pkg/errors"
 	"log"
 	"time"
 )
 
 type PlayerInfoUpdater struct {
-	db *sqlx.DB
+	db database.Database
 	incoming chan models.Player
 	ctx context.Context
 	cancelFunc context.CancelFunc
 }
 
-func NewPlayerInfoUpdater(db *sqlx.DB) *PlayerInfoUpdater {
+func NewPlayerInfoUpdater(db database.Database) *PlayerInfoUpdater {
 	p := &PlayerInfoUpdater{
 		db: db,
 		incoming: make(chan models.Player, 10240),
@@ -64,21 +62,5 @@ func (p *PlayerInfoUpdater) process() {
 }
 
 func (p *PlayerInfoUpdater) commitPlayer(player *models.Player) error {
-	tx, err := p.db.Begin()
-	if err != nil {
-		return errors.Wrap(err, "error starting transaction")
-	}
-	defer tx.Rollback()
-
-
-	_, err = db.Exec("UPDATE players SET oldgold=?,registered=?,role=?,avatar=?,tier=? WHERE ID=?",
-		player.OldGold, player.Registered, player.Role, player.Avatar, player.Tier, player.ID)
-	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("error updating player %s with api info", player.Username))
-	}
-
-	if err := tx.Commit(); err != nil {
-		return errors.Wrap(err, "error commiting updated player info")
-	}
-	return nil
+	return p.db.CommitPlayer(player)
 }
