@@ -235,6 +235,7 @@ export interface FollowingCount {
 export interface PollQuestion {
   questionID: number;
   question: string;
+  questionHash: string;
   options: string;
   options_split: string[];
   required: boolean;
@@ -245,4 +246,14 @@ export interface Poll {
   name: string;
   description: string;
   questions: PollQuestion[];
+}
+
+export interface PollResponse {
+  completed: boolean;
+  poll: Poll;
+}
+
+export interface PollAnswer {
+  questionID: number;
+  answer: string;
 }

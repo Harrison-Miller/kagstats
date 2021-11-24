@@ -1,11 +1,13 @@
 <ng-container *ngIf="poll; else noPoll">
-  <h2 class="text-center">{{poll.name}}</h2>
-  <p class="text-center">{{poll.description}}</p>
+  <h2 class="text-center">{{poll.poll.name}}</h2>
+  <p class="text-center">{{poll.poll.description}}</p>
   <ng-container *ngIf="!playerClaims; else showPoll">
     <div class="alert alert-danger" role="alert">Login to participate in the survey</div>
   </ng-container>
   <ng-template #showPoll>
-  <ng-container *ngFor="let question of poll.questions; index as i">
+  <ng-container *ngIf="!poll.completed; else pollCompleted">
+  <form [formGroup]="pollForm" (ngSubmit)="onPollSubmit()">
+  <ng-container *ngFor="let question of poll.poll.questions; index as i">
     <br>
     <div class="card">
       <div class="card-header">
@@ -17,27 +19,41 @@
       <div class="card-body">
         <ng-container *ngIf="question.options_split.length < 2; else hasOptions">
           <div class="form-group">
-            <textarea class="form-control" rows="3" placeholder="{{question.options}}"></textarea>
+            <textarea class="form-control" formControlName="{{question.questionHash}}" rows="3" placeholder="{{question.options}}"></textarea>
           </div>
         </ng-container>
         <ng-template #hasOptions>
           <ng-container *ngFor="let option of question.options_split">
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="{{question.question}}" value="{{option}}">
+              <input class="form-check-input" type="radio" name="{{question.questionHash}}" value="{{option}}" formControlName="{{question.questionHash}}">
               <label class="form-check-label" for="{{option}}">
                 {{option}}
               </label>
               <ng-container *ngIf="option.includes('Other')">
-                <input type="text" class="form-control" placeholder="">
+                <input type="text" class="form-control" placeholder="" formControlName="{{question.questionHash}}other">
               </ng-container>
             </div>
           </ng-container>
         </ng-template>
       </div>
+      <div *ngIf="formErrors[question.questionHash]" class="card-footer">
+        <div class="alert alert-danger">{{formErrors[question.questionHash]}}</div>
+      </div>
     </div>
   </ng-container>
+  <br>
+  <div class="row">
+    <div class="col text-center">
+      <button type="submit" class="btn btn-primary text-center">Submit</button>
+    </div>
+  </div>
+  </form>
+  </ng-container>
+  </ng-template>
+  <ng-template #pollCompleted>
+    <div class="alert alert-success" role="alert">You've already completed this survey. Thanks for participating!</div>
   </ng-template>
 </ng-container>
 <ng-template #noPoll>
-  <h2 class="text-center">No poll currently available</h2>
+  <h2 class="text-center">No survey currently available</h2>
 </ng-template>

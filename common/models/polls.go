@@ -14,9 +14,7 @@ type Poll struct {
 	Questions []PollQuestion `json:"questions"`
 }
 
-type PollAnswers struct {
-	Answer struct {
-		QuestionID int64 `json:"questionID"`
-		Answer string `json:"answer"`
-	} `json:"answers"`
+type PollAnswer struct {
+	QuestionID int64 `json:"questionID" db:"questionID"`
+	Answer string `json:"answer" db:"answer"`
 }
