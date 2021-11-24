@@ -11,6 +11,7 @@ services:
       - BUILDER_GATE=20
       - KNIGHT_GATE=75
       - NEMESIS_GATE=11
+      - PROD="true"
   basic-indexer:
     environment:
       - INDEXER_BATCHSIZE=10000

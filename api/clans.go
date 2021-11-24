@@ -72,7 +72,7 @@ func RegisterClan(w http.ResponseWriter, r *http.Request) {
 
 	_, err = tx.Exec("INSERT INTO clan_info (name, lowerName, createdAt, leaderID) VALUES (?, ?, ?, ?)", req.Name, strings.ToLower(req.Name), utils.NowAsUnixMilliseconds(), claims.PlayerID)
 	if err != nil {
-		log.Printf("failed to creat clan: %s\n", err)
+		log.Printf("failed to create clan: %s\n", err)
 		http.Error(w, "failed to create clan", http.StatusBadRequest)
 		return
 	}

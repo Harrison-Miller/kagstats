@@ -1,0 +1,24 @@
+<h2>Survey Management</h2>
+
+<ng-container *ngIf="polls">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Responses</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let poll of polls">
+        <td>{{poll.name}}</td>
+        <td>{{poll.description}}</td>
+        <td>{{poll.startAt*1000 | date}}</td>
+        <td>{{poll.endAt*1000 | date }}</td>
+        <td><button type="button" class="btn btn-primary" (click)="downloadResponses(poll.id)">Download {{poll.responses}} Response(s)</button></td>
+      </tr>
+    </tbody>
+  </table>
+</ng-container>

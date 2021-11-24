@@ -16,6 +16,7 @@ export class AuthService {
   playerClaims = new BehaviorSubject<PlayerClaims>(null);
 
   constructor(private http: HttpClient) {
+    Cookies.remove(tokenName, {path: '/api'});
     this.getClaims();
   }
 
@@ -27,10 +28,7 @@ export class AuthService {
     }, {withCredentials: true}).pipe(share<LoginResp>());
     obs.subscribe( resp => {
       this.playerClaims.next(null);
-      Cookies.remove(tokenName);
-      Cookies.set(tokenName, resp.token, { expires: 365 });
       this.getClaims();
-
     });
     return obs;
   }
@@ -50,7 +48,6 @@ export class AuthService {
     let token = Cookies.get(tokenName);
     if (typeof token !== 'undefined' && token !== '') {
       this.validate().subscribe( resp => {
-        Cookies.set(tokenName, resp.token, { expires: 365 });
         token = resp.token;
         const parts = token.split('.');
         if (parts.length === 3) {
@@ -61,6 +58,7 @@ export class AuthService {
             avatar: payload.avatar,
             clanID: payload.clanID,
             bannedFromMakingClans: payload.bannedFromMakingClans,
+            permissions: payload.permissions,
           });
         }
       });

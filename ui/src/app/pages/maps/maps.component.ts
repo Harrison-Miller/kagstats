@@ -9,7 +9,7 @@ import { MapsService } from '../../services/maps.service';
 })
 export class MapsComponent implements OnInit {
   maps: MapBasics[];
-  paths: GithubTree
+  paths: GithubTree;
 
   constructor(private mapsService: MapsService) { }
 

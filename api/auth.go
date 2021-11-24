@@ -3,12 +3,15 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/Harrison-Miller/kagstats/common/models"
 	"github.com/Harrison-Miller/kagstats/common/utils"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"regexp"
+	"strings"
 	"time"
 )
 
@@ -25,6 +28,7 @@ type PlayerClaims struct {
 	Avatar string `json:"avatar"`
 	ClanID *int64 `json:"clanID"`
 	BannedFromMakingClans bool `json:"bannedFromMakingClans"`
+	Permissions []string `json:"permissions"`
 	jwt.StandardClaims
 }
 
@@ -44,18 +48,42 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	// get player by id
 	var player models.Player
-	err = db.Get(&player, "SELECT * FROM players WHERE username=?", login.Username)
+	err = db.Get(&player, "SELECT * FROM players WHERE LOWER(username)=LOWER(?)", login.Username)
 	if err != nil {
 		log.Printf("player not in database: %s\n", err)
 		http.Error(w, "unauthorized", http.StatusUnauthorized)
 		return
 	}
 
+	// get the login.Token from whatever was put in
+	tokenRegex, err := regexp.Compile(fmt.Sprintf(`[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}%s[0-9a-f]{128}?`, strings.ToLower(login.Username)))
+	if err != nil {
+		log.Printf("failed to compile regex: %s\n", err)
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	matchBytes := tokenRegex.Find([]byte(login.Token))
+	if matchBytes == nil {
+		log.Printf("no match in regex: %s\n", login.Token)
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	match := strings.TrimSpace(string(matchBytes))
+
 	// validate token against api.kag2d.com
-	err = utils.ValidateToken(login.Username, login.Token)
+	err = utils.ValidateToken(login.Username, match)
 	if err != nil {
 		log.Printf("player %s failed to login: %s\n", login.Username, err)
 		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	// get permissions
+	permissions := []string{}
+	err = db.Select(&permissions, "SELECT permission FROM permissions WHERE playerID=?", player.ID)
+	if err != nil {
+		log.Printf("error retrieving permissions: %s\n", err)
+		http.Error(w, "error retrieving permissions", http.StatusInternalServerError)
 		return
 	}
 
@@ -65,6 +93,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Username: player.Username,
 		Avatar: player.Avatar,
 		BannedFromMakingClans: player.BannedFromMakingClans,
+		Permissions: permissions,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expiration.Unix(),
 		},
@@ -86,6 +115,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Name:       "KAGSTATS_TOKEN",
 		Value:      signed,
 		Expires:    expiration,
+		Path: "/",
+		Secure: prod,
+		SameSite: http.SameSiteStrictMode,
 	})
 
 	JSONResponse(w, struct{
@@ -95,6 +127,35 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+
+func WithPermissions(permissionsRequired []string) func (next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			claims, err := GetClaims(r)
+			if err != nil {
+				http.Error(w, "unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			for _, required := range permissionsRequired {
+				found := false
+				for _, permission := range claims.Permissions {
+					if required == permission {
+						found = true
+						break
+					}
+				}
+
+				if !found {
+					http.Error(w, "unaauthorized", http.StatusUnauthorized)
+					return
+				}
+			}
+
+			next.ServeHTTP(w, r)
+		})
+	}
+}
 
 func Verify(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -123,14 +184,27 @@ func Verify(next http.Handler) http.Handler {
 
 func Validate(w http.ResponseWriter, r *http.Request) {
 	// refresh the token as well as validate
-	oldClaims, _ := GetClaims(r);
+	oldClaims, err := GetClaims(r)
+	if err != nil {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
 
 	// get player by id
 	var player models.Player
-	err := db.Get(&player, "SELECT * FROM players WHERE ID=?", oldClaims.PlayerID)
+	err = db.Get(&player, "SELECT * FROM players WHERE ID=?", oldClaims.PlayerID)
 	if err != nil {
 		log.Printf("player not in database: %s\n", err)
 		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	// get permissions
+	permissions := []string{}
+	err = db.Select(&permissions, "SELECT permission FROM permissions WHERE playerID=?", player.ID)
+	if err != nil {
+		log.Printf("error retrieving permissions: %s\n", err)
+		http.Error(w, "error retrieving permissions", http.StatusInternalServerError)
 		return
 	}
 
@@ -140,6 +214,7 @@ func Validate(w http.ResponseWriter, r *http.Request) {
 		Username: player.Username,
 		Avatar: player.Avatar,
 		BannedFromMakingClans: player.BannedFromMakingClans,
+		Permissions: permissions,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expiration.Unix(),
 		},
@@ -161,8 +236,9 @@ func Validate(w http.ResponseWriter, r *http.Request) {
 		Name:       "KAGSTATS_TOKEN",
 		Value:      signed,
 		Expires:    expiration,
-		//Secure:     true,
-		//HttpOnly:   true,
+		Path: "/",
+		Secure: prod,
+		SameSite: http.SameSiteStrictMode,
 	})
 
 	JSONResponse(w, struct{
