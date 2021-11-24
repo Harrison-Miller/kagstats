@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {PollService} from "../../services/poll.service";
-import {PlayerClaims, Poll, PollAnswer, PollResponse} from "../../models";
+import {PlayerClaims, Poll, PollAnswer} from "../../models";
 import {AuthService} from "../../services/auth.service";
 import {takeUntil} from "rxjs/operators";
 import {Subject} from "rxjs";
@@ -13,7 +13,8 @@ import {Md5} from "ts-md5";
   styleUrls: ['./poll.component.sass']
 })
 export class PollComponent implements OnInit, OnDestroy {
-  poll: PollResponse;
+  poll: Poll;
+  pollCompleted: boolean;
   playerClaims: PlayerClaims;
   componentDestroyed$ = new Subject();
 
@@ -25,11 +26,12 @@ export class PollComponent implements OnInit, OnDestroy {
               private formBuilder: FormBuilder) { }
 
   getPoll() {
+    this.pollService.pollCompleted().subscribe( resp => { this.pollCompleted = resp.completed; });
     this.pollService.getCurrentPoll().subscribe(
       poll => {
         this.poll = poll;
-        var controls = {};
-        for(var q of this.poll.poll.questions) {
+        const controls = {};
+        for(var q of this.poll.questions) {
           q.options_split = q.options.split(';');
           q.questionHash = Md5.hashStr(q.question);
           controls[q.questionHash] = '';
@@ -58,7 +60,7 @@ export class PollComponent implements OnInit, OnDestroy {
 
   validate() {
     this.formErrors = {};
-    for(var q of this.poll.poll.questions) {
+    for(var q of this.poll.questions) {
       let value = this.pollForm.value[q.questionHash].trim();
       let isOther = false;
       if (value.includes('Other')) {
@@ -87,7 +89,7 @@ export class PollComponent implements OnInit, OnDestroy {
     }
 
     const answers: PollAnswer[] = [];
-    for(var q of this.poll.poll.questions) {
+    for(var q of this.poll.questions) {
       let value = this.pollForm.value[q.questionHash].trim();
       if (value.includes('Other')) {
         value = this.pollForm.value[q.questionHash + 'other'].trim();
@@ -103,7 +105,7 @@ export class PollComponent implements OnInit, OnDestroy {
       this.getPoll();
     }, err => {
       console.log(err);
-    });;
+    });
   }
 
 }

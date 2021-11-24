@@ -202,6 +202,7 @@ export interface PlayerClaims {
   avatar: string;
   clanID: number;
   bannedFromMakingClans: boolean;
+  permissions: string[];
 }
 
 export interface LoginResp {
@@ -242,15 +243,17 @@ export interface PollQuestion {
 }
 
 export interface Poll {
-  pollID: number;
+  id: number;
   name: string;
   description: string;
   questions: PollQuestion[];
+  responses: number;
+  startAt: number;
+  endAt: number;
 }
 
-export interface PollResponse {
+export interface PollCompletedResponse {
   completed: boolean;
-  poll: Poll;
 }
 
 export interface PollAnswer {

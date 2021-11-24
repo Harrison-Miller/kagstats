@@ -43,6 +43,7 @@ import { StatsHistoryComponent } from './shared/stats-history/stats-history.comp
 import {NgApexchartsModule} from "ng-apexcharts";
 import { FollowingComponent } from './pages/following/following.component';
 import { PollComponent } from './pages/poll/poll.component';
+import { SurveyManagementComponent } from './pages/survey-management/survey-management.component';
 
 @NgModule({
   declarations: [
@@ -75,6 +76,7 @@ import { PollComponent } from './pages/poll/poll.component';
     StatsHistoryComponent,
     FollowingComponent,
     PollComponent,
+    SurveyManagementComponent,
   ],
   imports: [
     BrowserModule,

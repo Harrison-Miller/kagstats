@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/felixge/httpsnoop"
@@ -24,6 +25,7 @@ import (
 var db *sqlx.DB
 var config configs.Config
 var version string
+var prod bool
 
 func LogHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -92,6 +94,12 @@ func main() {
 
 	if value, ok := os.LookupEnv("AUTH_SECRET"); ok {
 		AUTH_SECRET = value
+	}
+
+	if value, ok := os.LookupEnv("PROD"); ok {
+		if strings.ToLower(value) == "true" {
+			prod = true
+		}
 	}
 
 	version, _ = os.LookupEnv("VERSION")

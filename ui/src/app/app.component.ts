@@ -4,7 +4,7 @@ import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder } from '@angular/forms';
 import {PlayersService} from './services/players.service';
 import {AuthService} from './services/auth.service';
-import {PlayerClaims, PollResponse} from './models';
+import {PlayerClaims, Poll} from './models';
 import {Subject} from "rxjs";
 import { takeUntil } from 'rxjs/operators';
 import {PollService} from "./services/poll.service";
@@ -16,7 +16,8 @@ import {PollService} from "./services/poll.service";
 })
 export class AppComponent implements OnDestroy, OnInit{
 
-  poll: PollResponse;
+  poll: Poll;
+  pollCompleted: boolean;
 
   componentDestroyed$ = new Subject();
 
@@ -45,6 +46,7 @@ export class AppComponent implements OnDestroy, OnInit{
         this.playerClaims = value;
       });
 
+    this.pollService.pollCompleted().subscribe( resp => { this.pollCompleted = resp.completed; });
     this.pollService.getCurrentPoll().subscribe(
       poll => {
         this.poll = poll;
@@ -88,6 +90,6 @@ export class AppComponent implements OnDestroy, OnInit{
 
   logout(): void {
     this.authService.logout();
-    //this.router.navigate(['/leaderboards/MonthlyArcher']);
+    this.router.navigate(['/leaderboards/MonthlyArcher']);
   }
 }

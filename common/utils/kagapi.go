@@ -130,7 +130,7 @@ func ValidateToken(username string, token string) error {
 		return nil
 	}*/
 
-	path := fmt.Sprintf("https://api.kag2d.com/player/%s/token/%s", username, token)
+	path := fmt.Sprintf("https://api.kag2d.com/v1/player/%s/token/%s", username, token)
 
 	resp, err := client.Get(path)
 	if err != nil {
