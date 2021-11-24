@@ -15,6 +15,9 @@ import {AuthenticatedGuard} from "./guard/authenticated.guard";
 import {ClanDetailComponent} from "./pages/clan-detail/clan-detail.component";
 import {ClansComponent} from "./pages/clans/clans.component";
 import {FollowingComponent} from "./pages/following/following.component";
+import {PollComponent} from "./pages/poll/poll.component";
+import {SurveyManagementComponent} from "./pages/survey-management/survey-management.component";
+import {WithPermissionGuard} from "./guard/with-permission.guard";
 
 const routes: Routes = [{
   path: '',
@@ -62,6 +65,14 @@ const routes: Routes = [{
   path: 'following',
   component: FollowingComponent,
   canActivate: [AuthenticatedGuard]
+},{
+  path: 'survey',
+  component: PollComponent,
+},{
+  path: 'survey-management',
+  component: SurveyManagementComponent,
+  canActivate: [WithPermissionGuard],
+  data: { permissionsRequired: ['poll_viewer'] }
 }];
 
 @NgModule({

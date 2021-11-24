@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/felixge/httpsnoop"
@@ -17,13 +18,14 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 
-	"github.com/swaggo/http-swagger"
 	_ "github.com/Harrison-Miller/kagstats/api/docs"
+	"github.com/swaggo/http-swagger"
 )
 
 var db *sqlx.DB
 var config configs.Config
 var version string
+var prod bool
 
 func LogHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -94,6 +96,12 @@ func main() {
 		AUTH_SECRET = value
 	}
 
+	if value, ok := os.LookupEnv("PROD"); ok {
+		if strings.ToLower(value) == "true" {
+			prod = true
+		}
+	}
+
 	version, _ = os.LookupEnv("VERSION")
 	log.Printf("KAG Stats  %s\n", version)
 
@@ -133,6 +141,7 @@ func main() {
 	ClanRoutes(r, protected)
 	AuthRoutes(r, protected)
 	FollowingRoutes(r, protected)
+	PollRoutes(r, protected)
 
 	r.Use(LogHandler)
 

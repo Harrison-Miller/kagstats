@@ -4,9 +4,10 @@ import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder } from '@angular/forms';
 import {PlayersService} from './services/players.service';
 import {AuthService} from './services/auth.service';
-import {PlayerClaims} from './models';
+import {PlayerClaims, Poll} from './models';
 import {Subject} from "rxjs";
 import { takeUntil } from 'rxjs/operators';
+import {PollService} from "./services/poll.service";
 
 @Component({
   selector: 'app-root',
@@ -14,6 +15,9 @@ import { takeUntil } from 'rxjs/operators';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnDestroy, OnInit{
+
+  poll: Poll;
+  pollCompleted: boolean;
 
   componentDestroyed$ = new Subject();
 
@@ -28,7 +32,8 @@ export class AppComponent implements OnDestroy, OnInit{
   constructor(public router: Router,
               private modalService: NgbModal,
               private formBuilder: FormBuilder,
-              private authService: AuthService) {}
+              private authService: AuthService,
+              private pollService: PollService) {}
 
   loginForm = this.formBuilder.group({
     username: '',
@@ -39,6 +44,12 @@ export class AppComponent implements OnDestroy, OnInit{
     this.authService.playerClaims.pipe(takeUntil(this.componentDestroyed$))
       .subscribe( value => {
         this.playerClaims = value;
+      });
+
+    this.pollService.pollCompleted().subscribe( resp => { this.pollCompleted = resp.completed; });
+    this.pollService.getCurrentPoll().subscribe(
+      poll => {
+        this.poll = poll;
       });
   }
 
