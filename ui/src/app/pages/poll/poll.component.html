@@ -1,6 +1,6 @@
 <ng-container *ngIf="poll; else noPoll">
   <h2 class="text-center">{{poll.name}}</h2>
-  <p class="text-center">{{poll.description}}</p>
+  <div [innerHTML]="poll.description"></div>
   <ng-container *ngIf="!playerClaims; else showPoll">
     <div class="alert alert-danger" role="alert">Login to participate in the survey</div>
   </ng-container>
