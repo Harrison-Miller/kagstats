@@ -6,7 +6,7 @@ ADD go.mod .
 ADD go.sum .
 ADD vendor/ ./vendor
 
-RUN go install github.com/swaggo/swag/cmd/swag@latest
+RUN go install github.com/swaggo/swag/cmd/swag@v1.8.7
 
 ADD common/ ./common
 ADD api/ ./api
