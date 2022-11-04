@@ -107,7 +107,7 @@ func generateCSV(poll models.Poll, answers map[int64]*answerSet) (io.Reader, int
 	b.WriteString("playerID,")
 	// questions
 	for _, question := range poll.Questions {
-		b.WriteString(question.Question + ",")
+		b.WriteString("\"" + question.Question + "\",")
 	}
 	// player stats
 	b.WriteString("ArcherKills,ArcherDeaths,BuilderKills,BuilderDeaths,KnightKills,KnightDeaths,TotalKills,TotalDeaths\n")
