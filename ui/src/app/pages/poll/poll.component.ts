@@ -31,7 +31,7 @@ export class PollComponent implements OnInit, OnDestroy {
       poll => {
         this.poll = poll;
         const controls = {};
-        for(var q of this.poll.questions) {
+        for (const q of this.poll.questions) {
           q.options_split = q.options.split(';');
           q.questionHash = Md5.hashStr(q.question);
           controls[q.questionHash] = '';
@@ -60,7 +60,7 @@ export class PollComponent implements OnInit, OnDestroy {
 
   validate() {
     this.formErrors = {};
-    for(var q of this.poll.questions) {
+    for (const q of this.poll.questions) {
       let value = this.pollForm.value[q.questionHash].trim();
       let isOther = false;
       if (value.includes('Other')) {
@@ -79,7 +79,7 @@ export class PollComponent implements OnInit, OnDestroy {
       }
     }
 
-    return Object.keys(this.formErrors).length
+    return Object.keys(this.formErrors).length;
   }
 
   onPollSubmit() {
@@ -89,10 +89,14 @@ export class PollComponent implements OnInit, OnDestroy {
     }
 
     const answers: PollAnswer[] = [];
-    for(var q of this.poll.questions) {
-      let value = this.pollForm.value[q.questionHash].trim();
+    for (const q of this.poll.questions) {
+      let value = this.pollForm.value[q.questionHash];
+      value = value === undefined ? '' : value.trim();
       if (value.includes('Other')) {
-        value = this.pollForm.value[q.questionHash + 'other'].trim();
+        const otherText = this.pollForm.value[q.questionHash + 'other'];
+        if (otherText !== undefined) {
+          value = otherText === undefined ? '' : otherText.trim();
+        }
       }
 
       const a = {} as PollAnswer;
