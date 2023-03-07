@@ -3,7 +3,9 @@ package httpSwagger
 import (
 	"html/template"
 	"net/http"
+	"path/filepath"
 	"regexp"
+	"sync"
 
 	swaggerFiles "github.com/swaggo/files"
 	"github.com/swaggo/swag"
@@ -14,11 +16,16 @@ var WrapHandler = Handler()
 
 // Config stores httpSwagger configuration variables.
 type Config struct {
-	//The url pointing to API definition (normally swagger.json or swagger.yaml). Default is `doc.json`.
-	URL          string
-	DeepLinking  bool
-	DocExpansion string
-	DomID        string
+	// The url pointing to API definition (normally swagger.json or swagger.yaml). Default is `doc.json`.
+	URL                  string
+	DeepLinking          bool
+	DocExpansion         string
+	DomID                string
+	PersistAuthorization bool
+	Plugins              []template.JS
+	UIConfig             map[template.JS]template.JS
+	BeforeScript         template.JS
+	AfterScript          template.JS
 }
 
 // URL presents the url pointing to API definition (normally swagger.json or swagger.yaml).
@@ -28,29 +35,76 @@ func URL(url string) func(c *Config) {
 	}
 }
 
-// DeepLinking true, false
+// DeepLinking true, false.
 func DeepLinking(deepLinking bool) func(c *Config) {
 	return func(c *Config) {
 		c.DeepLinking = deepLinking
 	}
 }
 
-// DocExpansion list, full, none
+// DocExpansion list, full, none.
 func DocExpansion(docExpansion string) func(c *Config) {
 	return func(c *Config) {
 		c.DocExpansion = docExpansion
 	}
 }
 
-// DomID #swagger-ui
+// DomID #swagger-ui.
 func DomID(domID string) func(c *Config) {
 	return func(c *Config) {
 		c.DomID = domID
 	}
 }
 
+// If set to true, it persists authorization data and it would not be lost on browser close/refresh
+// Defaults to false
+func PersistAuthorization(persistAuthorization bool) func(c *Config) {
+	return func(c *Config) {
+		c.PersistAuthorization = persistAuthorization
+	}
+}
+
+// Plugins specifies additional plugins to load into Swagger UI.
+func Plugins(plugins []string) func(c *Config) {
+	return func(c *Config) {
+		vs := make([]template.JS, len(plugins))
+		for i, v := range plugins {
+			vs[i] = template.JS(v)
+		}
+		c.Plugins = vs
+	}
+}
+
+// UIConfig specifies additional SwaggerUIBundle config object properties.
+func UIConfig(props map[string]string) func(c *Config) {
+	return func(c *Config) {
+		vs := make(map[template.JS]template.JS, len(props))
+		for k, v := range props {
+			vs[template.JS(k)] = template.JS(v)
+		}
+		c.UIConfig = vs
+	}
+}
+
+// BeforeScript holds JavaScript to be run right before the Swagger UI object is created.
+func BeforeScript(js string) func(c *Config) {
+	return func(c *Config) {
+		c.BeforeScript = template.JS(js)
+	}
+}
+
+// AfterScript holds JavaScript to be run right after the Swagger UI object is created
+// and set on the window.
+func AfterScript(js string) func(c *Config) {
+	return func(c *Config) {
+		c.AfterScript = template.JS(js)
+	}
+}
+
 // Handler wraps `http.Handler` into `http.HandlerFunc`.
 func Handler(configFns ...func(*Config)) http.HandlerFunc {
+	var once sync.Once
+
 	config := &Config{
 		URL:          "doc.json",
 		DeepLinking:  true,
@@ -61,36 +115,54 @@ func Handler(configFns ...func(*Config)) http.HandlerFunc {
 		configFn(config)
 	}
 
-	//create a template with name
+	// create a template with name
 	t := template.New("swagger_index.html")
 	index, _ := t.Parse(indexTempl)
 
 	var re = regexp.MustCompile(`^(.*/)([^?].*)?[?|.]*$`)
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
 		matches := re.FindStringSubmatch(r.RequestURI)
 		path := matches[2]
-		prefix := matches[1]
 
 		h := swaggerFiles.Handler
-		h.Prefix = prefix
+		once.Do(func() {
+			h.Prefix = matches[1]
+		})
+
+		switch filepath.Ext(path) {
+		case ".html":
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		case ".css":
+			w.Header().Set("Content-Type", "text/css; charset=utf-8")
+		case ".js":
+			w.Header().Set("Content-Type", "application/javascript")
+		case ".png":
+			w.Header().Set("Content-Type", "image/png")
+		case ".json":
+			w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		}
 
 		switch path {
 		case "index.html":
 			_ = index.Execute(w, config)
 		case "doc.json":
-			w.Header().Set("Content-Type", "application/json; charset=utf-8")
 			doc, err := swag.ReadDoc()
 			if err != nil {
-				panic(err)
+				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+
+				return
 			}
 			_, _ = w.Write([]byte(doc))
 		case "":
-			http.Redirect(w, r, prefix+"index.html", 301)
+			http.Redirect(w, r, h.Prefix+"index.html", http.StatusMovedPermanently)
 		default:
 			h.ServeHTTP(w, r)
 		}
-		return
 	}
 }
 
@@ -165,12 +237,16 @@ const indexTempl = `<!-- HTML for static distribution bundle build -->
 <script src="./swagger-ui-standalone-preset.js"> </script>
 <script>
 window.onload = function() {
+  {{- if .BeforeScript}}
+  {{.BeforeScript}}
+  {{- end}}
   // Build a system
   const ui = SwaggerUIBundle({
     url: "{{.URL}}",
     deepLinking: {{.DeepLinking}},
     docExpansion: "{{.DocExpansion}}",
     dom_id: "{{.DomID}}",
+    persistAuthorization: {{.PersistAuthorization}},
     validatorUrl: null,
     presets: [
       SwaggerUIBundle.presets.apis,
@@ -178,11 +254,20 @@ window.onload = function() {
     ],
     plugins: [
       SwaggerUIBundle.plugins.DownloadUrl
+      {{- range $plugin := .Plugins }},
+      {{$plugin}}
+      {{- end}}
     ],
+    {{- range $k, $v := .UIConfig}}
+    {{$k}}: {{$v}},
+    {{- end}}
     layout: "StandaloneLayout"
   })
 
   window.ui = ui
+  {{- if .AfterScript}}
+  {{.AfterScript}}
+  {{- end}}
 }
 </script>
 </body>
