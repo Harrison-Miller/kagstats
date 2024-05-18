@@ -144,6 +144,13 @@ func (d *SQLDatabase) InitDB() error {
 		return errors.Wrap(err, "error creating kills table")
 	}
 
+	_, err = d.db.Exec(`CREATE TABLE IF NOT EXISTS events (
+		ID INTEGER PRIMARY KEY AUTO_INCREMENT
+	)`)
+	if err != nil {
+		return errors.Wrap(err, "error creating events table")
+	}
+
 	_, err = d.db.Exec(`CREATE TABLE IF NOT EXISTS stats_info (
 		key_name VARCHAR(30) PRIMARY KEY,
 		value INT NOT NULL	
@@ -265,7 +272,6 @@ func (d *SQLDatabase) CommitPlayer(player *models.Player) error {
 		return errors.Wrap(err, "error starting transaction")
 	}
 	defer tx.Rollback()
-
 
 	_, err = tx.Exec("UPDATE players SET oldgold=?,registered=?,role=?,avatar=?,tier=? WHERE ID=?",
 		player.OldGold, player.Registered, player.Role, player.Avatar, player.Tier, player.ID)
