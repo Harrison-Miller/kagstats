@@ -501,17 +501,17 @@ func AddMapVotes(db *sqlx.DB) error {
 }
 
 func RemoveEvents(db *sqlx.DB) error {
-	err := DelFK("players", "players_ibfk_1", db)
-	if err != nil {
-		return err
-	}
+	// err := DelFK("players", "players_ibfk_1", db)
+	// if err != nil {
+	// 	return err
+	// }
 
-	err = DelColumn("players", "lastEventID", db)
-	if err != nil {
-		return err
-	}
+	// err = DelColumn("players", "lastEventID", db)
+	// if err != nil {
+	// 	return err
+	// }
 
-	_, err = db.Exec("DROP TABLE IF EXISTS events")
+	_, err := db.Exec("DROP TABLE IF EXISTS events")
 	if err != nil {
 		return err
 	}
@@ -521,15 +521,16 @@ func RemoveEvents(db *sqlx.DB) error {
 
 func RefreshPlayerInfo(db *sqlx.DB) error {
 	/*
-	players := []*models.Player{}
-	err := db.Select(&players, "SELECT * FROM players")
-	if err != nil {
-		return err
-	}
+	  players := []*models.Player{}
+	  err := db.Select(&players, "SELECT * FROM players")
+	  if err != nil {
+	    return err
+	  }
 
-	for _, player := range players {
-		updater.incoming <- *player
-	}*/
+	  for _, player := range players {
+	    updater.incoming <- *player
+	  }
+	*/
 	return nil
 }
 
