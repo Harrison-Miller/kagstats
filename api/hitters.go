@@ -17,48 +17,48 @@ type Hitter struct {
 }
 
 type HittersStats struct {
-	PlayerID int64 `json:"-" db:"playerID"`
+	PlayerID      int64 `json:"-" db:"playerID"`
 	models.Player `json:"player" db:"player,prefix=player."`
 
 	// hitters
-	Died int64 `json:"died"`
-	Crushing int64 `json:"crushing"`
-	Fall int64 `json:"fall"`
-	Water int64 `json:"water"`
-	WaterStun int64 `json:"water_stun" db:"water_stun"`
-	WaterStunForce int64 `json:"water_stun_force" db:"water_stun_force"`
-	Drowning int64 `json:"drowning"`
-	Fire int64 `json:"fire"`
-	Burn int64 `json:"burn"`
-	Flying int64 `json:"flying"`
-	Stomp int64 `json:"stomp"`
-	Suicide int64 `json:"suicide"`
-	Bite int64 `json:"bite"`
-	Pickaxe int64 `json:"pickaxe"`
-	Sword int64 `json:"sword"`
-	Shield int64 `json:"shield"`
-	Bomb int64 `json:"bomb"`
-	Stab int64 `json:"stab"`
-	Arrow int64 `json:"arrow"`
-	BombArrow int64 `json:"bomb_arrow" db:"bomb_arrow"`
-	BallistaBolt int64 `json:"ballista_bolt" db:"ballista_bolt"`
-	CatapultStones int64 `json:"catapult_stones" db:"catapult_stones"`
+	Died            int64 `json:"died"`
+	Crushing        int64 `json:"crushing"`
+	Fall            int64 `json:"fall"`
+	Water           int64 `json:"water"`
+	WaterStun       int64 `json:"water_stun" db:"water_stun"`
+	WaterStunForce  int64 `json:"water_stun_force" db:"water_stun_force"`
+	Drowning        int64 `json:"drowning"`
+	Fire            int64 `json:"fire"`
+	Burn            int64 `json:"burn"`
+	Flying          int64 `json:"flying"`
+	Stomp           int64 `json:"stomp"`
+	Suicide         int64 `json:"suicide"`
+	Bite            int64 `json:"bite"`
+	Pickaxe         int64 `json:"pickaxe"`
+	Sword           int64 `json:"sword"`
+	Shield          int64 `json:"shield"`
+	Bomb            int64 `json:"bomb"`
+	Stab            int64 `json:"stab"`
+	Arrow           int64 `json:"arrow"`
+	BombArrow       int64 `json:"bomb_arrow" db:"bomb_arrow"`
+	BallistaBolt    int64 `json:"ballista_bolt" db:"ballista_bolt"`
+	CatapultStones  int64 `json:"catapult_stones" db:"catapult_stones"`
 	CatapultBoulder int64 `json:"catapult_boulder" db:"catapult_boulder"`
-	Boulder int64 `json:"boulder"`
-	Ram int64 `json:"ram"`
-	Explosion int64 `json:"explosion"`
-	Keg int64 `json:"keg"`
-	Mine int64 `json:"mine"`
-	MineSpecial int64 `json:"mine_special" db:"mine_special"`
-	Spikes int64 `json:"spikes"`
-	Saw int64 `json:"saw"`
-	Drill int64 `json:"drill"`
-	Muscles int64 `json:"muscles"`
-	SuddenGib int64 `json:"sudden_gib" db:"sudden_gib"`
+	Boulder         int64 `json:"boulder"`
+	Ram             int64 `json:"ram"`
+	Explosion       int64 `json:"explosion"`
+	Keg             int64 `json:"keg"`
+	Mine            int64 `json:"mine"`
+	MineSpecial     int64 `json:"mine_special" db:"mine_special"`
+	Spikes          int64 `json:"spikes"`
+	Saw             int64 `json:"saw"`
+	Drill           int64 `json:"drill"`
+	Muscles         int64 `json:"muscles"`
+	SuddenGib       int64 `json:"sudden_gib" db:"sudden_gib"`
 }
 
 type MonthlyHittersStats struct {
-	Year int64 `json:"year"`
+	Year  int64 `json:"year"`
 	Month int64 `json:"month"`
 	HittersStats
 }
@@ -66,6 +66,7 @@ type MonthlyHittersStats struct {
 func HitterRoutes(r *mux.Router) {
 	r.HandleFunc("/players/{id:[0-9]+}/hitters", GetHitters).Methods("GET")
 	r.HandleFunc("/players/{id:[0-9]+}/hitters/monthly", GetMonthlyHitters).Methods("GET")
+	r.HandleFunc("/players/{id:[0-9]+}/year/{year:[0-9]+}/hitters", GetMonthlyHitters).Methods("GET")
 	r.HandleFunc("/leaderboard/monthly/hitter/{id:[0-9]+}", GetMonthlyHitterLeaderboard).Methods("GET")
 }
 
@@ -115,6 +116,13 @@ func GetHitters(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// GetMonthlyHitters godoc
+// @Tags Players
+// @Summary returns the last 12 monthly hitter stats for a given player
+// @Produce json
+// @Param id path int true "PlayerID"
+// @Success 200 {object} HittersList
+// @Router /players/{id}/hitters/monthly [get]
 func GetMonthlyHitters(w http.ResponseWriter, r *http.Request) {
 	playerID, err := GetIntURLArg("id", r)
 	if err != nil {
@@ -133,12 +141,44 @@ func GetMonthlyHitters(w http.ResponseWriter, r *http.Request) {
 	JSONResponse(w, &stats)
 }
 
+// GetHittersForYear godoc
+// @Tags Players
+// @Summary returns all monthly hitter stats for a given year and given player
+// @Produce json
+// @Param id path int true "PlayerID"
+// @Param year path int true "Year"
+// @Success 200 {object} HittersList
+// @Router /players/{id}/year/{year}/hitters [get]
+func GetHittersForYear(w http.ResponseWriter, r *http.Request) {
+	playerID, err := GetIntURLArg("id", r)
+	if err != nil {
+		http.Error(w, "could not get id", http.StatusBadRequest)
+		return
+	}
+
+	year, err := GetIntURLArg("year", r)
+	if err != nil {
+		http.Error(w, "could not get year", http.StatusBadRequest)
+		return
+	}
+
+	var stats []MonthlyHittersStats
+	err = db.Select(&stats, `SELECT * FROM monthly_hitters WHERE playerID=? AND year=? ORDER BY monthly_hitters.month DESC LIMIT 12`, playerID, year)
+	if err != nil {
+		log.Printf("Could not find hitters for player: %v\n", err)
+		http.Error(w, "Could not find hitters for player", http.StatusInternalServerError)
+		return
+	}
+
+	JSONResponse(w, &stats)
+}
+
 type MonthlyHittersLeaderboardList struct {
-	Size int `json:"size"`
-	Year int `json:"year"`
-	Month int `json:"month"`
-	Hitter int `json:"hitter"`
-	HitterName string `json:"hitterName"`
+	Size        int                   `json:"size"`
+	Year        int                   `json:"year"`
+	Month       int                   `json:"month"`
+	Hitter      int                   `json:"hitter"`
+	HitterName  string                `json:"hitterName"`
 	Leaderboard []MonthlyHittersStats `json:"leaderboard"`
 }
 
@@ -165,7 +205,7 @@ func GetMonthlyHitterLeaderboard(w http.ResponseWriter, r *http.Request) {
 		FROM monthly_hitters
 		INNER JOIN players as p ON monthly_hitters.playerID=p.ID 
 		LEFT JOIN clan_info as c ON p.clanID=c.ID 
-		WHERE NOT p.monthlyLeaderboardBan AND NOT p.statsBan AND monthly_hitters.year=? AND monthly_hitters.month=? ORDER BY monthly_hitters.` + hitterName + ` DESC LIMIT 20`, year, month)
+		WHERE NOT p.monthlyLeaderboardBan AND NOT p.statsBan AND monthly_hitters.year=? AND monthly_hitters.month=? ORDER BY monthly_hitters.`+hitterName+` DESC LIMIT 20`, year, month)
 	if err != nil {
 		leaderboardError(w, err)
 		return

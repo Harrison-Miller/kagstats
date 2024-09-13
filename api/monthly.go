@@ -134,6 +134,7 @@ func GetMonthlyKnightLeaderBoard(w http.ResponseWriter, r *http.Request) {
 // @Tags Players
 // @Summary returns the the last 12 monthly stats objects for a given player
 // @Produce json
+// @Param id path int true "Player ID"
 // @Success 200 {object} MonthlyStats
 // @Router /players/{id}/monthly [get]
 func GetMonthlyStats(w http.ResponseWriter, r *http.Request) {
@@ -157,6 +158,8 @@ func GetMonthlyStats(w http.ResponseWriter, r *http.Request) {
 // @Tags Players
 // @Summary returns all monthly stats for a given year and given player
 // @Produce json
+// @Param id path int true "Player ID"
+// @Param year path int true "Year"
 // @Success 200 {object} MonthlyStats
 // @Router /players/{id}/year/{year} [get]
 func GetStatsForYear(w http.ResponseWriter, r *http.Request) {
@@ -173,7 +176,7 @@ func GetStatsForYear(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var stats []MonthlyStats
-	err = db.Select(&stats, monthlyQuery+`WHERE p.ID=? year=? ORDER BY monthly_stats.month DESC`, playerID, year)
+	err = db.Select(&stats, monthlyQuery+`WHERE p.ID=? AND year=? ORDER BY monthly_stats.month DESC`, playerID, year)
 	if err != nil {
 		playerNotFoundError(w, err)
 		return
