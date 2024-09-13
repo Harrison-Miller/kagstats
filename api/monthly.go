@@ -29,6 +29,7 @@ func MonthlyStatsRoutes(r *mux.Router) {
 	r.HandleFunc("/leaderboard/monthly/knight", GetMonthlyKnightLeaderBoard).Methods("GET")
 
 	r.HandleFunc("/players/{id:[0-9]+}/monthly", GetMonthlyStats).Methods("GET")
+	r.HandleFunc("/players/{id:[0-9]+}/year/{year:[0-9]+}", GetStatsForYear).Methods("GET")
 }
 
 func getYearMonth(r *http.Request) (int, int) {
@@ -129,6 +130,12 @@ func GetMonthlyKnightLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// GetMonthlyStats godoc
+// @Tags Players
+// @Summary returns the the last 12 monthly stats objects for a given player
+// @Produce json
+// @Success 200 {object} MonthlyStats
+// @Router /players/{id}/monthly [get]
 func GetMonthlyStats(w http.ResponseWriter, r *http.Request) {
 	playerID, err := GetIntURLArg("id", r)
 	if err != nil {
@@ -137,7 +144,36 @@ func GetMonthlyStats(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var stats []MonthlyStats
-	err = db.Select(&stats, monthlyQuery +`WHERE p.ID=? ORDER BY monthly_stats.year DESC LIMIT 12`, playerID)
+	err = db.Select(&stats, monthlyQuery+`WHERE p.ID=? ORDER BY monthly_stats.year DESC LIMIT 12`, playerID)
+	if err != nil {
+		playerNotFoundError(w, err)
+		return
+	}
+
+	JSONResponse(w, &stats)
+}
+
+// GetStatsForYear godoc
+// @Tags Players
+// @Summary returns all monthly stats for a given year and given player
+// @Produce json
+// @Success 200 {object} MonthlyStats
+// @Router /players/{id}/year/{year} [get]
+func GetStatsForYear(w http.ResponseWriter, r *http.Request) {
+	playerID, err := GetIntURLArg("id", r)
+	if err != nil {
+		http.Error(w, "could not get id", http.StatusBadRequest)
+		return
+	}
+
+	year, err := GetIntURLArg("year", r)
+	if err != nil {
+		http.Error(w, "could not get year", http.StatusBadRequest)
+		return
+	}
+
+	var stats []MonthlyStats
+	err = db.Select(&stats, monthlyQuery+`WHERE p.ID=? year=? ORDER BY monthly_stats.month DESC`, playerID, year)
 	if err != nil {
 		playerNotFoundError(w, err)
 		return
