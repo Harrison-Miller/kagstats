@@ -2,12 +2,13 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/Harrison-Miller/kagstats/common/models"
-	"github.com/Harrison-Miller/kagstats/common/utils"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/Harrison-Miller/kagstats/common/models"
+	"github.com/Harrison-Miller/kagstats/common/utils"
+	"github.com/gorilla/mux"
 )
 
 type RegisterClanReq struct {
@@ -104,7 +105,7 @@ func GetClan(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var clan models.ClanInfo
-	err = db.Get(&clan, "SELECT c.*, " + leadersAs + " FROM clan_info as c INNER JOIN players as l ON leaderID=l.ID WHERE c.ID=? AND c.banned=false", clanID)
+	err = db.Get(&clan, "SELECT c.*, "+leadersAs+" FROM clan_info as c INNER JOIN players as l ON leaderID=l.ID WHERE c.ID=? AND c.banned=false", clanID)
 	if err != nil {
 		clanError(w, err)
 		return
@@ -195,7 +196,7 @@ func InviteMember(w http.ResponseWriter, r *http.Request) {
 	err = db.Get(&player, "SELECT * FROM players WHERE username=?", req.Username)
 	if err != nil {
 		log.Printf("could not find player\n")
-		http.Error(w,"could not find player", http.StatusBadRequest)
+		http.Error(w, "could not find player", http.StatusBadRequest)
 		return
 	}
 
@@ -235,7 +236,7 @@ func GetClanInvites(w http.ResponseWriter, r *http.Request) {
 	}
 
 	invites := []models.ClanInvite{}
-	err = db.Select(&invites, `SELECT clan_invites.*, ` + playersAs + ` FROM clan_invites INNER JOIN players as p ON playerID=p.ID WHERE clan_invites.clanID=?`, clanID)
+	err = db.Select(&invites, `SELECT clan_invites.*, `+playersAs+` FROM clan_invites INNER JOIN players as p ON playerID=p.ID WHERE clan_invites.clanID=?`, clanID)
 	if err != nil {
 		log.Printf("Error getting clan invites: %s\n", err)
 		http.Error(w, "could not get clan invites", http.StatusInternalServerError)
@@ -284,7 +285,7 @@ func GetMyInvites(w http.ResponseWriter, r *http.Request) {
 	claims, _ := GetClaims(r)
 
 	invites := []models.ClanInvite{}
-	err := db.Select(&invites, `SELECT clan_invites.*, ` + clansAs + "," + leadersAs + ` FROM clan_invites INNER JOIN clan_info as c ON clanID=c.ID INNER JOIN players as l ON leaderID=l.ID WHERE clan_invites.playerID=?`, claims.PlayerID)
+	err := db.Select(&invites, `SELECT clan_invites.*, `+clansAs+","+leadersAs+` FROM clan_invites INNER JOIN clan_info as c ON clanID=c.ID INNER JOIN players as l ON leaderID=l.ID WHERE clan_invites.playerID=?`, claims.PlayerID)
 	if err != nil {
 		log.Printf("Error getting clan invites: %s\n", err)
 		http.Error(w, "could not get clan invites", http.StatusInternalServerError)
@@ -365,7 +366,7 @@ func GetMembers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	members := []BasicStats{}
-	err = db.Select(&members, basicQuery + "WHERE clanID=?", clanID)
+	err = db.Select(&members, basicQuery+"WHERE clanID=?", clanID)
 
 	JSONResponse(w, &members)
 }
@@ -423,7 +424,7 @@ func LeaveClan(w http.ResponseWriter, r *http.Request) {
 
 func GetClans(w http.ResponseWriter, r *http.Request) {
 	clans := []models.ClanInfo{}
-	err := db.Select(&clans, "SELECT (SELECT COUNT(id) FROM players WHERE clanID=c.ID) as membersCount, c.*, " + leadersAs + " FROM clan_info as c JOIN players AS l ON c.leaderID=l.ID")
+	err := db.Select(&clans, "SELECT (SELECT COUNT(id) FROM players WHERE clanID=c.ID) as membersCount, c.*, "+leadersAs+" FROM clan_info as c JOIN players AS l ON c.leaderID=l.ID ORDER BY membersCount DESC")
 	if err != nil {
 		clanError(w, err)
 		return
